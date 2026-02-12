@@ -1,10 +1,9 @@
 import { html } from "../shared/lit.js";
-import { defineTutorialLitHost } from "../shared/tutorial-lit-host.js";
+import { defineTutorialApp } from "../shared/tutorial-app.js";
 
-defineTutorialLitHost({
-    tagName: "dsu-tutorial-app",
-    runtimeModulePath: new URL("./app-runtime.js", import.meta.url).href,
-    renderTemplate: () => html`
+defineTutorialApp(import.meta.url, {
+  tutorialId: "dsu",
+  renderTemplate: () => html`
     <div class="bg-shape shape-a"></div>
     <div class="bg-shape shape-b"></div>
 

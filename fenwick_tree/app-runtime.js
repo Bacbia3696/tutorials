@@ -354,7 +354,6 @@ function renderJumpTimeline(activeIndex = null, opType = elements.opType.value, 
     const x = leftPad + idx * gap;
 
     if (idx < sequence.length - 1) {
-      const next = sequence[idx + 1];
       const nextX = leftPad + (idx + 1) * gap;
       const edge = createSvgElement("line", {
         class: "jump-edge",

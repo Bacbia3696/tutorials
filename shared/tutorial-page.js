@@ -64,11 +64,6 @@ function ensureHostElement(tagName) {
 }
 
 function loadTutorialEntry(moduleEntryPath) {
-  if (typeof window.loadTutorialModule === "function") {
-    window.loadTutorialModule(moduleEntryPath);
-    return;
-  }
-
   const script = document.createElement("script");
   script.type = "module";
   script.src = toVersionedUrl(moduleEntryPath);

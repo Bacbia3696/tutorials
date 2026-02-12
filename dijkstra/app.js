@@ -1,9 +1,8 @@
 import { html } from "../shared/lit.js";
-import { defineTutorialLitHost } from "../shared/tutorial-lit-host.js";
+import { defineTutorialApp } from "../shared/tutorial-app.js";
 
-defineTutorialLitHost({
-  tagName: "dijkstra-tutorial-app",
-  runtimeModulePath: new URL("./app-runtime.js", import.meta.url).href,
+defineTutorialApp(import.meta.url, {
+  tutorialId: "dijkstra",
   renderTemplate: () => html`
     <div class="bg-beam beam-a"></div>
     <div class="bg-beam beam-b"></div>

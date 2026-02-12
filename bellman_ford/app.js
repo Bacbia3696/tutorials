@@ -1,9 +1,8 @@
 import { html } from "../shared/lit.js";
-import { defineTutorialLitHost } from "../shared/tutorial-lit-host.js";
+import { defineTutorialApp } from "../shared/tutorial-app.js";
 
-defineTutorialLitHost({
-  tagName: "bellman-ford-tutorial-app",
-  runtimeModulePath: new URL("./app-runtime.js", import.meta.url).href,
+defineTutorialApp(import.meta.url, {
+  tutorialId: "bellman_ford",
   renderTemplate: () => html`
     <div class="bg-blur blur-a"></div>
     <div class="bg-blur blur-b"></div>

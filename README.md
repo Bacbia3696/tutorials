@@ -11,7 +11,8 @@ Interactive, browser-based labs for learning core data structures and graph algo
 - `topological_sort/`: Kahn's algorithm tracing for queue/indegree/order evolution
 
 Each tutorial is a standalone HTML/CSS/JS module and reuses shared runtime utilities from `shared/`.
-Tutorial page metadata + shell bootstrap are centralized in `shared/tutorial-registry.js` and `shared/tutorial-page.js`.
+Tutorial metadata is centralized in `shared/tutorial-registry.js`.
+Tutorial page shell bootstrap lives in `shared/tutorial-page.js`, landing cards are rendered by `shared/landing-page.js`, and tutorial app host wiring is centralized in `shared/tutorial-app.js`.
 All tutorials are mounted through Lit custom elements in `app.js`, and algorithm/runtime logic lives in `app-runtime.js`.
 
 ## Run Locally
@@ -55,7 +56,7 @@ Then open `http://localhost:4173/` for the landing page, or navigate directly to
 
 ## Repository Layout
 
-- `index.html`: landing page linking to every tutorial
+- `index.html`: landing page skeleton rendered from `shared/tutorial-registry.js` via `shared/landing-page.js`
 - `trie/`, `segment_tree/`, `sparse_segment_tree/`, `fenwick_tree/`, `dsu/`, `dijkstra/`, `bellman_ford/`, `topological_sort/`
   - `index.html`: minimal page stub that delegates bootstrapping to `shared/tutorial-page.js`
   - `styles.css`: module-specific theme and layout
@@ -63,9 +64,10 @@ Then open `http://localhost:4173/` for the landing page, or navigate directly to
   - `app-runtime.js`: algorithm tracer + UI wiring
 - `shared/tutorial-core.js`: common operation runner, logger, shortcuts, code highlighter
 - `shared/tutorial-bootstrap.js`: common runner-control bindings and debounced resize wiring
-- `shared/cache-bust.js`: shared dev cache-busting loader for local CSS/JS assets
-- `shared/tutorial-registry.js`: centralized tutorial metadata (title/description/font/tag/route)
+- `shared/tutorial-registry.js`: centralized tutorial metadata (routing, page bootstrap, landing-card content)
 - `shared/tutorial-page.js`: shared per-tutorial page bootstrap (head assets + host mount + module load)
+- `shared/landing-page.js`: shared landing-page card renderer driven by `shared/tutorial-registry.js`
+- `shared/tutorial-app.js`: shared tutorial-app bootstrap helper that binds registry `tagName` + runtime module loading
 - `shared/tutorial-lit-host.js`: shared Lit host wrapper for runtime bootstrap and cache-busted dynamic import
 - `shared/graph-core.js`: shared SVG graph geometry/math helpers for graph tutorials
 - `shared/graph-renderer.js`: shared SVG graph rendering helpers (canvas prep, edges, nodes, arrow markers)

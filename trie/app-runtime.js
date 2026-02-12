@@ -460,8 +460,6 @@ function renderTree(snapshot, activeNodeId = null) {
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.setAttribute("preserveAspectRatio", "none");
 
-  const nodeMap = new Map(snapshot.nodes.map((node) => [node.id, node]));
-
   for (const node of snapshot.nodes) {
     const from = coords.get(node.id);
     for (const childId of node.children) {

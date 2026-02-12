@@ -1,9 +1,8 @@
 import { html } from "../shared/lit.js";
-import { defineTutorialLitHost } from "../shared/tutorial-lit-host.js";
+import { defineTutorialApp } from "../shared/tutorial-app.js";
 
-defineTutorialLitHost({
-  tagName: "topological-sort-tutorial-app",
-  runtimeModulePath: new URL("./app-runtime.js", import.meta.url).href,
+defineTutorialApp(import.meta.url, {
+  tutorialId: "topological_sort",
   renderTemplate: () => html`
     <div class="bg-net net-a"></div>
     <div class="bg-net net-b"></div>

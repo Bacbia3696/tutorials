@@ -9,9 +9,10 @@ Reusable module for all algorithm tutorials in this repo.
 - `shared/tutorial-lit-host.js`
 - `shared/tutorial-base.css`
 - `shared/lit.js`
-- `shared/cache-bust.js`
 - `shared/tutorial-registry.js`
 - `shared/tutorial-page.js`
+- `shared/landing-page.js`
+- `shared/tutorial-app.js`
 - `shared/graph-core.js`
 - `shared/graph-renderer.js`
 - `shared/graph-input.js`
@@ -33,14 +34,18 @@ Reusable module for all algorithm tutorials in this repo.
   - Shared wiring for animate/step/instant/finish controls, speed slider, clear-log action, and keyboard shortcuts.
 - `bindDebouncedResize(...)` (`tutorial-bootstrap.js`)
   - Shared debounced `resize` listener binding used by tree-based tutorials.
-- `cache-bust.js`
-  - Shared dev helper to append cache-busting query params to local tutorial CSS and JS files.
-  - Exposes `window.loadTutorialModule("./app.js")` for no-stale script loading.
 - `tutorial-registry.js`
-  - Centralized metadata for each tutorial page (title, description, font URL, host tag, route, module entry).
+  - Centralized metadata for each tutorial (page shell + landing card).
+  - Includes route, title/description, font URL, host tag, module entry, category, and landing tags/text.
 - `tutorial-page.js`
   - Shared page bootstrap for all tutorial `index.html` files.
   - Applies page metadata, shared + local styles, mounts the tutorial host tag, and loads `app.js`.
+- `landing-page.js`
+  - Renders landing cards from `tutorial-registry.js` into category grids.
+  - Keeps tutorial listing in sync without duplicating card content in `index.html`.
+- `tutorial-app.js`
+  - Shared tutorial `app.js` bootstrap helper.
+  - Resolves host `tagName` from registry and `app-runtime.js` path from `import.meta.url`.
 - `tutorial-lit-host.js`
   - Shared Lit host wrapper that mounts light-DOM templates and lazy-loads `app-runtime.js`.
   - Replaces repeated custom-element bootstrap boilerplate across tutorials.
@@ -75,19 +80,17 @@ Reusable module for all algorithm tutorials in this repo.
 1. Use the shared tutorial page bootstrap in HTML:
 
 ```html
-<script src="../shared/cache-bust.js"></script>
 <script type="module" src="../shared/tutorial-page.js" data-tutorial="trie"></script>
 ```
 
-2. Define the Lit host in `app.js`:
+2. Define the tutorial app shell in `app.js`:
 
 ```js
 import { html } from "../shared/lit.js";
-import { defineTutorialLitHost } from "../shared/tutorial-lit-host.js";
+import { defineTutorialApp } from "../shared/tutorial-app.js";
 
-defineTutorialLitHost({
-  tagName: "your-tutorial-app",
-  runtimeModulePath: "./app-runtime.js",
+defineTutorialApp(import.meta.url, {
+  tutorialId: "trie",
   renderTemplate: () => html`<main class="layout">...</main>`,
 });
 ```

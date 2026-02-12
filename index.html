@@ -353,121 +353,13 @@
         <div class="section-header">
             <h2>Data Structures</h2>
         </div>
-        <div class="grid">
-            <a href="trie/" class="card" data-category="ds">
-                <span class="card-badge">Data Structure</span>
-                <span class="card-arrow">↗</span>
-                <h3>Trie</h3>
-                <p class="desc">
-                    Insert, search, prefix-check, and delete words in a prefix tree.
-                    Watch nodes appear and edges light up as each character is
-                    consumed.
-                </p>
-                <div class="card-tags">
-                    <span>insert</span><span>search</span><span>prefix</span><span>delete</span>
-                </div>
-            </a>
-
-            <a href="segment_tree/" class="card" data-category="ds">
-                <span class="card-badge">Data Structure</span>
-                <span class="card-arrow">↗</span>
-                <h3>Segment Tree + Lazy Propagation</h3>
-                <p class="desc">
-                    Range updates and range queries on an array backed by a segment
-                    tree. See how lazy values propagate down through the tree.
-                </p>
-                <div class="card-tags">
-                    <span>range-add</span><span>range-query</span><span>lazy-propagation</span>
-                </div>
-            </a>
-
-            <a href="sparse_segment_tree/" class="card" data-category="ds">
-                <span class="card-badge">Data Structure</span>
-                <span class="card-arrow">↗</span>
-                <h3>Sparse Segment Tree</h3>
-                <p class="desc">
-                    Dynamic segment tree for huge index spaces. Nodes are created lazily only along touched paths,
-                    so untouched ranges consume zero extra memory.
-                </p>
-                <div class="card-tags">
-                    <span>dynamic-nodes</span><span>point-update</span><span>range-query</span>
-                </div>
-            </a>
-
-            <a href="fenwick_tree/" class="card" data-category="ds">
-                <span class="card-badge">Data Structure</span>
-                <span class="card-arrow">↗</span>
-                <h3>Fenwick Tree (BIT)</h3>
-                <p class="desc">
-                    Point updates, prefix sums, and range queries. Follow the lowbit
-                    jumps through the coverage map and the binary index timeline.
-                </p>
-                <div class="card-tags">
-                    <span>point-update</span><span>prefix-sum</span><span>range-query</span>
-                </div>
-            </a>
-
-            <a href="dsu/" class="card" data-category="ds">
-                <span class="card-badge">Data Structure</span>
-                <span class="card-arrow">↗</span>
-                <h3>Disjoint Set Union (Union-Find)</h3>
-                <p class="desc">
-                    Merge sets and find representatives with path compression and
-                    union by rank. Watch the forest of trees evolve as elements
-                    are connected.
-                </p>
-                <div class="card-tags">
-                    <span>union</span><span>find</span><span>path-compression</span><span>union-by-rank</span>
-                </div>
-            </a>
-        </div>
+        <div id="dsGrid" class="grid"></div>
 
         <!-- Graph Algorithms -->
         <div class="section-header">
             <h2>Graph Algorithms</h2>
         </div>
-        <div class="grid">
-            <a href="dijkstra/" class="card" data-category="graph">
-                <span class="card-badge">Graph Algorithm</span>
-                <span class="card-arrow">↗</span>
-                <h3>Dijkstra's Algorithm</h3>
-                <p class="desc">
-                    Find shortest paths in weighted graphs with non-negative edges.
-                    Watch the priority queue, edge relaxation, and distance table
-                    update in real time.
-                </p>
-                <div class="card-tags">
-                    <span>shortest-path</span><span>priority-queue</span><span>relaxation</span>
-                </div>
-            </a>
-
-            <a href="bellman_ford/" class="card" data-category="graph">
-                <span class="card-badge">Graph Algorithm</span>
-                <span class="card-arrow">↗</span>
-                <h3>Bellman-Ford</h3>
-                <p class="desc">
-                    Shortest paths with negative-weight edges. Trace each relaxation
-                    pass across every edge and see negative-cycle detection
-                    in action.
-                </p>
-                <div class="card-tags">
-                    <span>shortest-path</span><span>negative-weights</span><span>cycle-detection</span>
-                </div>
-            </a>
-
-            <a href="topological_sort/" class="card" data-category="graph">
-                <span class="card-badge">Graph Algorithm</span>
-                <span class="card-arrow">↗</span>
-                <h3>Topological Sort</h3>
-                <p class="desc">
-                    Order a directed acyclic graph with Kahn's algorithm. Watch the
-                    indegree table, the BFS queue, and the output ordering evolve.
-                </p>
-                <div class="card-tags">
-                    <span>kahn's</span><span>indegree</span><span>DAG</span>
-                </div>
-            </a>
-        </div>
+        <div id="graphGrid" class="grid"></div>
 
         <!-- Footer -->
         <footer class="footer">
@@ -480,6 +372,7 @@
             </p>
         </footer>
     </div>
+    <script type="module" src="./shared/landing-page.js"></script>
 </body>
 
 </html>
