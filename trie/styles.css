@@ -28,6 +28,10 @@
   --kbd-border: 1px solid var(--edge);
 }
 
+trie-tutorial-app {
+  display: block;
+}
+
 .bg-shape {
   position: fixed;
   width: 260px;

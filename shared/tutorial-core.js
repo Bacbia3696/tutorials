@@ -172,6 +172,14 @@ export function createOperationRunner({
     }
   };
 
+  /**
+   * Skip to the last pending event and finalize immediately.
+   *
+   * IMPORTANT CONTRACT: This applies only the **last** event, skipping all
+   * intermediate ones. Each event must therefore carry a complete, self-
+   * contained snapshot of algorithm state — not an incremental delta — so
+   * that jumping to the final event produces the correct end-state.
+   */
   const finishCurrent = () => {
     if (!pendingMeta) {
       onNoPending?.();

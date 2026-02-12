@@ -1,182 +1,27 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Topological Sort Tutorial Lab</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="../shared/tutorial-base.css" data-cache-bust="1" />
-    <link rel="stylesheet" href="styles.css" data-cache-bust="1" />
-    <script src="../shared/cache-bust.js"></script>
-  </head>
-  <body>
-    <div class="bg-net net-a"></div>
-    <div class="bg-net net-b"></div>
 
-    <main class="layout">
-      <header class="panel hero">
-        <p class="eyebrow">Directed Acyclic Graphs</p>
-        <h1>Topological Sort Tutorial Lab</h1>
-        <p>
-          Learn Kahn's algorithm by tracking indegrees and queue operations in real time. Each step
-          removes one zero-indegree node and updates its neighbors.
-        </p>
-      </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Topological Sort Tutorial Lab</title>
+  <meta name="description"
+    content="Interactive topological sort tutorial using Kahn's algorithm. Trace queue, indegree, and ordering evolution step-by-step." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/tutorial-base.css" data-cache-bust="1" />
+  <link rel="stylesheet" href="styles.css" data-cache-bust="1" />
+  <script src="../shared/cache-bust.js"></script>
+</head>
 
-      <section class="panel controls">
-        <div class="control-group">
-          <label for="nodesInput">Nodes (labels, comma/space separated, max 12)</label>
-          <div class="row">
-            <input id="nodesInput" type="text" value="A, B, C, D, E, F, G, H" />
-            <button id="loadGraphBtn" class="btn">Load Graph</button>
-            <button id="sampleGraphBtn" class="btn btn-muted">Sample DAG</button>
-            <button id="randomGraphBtn" class="btn btn-muted">Random</button>
-          </div>
-        </div>
+<body>
+  <topological-sort-tutorial-app></topological-sort-tutorial-app>
+  <script>
+    window.loadTutorialModule("./app.js");
+  </script>
+</body>
 
-        <div class="control-group">
-          <label for="edgesInput">
-            Directed edges (one per line): <code>FROM TO</code> (example: <code>A C</code>)
-          </label>
-          <textarea id="edgesInput" rows="7">A C
-A D
-B D
-B E
-C F
-D F
-D G
-E G
-F H
-G H</textarea>
-        </div>
-
-        <div class="row wrap">
-          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-          <button id="stepBtn" class="btn">Step</button>
-          <button id="instantBtn" class="btn">Apply Instantly</button>
-          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-
-          <div class="speed-wrap">
-            <label for="speedRange">Speed</label>
-            <input id="speedRange" type="range" min="120" max="1200" step="20" value="400" />
-            <span id="speedLabel">400 ms</span>
-          </div>
-        </div>
-
-        <p class="key-hint">
-          Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd> finish,
-          <kbd>L</kbd> load, <kbd>M</kbd> sample, <kbd>R</kbd> random.
-        </p>
-      </section>
-
-      <section class="panel process-view">
-        <h2>Process State</h2>
-
-        <div class="lane-wrap">
-          <div class="lane">
-            <h3>Queue (zero indegree)</h3>
-            <div id="queueStrip" class="queue-strip"></div>
-          </div>
-          <div class="lane">
-            <h3>Topological Order</h3>
-            <div id="orderStrip" class="order-strip"></div>
-          </div>
-        </div>
-
-        <div class="process-grid">
-          <div>
-            <h3>Graph Canvas</h3>
-            <div class="graph-canvas-wrap">
-              <svg id="graphCanvas" class="graph-canvas" viewBox="0 0 920 520" role="img" aria-label="Topological sort graph visualization"></svg>
-            </div>
-
-            <h3>Node In-Degrees</h3>
-            <div id="nodeCards" class="node-grid"></div>
-          </div>
-          <div>
-            <h3>Edges</h3>
-            <div class="edge-table-wrap">
-              <table class="edge-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Edge</th>
-                  </tr>
-                </thead>
-                <tbody id="edgeRows"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel status">
-        <div>
-          <h2>Status</h2>
-          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready.</p>
-        </div>
-        <div class="metrics">
-          <p><span class="metric-label">Processed Nodes:</span> <span id="processedMetric">0 / 0</span></p>
-          <p><span class="metric-label">Order Length:</span> <span id="orderMetric">0</span></p>
-          <p><span class="metric-label">Cycle Detected:</span> <span id="cycleMetric">No</span></p>
-          <p><span class="metric-label">Step:</span> <span id="stepCounter">0 / 0</span></p>
-        </div>
-      </section>
-
-      <section class="panel code-view">
-        <h2>Pseudocode Lens</h2>
-        <div class="code-grid">
-          <div class="code-panel" data-op="topo">
-            <h3>Kahn's Algorithm</h3>
-            <ol>
-              <li data-line="1">compute indegree for each node, enqueue all indegree-0 nodes</li>
-              <li data-line="2">while queue is not empty:</li>
-              <li data-line="3">u = pop front from queue</li>
-              <li data-line="4">append u to topological order</li>
-              <li data-line="5">for each edge (u, v):</li>
-              <li data-line="6">indegree[v] -= 1</li>
-              <li data-line="7">if indegree[v] == 0: enqueue v</li>
-              <li data-line="8">if order size &lt; n: cycle exists</li>
-              <li data-line="9">otherwise order is valid</li>
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel concept">
-        <h2>Core Idea</h2>
-        <div class="concept-grid">
-          <div class="concept-card">
-            <h3>In-degree Gate</h3>
-            <p>Only nodes with no remaining prerequisites can be taken next.</p>
-          </div>
-          <div class="concept-card">
-            <h3>Queue Dynamics</h3>
-            <p>Removing one node can unlock several downstream nodes.</p>
-          </div>
-          <div class="concept-card">
-            <h3>Cycle Signal</h3>
-            <p>If queue empties early, remaining nodes belong to at least one cycle.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel log-view">
-        <div class="row between">
-          <h2>Trace Log</h2>
-          <button id="clearLogBtn" class="btn btn-muted">Clear Log</button>
-        </div>
-        <div id="logOutput" class="log-output" role="log" aria-live="polite" aria-relevant="additions"></div>
-      </section>
-    </main>
-
-    <script>
-      window.loadTutorialModule("./app.js");
-    </script>
-  </body>
 </html>

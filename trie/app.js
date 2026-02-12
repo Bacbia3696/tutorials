@@ -1,734 +1,154 @@
-import {
-  createCodeHighlighter,
-  createLogger,
-  createOperationRunner,
-} from "../shared/tutorial-core.js";
-import {
-  bindDebouncedResize,
-  setupRunnerControls,
-} from "../shared/tutorial-bootstrap.js";
-
-class TrieNode {
-  constructor(id, char) {
-    this.id = id;
-    this.char = char;
-    this.children = new Map();
-    this.isEnd = false;
-  }
-}
-
-class TrieTracer {
-  constructor(words = []) {
-    this.root = new TrieNode(0, "");
-    this.nextId = 1;
-    this.words = new Set();
-
-    for (const word of words) {
-      this.insertInternal(word);
-    }
-  }
-
-  insertInternal(word) {
-    let node = this.root;
-    for (const ch of word) {
-      if (!node.children.has(ch)) {
-        const child = new TrieNode(this.nextId, ch);
-        this.nextId += 1;
-        node.children.set(ch, child);
-      }
-      node = node.children.get(ch);
-    }
-    node.isEnd = true;
-    this.words.add(word);
-  }
-
-  snapshot() {
-    const nodes = [];
-    const queue = [{ node: this.root, depth: 0 }];
-
-    while (queue.length > 0) {
-      const { node, depth } = queue.shift();
-      const children = [...node.children.values()].sort((a, b) => a.char.localeCompare(b.char));
-      nodes.push({
-        id: node.id,
-        char: node.char,
-        isEnd: node.isEnd,
-        depth,
-        children: children.map((child) => child.id),
-      });
-
-      for (const child of children) {
-        queue.push({ node: child, depth: depth + 1 });
-      }
-    }
-
-    return {
-      nodes,
-      nextId: this.nextId,
-      words: [...this.words].sort(),
-    };
-  }
-
-  generateInsert(word) {
-    const events = [];
-    const existedBefore = this.words.has(word);
-
-    const emit = (message, line, activeNodeId = null, extras = {}) => {
-      events.push({
-        opType: "insert",
-        message,
-        line,
-        activeNodeId,
-        snapshot: this.snapshot(),
-        ...extras,
-      });
-    };
-
-    let node = this.root;
-    emit(`Initialize at root for insert("${word}")`, 1, node.id);
-
-    for (const ch of word) {
-      emit(`Process char '${ch}'`, 2, node.id, { char: ch });
-
-      if (!node.children.has(ch)) {
-        const child = new TrieNode(this.nextId, ch);
-        this.nextId += 1;
-        node.children.set(ch, child);
-        emit(`Create node '${ch}' as child`, 3, child.id, { char: ch });
-      }
-
-      node = node.children.get(ch);
-      emit(`Move to child '${ch}'`, 4, node.id, { char: ch });
-    }
-
-    const alreadyEnd = node.isEnd;
-    node.isEnd = true;
-    this.words.add(word);
-    emit(
-      alreadyEnd
-        ? `Word already existed. End marker remains true.`
-        : `Mark end-of-word at last node`,
-      5,
-      node.id,
-      { done: true, existedBefore },
-    );
-
-    return { events, existedBefore };
-  }
-
-  generateSearch(word) {
-    const events = [];
-
-    const emit = (message, line, activeNodeId = null, extras = {}) => {
-      events.push({
-        opType: "search",
-        message,
-        line,
-        activeNodeId,
-        snapshot: this.snapshot(),
-        ...extras,
-      });
-    };
-
-    let node = this.root;
-    emit(`Initialize at root for search("${word}")`, 1, node.id);
-
-    for (const ch of word) {
-      emit(`Process char '${ch}'`, 2, node.id, { char: ch });
-
-      if (!node.children.has(ch)) {
-        emit(`Missing child '${ch}' => return false`, 3, node.id, {
-          done: true,
-          result: false,
-        });
-        return { events, result: false };
-      }
-
-      node = node.children.get(ch);
-      emit(`Move to child '${ch}'`, 4, node.id, { char: ch });
-    }
-
-    emit(`Reached end. Return node.isEnd = ${node.isEnd}`, 5, node.id, {
-      done: true,
-      result: node.isEnd,
-    });
-    return { events, result: node.isEnd };
-  }
-
-  generateStartsWith(prefix) {
-    const events = [];
-
-    const emit = (message, line, activeNodeId = null, extras = {}) => {
-      events.push({
-        opType: "prefix",
-        message,
-        line,
-        activeNodeId,
-        snapshot: this.snapshot(),
-        ...extras,
-      });
-    };
-
-    let node = this.root;
-    emit(`Initialize at root for startsWith("${prefix}")`, 1, node.id);
-
-    for (const ch of prefix) {
-      emit(`Process char '${ch}'`, 2, node.id, { char: ch });
-
-      if (!node.children.has(ch)) {
-        emit(`Missing child '${ch}' => return false`, 3, node.id, {
-          done: true,
-          result: false,
-        });
-        return { events, result: false };
-      }
-
-      node = node.children.get(ch);
-      emit(`Move to child '${ch}'`, 4, node.id, { char: ch });
-    }
-
-    emit(`All prefix chars found => return true`, 5, node.id, {
-      done: true,
-      result: true,
-    });
-    return { events, result: true };
-  }
-
-  generateDelete(word) {
-    const events = [];
-
-    const emit = (message, line, activeNodeId = null, extras = {}) => {
-      events.push({
-        opType: "delete",
-        message,
-        line,
-        activeNodeId,
-        snapshot: this.snapshot(),
-        ...extras,
-      });
-    };
-
-    let node = this.root;
-    const path = [];
-    emit(`Initialize at root for delete("${word}")`, 1, node.id);
-
-    for (const ch of word) {
-      emit(`Process char '${ch}' and walk down`, 2, node.id, { char: ch });
-
-      if (!node.children.has(ch)) {
-        emit(`Missing child '${ch}' => return false`, 3, node.id, {
-          done: true,
-          result: false,
-        });
-        return { events, result: false };
-      }
-
-      path.push({ parent: node, ch });
-      node = node.children.get(ch);
-      emit(`Move to child '${ch}'`, 2, node.id, { char: ch });
-    }
-
-    if (!node.isEnd) {
-      emit(`Path exists but node is not end-of-word => return false`, 4, node.id, {
-        done: true,
-        result: false,
-      });
-      return { events, result: false };
-    }
-
-    node.isEnd = false;
-    this.words.delete(word);
-    emit(`Unmark end-of-word at last node`, 5, node.id);
-
-    for (let i = path.length - 1; i >= 0; i -= 1) {
-      const { parent, ch } = path[i];
-      const child = parent.children.get(ch);
-
-      if (!child) {
-        continue;
-      }
-
-      const shouldPrune = child.children.size === 0 && !child.isEnd;
-      if (!shouldPrune) {
-        emit(`Stop pruning at '${ch}' (node still needed)`, 6, child.id, { char: ch });
-        break;
-      }
-
-      parent.children.delete(ch);
-      emit(`Prune empty node '${ch}'`, 6, parent.id, { char: ch });
-    }
-
-    emit(`Delete complete => return true`, 7, null, {
-      done: true,
-      result: true,
-    });
-    return { events, result: true };
-  }
-}
-
-const elements = {
-  initialWordsInput: document.getElementById("initialWordsInput"),
-  loadWordsBtn: document.getElementById("loadWordsBtn"),
-  sampleWordsBtn: document.getElementById("sampleWordsBtn"),
-  opType: document.getElementById("opType"),
-  wordInput: document.getElementById("wordInput"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  wordCount: document.getElementById("wordCount"),
-  nodeCount: document.getElementById("nodeCount"),
-  lastResult: document.getElementById("lastResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  treeContainer: document.getElementById("treeContainer"),
-  wordsList: document.getElementById("wordsList"),
-  logOutput: document.getElementById("logOutput"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-};
-
-const state = {
-  trie: null,
-  speedMs: Number(elements.speedRange.value),
-  lastResult: null,
-  lastTreeSnapshot: null,
-  lastActiveNodeId: null,
-};
-const logger = createLogger(elements.logOutput);
-const codeHighlighter = createCodeHighlighter(".code-panel");
-let operationRunner = null;
-
-function normalizeWord(raw) {
-  return raw.trim().toLowerCase();
-}
-
-function isValidWord(word) {
-  return /^[a-z]+$/.test(word);
-}
-
-function parseWordsInput(text) {
-  const tokens = text
-    .trim()
-    .split(/[\s,]+/)
-    .map((token) => normalizeWord(token))
-    .filter((token) => token.length > 0);
-
-  if (tokens.length === 0) {
-    return { error: "Please provide at least one word." };
-  }
-  if (tokens.length > 40) {
-    return { error: "Use at most 40 words." };
-  }
-
-  const unique = new Set();
-  for (const token of tokens) {
-    if (!isValidWord(token)) {
-      return { error: `Invalid token '${token}'. Use letters a-z only.` };
-    }
-    unique.add(token);
-  }
-
-  return { words: [...unique] };
-}
-
-function randomSampleWords() {
-  const bank = [
-    "cat",
-    "car",
-    "cart",
-    "care",
-    "dog",
-    "dot",
-    "dove",
-    "deal",
-    "deer",
-    "doom",
-    "sun",
-    "sand",
-    "song",
-    "soon",
-    "tea",
-    "team",
-    "tear",
-  ];
-
-  const chosen = [];
-  while (chosen.length < 8) {
-    const idx = Math.floor(Math.random() * bank.length);
-    const word = bank[idx];
-    if (!chosen.includes(word)) {
-      chosen.push(word);
-    }
-  }
-  return chosen;
-}
-
-function updateStatus(message) {
-  elements.statusMessage.textContent = message;
-}
-
-function appendLog(message, tone = "") {
-  logger.append(message, tone);
-}
-
-function clearCodeHighlights() {
-  codeHighlighter.clear();
-}
-
-function focusCodePanel(opType) {
-  codeHighlighter.focus(opType);
-}
-
-function highlightCode(opType, line) {
-  codeHighlighter.highlight(opType, line);
-}
-
-function renderWords(words) {
-  elements.wordsList.innerHTML = "";
-
-  if (!words || words.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "word-chip empty";
-    empty.textContent = "(empty dictionary)";
-    elements.wordsList.appendChild(empty);
-    return;
-  }
-
-  for (const word of words) {
-    const chip = document.createElement("div");
-    chip.className = "word-chip";
-    chip.textContent = word;
-    elements.wordsList.appendChild(chip);
-  }
-}
-
-function layoutTree(snapshot, containerWidth) {
-  const map = new Map(snapshot.nodes.map((node) => [node.id, node]));
-  const xUnits = new Map();
-  let leafCursor = 0;
-
-  const assign = (id) => {
-    const node = map.get(id);
-    const children = [...node.children]
-      .map((childId) => map.get(childId))
-      .filter(Boolean)
-      .sort((a, b) => a.char.localeCompare(b.char));
-
-    if (children.length === 0) {
-      xUnits.set(id, leafCursor);
-      leafCursor += 1;
-      return;
-    }
-
-    for (const child of children) {
-      assign(child.id);
-    }
-
-    const avg = children.reduce((acc, child) => acc + xUnits.get(child.id), 0) / children.length;
-    xUnits.set(id, avg);
-  };
-
-  assign(0);
-
-  const maxDepth = Math.max(...snapshot.nodes.map((node) => node.depth));
-  const leaves = Math.max(leafCursor, 1);
-  const sidePad = 46;
-  const minWidth = sidePad * 2 + Math.max(leaves - 1, 1) * 86;
-  const width = Math.max(containerWidth, minWidth);
-  const rowHeight = 98;
-  const topPad = 14;
-  const bottomPad = 16;
-  const height = topPad + bottomPad + (maxDepth + 1) * rowHeight;
-
-  const coords = new Map();
-  for (const node of snapshot.nodes) {
-    const unit = xUnits.get(node.id) ?? 0;
-    const x =
-      leaves <= 1
-        ? width / 2
-        : sidePad + (unit / (leaves - 1)) * (width - sidePad * 2);
-    const y = topPad + node.depth * rowHeight;
-    coords.set(node.id, { x, y });
-  }
-
-  return { coords, width, height };
-}
-
-function renderTree(snapshot, activeNodeId = null) {
-  state.lastTreeSnapshot = snapshot;
-  state.lastActiveNodeId = activeNodeId;
-  elements.treeContainer.innerHTML = "";
-
-  if (!snapshot || !snapshot.nodes || snapshot.nodes.length === 0) {
-    return;
-  }
-
-  const panelWidth = Math.max(elements.treeContainer.clientWidth - 6, 620);
-  const { coords, width, height } = layoutTree(snapshot, panelWidth);
-
-  const scroll = document.createElement("div");
-  scroll.className = "tree-scroll";
-
-  const diagram = document.createElement("div");
-  diagram.className = "tree-diagram";
-  diagram.style.width = `${width}px`;
-  diagram.style.height = `${height}px`;
-
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("class", "tree-links");
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svg.setAttribute("preserveAspectRatio", "none");
-
-  const nodeMap = new Map(snapshot.nodes.map((node) => [node.id, node]));
-
-  for (const node of snapshot.nodes) {
-    const from = coords.get(node.id);
-    for (const childId of node.children) {
-      const to = coords.get(childId);
-      if (!from || !to) {
-        continue;
-      }
-      const edge = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      edge.setAttribute("x1", String(from.x));
-      edge.setAttribute("y1", String(from.y + 30));
-      edge.setAttribute("x2", String(to.x));
-      edge.setAttribute("y2", String(to.y + 4));
-      edge.setAttribute("class", "tree-edge");
-      svg.appendChild(edge);
-    }
-  }
-
-  diagram.appendChild(svg);
-
-  const nodesOrdered = [...snapshot.nodes].sort((a, b) => a.depth - b.depth || a.id - b.id);
-  for (const node of nodesOrdered) {
-    const { x, y } = coords.get(node.id);
-    const card = document.createElement("div");
-    card.className = "trie-node";
-    if (node.isEnd) {
-      card.classList.add("end");
-    }
-    if (activeNodeId === node.id) {
-      card.classList.add("active");
-    }
-    card.style.left = `${x}px`;
-    card.style.top = `${y}px`;
-
-    const charLabel = node.id === 0 ? "ROOT" : node.char;
-    card.innerHTML = `
-      <div class="node-char ${node.id === 0 ? "root" : ""}">${charLabel}</div>
-      <span class="node-id">#${node.id}</span>
-      ${node.isEnd ? '<span class="end-flag">END</span>' : ""}
-    `;
-    diagram.appendChild(card);
-  }
-
-  scroll.appendChild(diagram);
-  elements.treeContainer.appendChild(scroll);
-}
-
-function rerenderTreeForResize() {
-  if (!state.lastTreeSnapshot) {
-    return;
-  }
-  renderTree(state.lastTreeSnapshot, state.lastActiveNodeId);
-}
-
-function updateMetrics(snapshot) {
-  const snap = snapshot || state.trie.snapshot();
-  elements.wordCount.textContent = String(snap.words.length);
-  elements.nodeCount.textContent = String(snap.nodes.length);
-  elements.lastResult.textContent = state.lastResult === null ? "-" : String(state.lastResult);
-  const step = operationRunner ? operationRunner.eventIndex : 0;
-  const total = operationRunner ? operationRunner.pendingLength : 0;
-  elements.stepCounter.textContent = `${step} / ${total}`;
-}
-
-function finalizePendingOperation(meta) {
-  if (Object.prototype.hasOwnProperty.call(meta, "result")) {
-    state.lastResult = meta.result;
-  } else {
-    state.lastResult = meta.summary;
-  }
-
-  updateStatus(meta.summary);
-  appendLog(meta.summary, "ok");
-
-  const snapshot = state.trie.snapshot();
-  renderTree(snapshot, null);
-  renderWords(snapshot.words);
-  clearCodeHighlights();
-  updateMetrics(snapshot);
-}
-
-function applyEvent(event) {
-  renderTree(event.snapshot, event.activeNodeId);
-  renderWords(event.snapshot.words);
-  highlightCode(event.opType, event.line);
-  updateStatus(event.message);
-}
-
-function prepareOperation() {
-  if (!state.trie) {
-    updateStatus("Load words first.");
-    return null;
-  }
-
-  const opType = elements.opType.value;
-  const word = normalizeWord(elements.wordInput.value);
-
-  if (!word || !isValidWord(word)) {
-    const message = "Word must contain letters a-z only.";
-    updateStatus(message);
-    appendLog(message);
-    return null;
-  }
-
-  if (opType === "insert") {
-    const trace = state.trie.generateInsert(word);
-    return {
-      opType,
-      events: trace.events,
-      summary: trace.existedBefore
-        ? `Insert("${word}"): word already existed.`
-        : `Insert("${word}"): word added.`,
-    };
-  }
-
-  if (opType === "search") {
-    const trace = state.trie.generateSearch(word);
-    const naive = state.trie.words.has(word);
-    return {
-      opType,
-      events: trace.events,
-      result: trace.result,
-      summary: `Search("${word}") => ${trace.result} (naive: ${naive})`,
-    };
-  }
-
-  if (opType === "delete") {
-    const existedBefore = state.trie.words.has(word);
-    const trace = state.trie.generateDelete(word);
-    const existsAfter = state.trie.words.has(word);
-    return {
-      opType,
-      events: trace.events,
-      result: trace.result,
-      summary: `Delete("${word}") => ${trace.result} (existed-before: ${existedBefore}, exists-after: ${existsAfter})`,
-    };
-  }
-
-  const trace = state.trie.generateStartsWith(word);
-  const naive = [...state.trie.words].some((candidate) => candidate.startsWith(word));
-  return {
-    opType,
-    events: trace.events,
-    result: trace.result,
-    summary: `StartsWith("${word}") => ${trace.result} (naive: ${naive})`,
-  };
-}
-
-function loadWords(words) {
-  operationRunner.stop();
-  operationRunner.ensureNoPending();
-
-  state.trie = new TrieTracer(words);
-  state.lastResult = null;
-
-  const snapshot = state.trie.snapshot();
-  renderTree(snapshot, null);
-  renderWords(snapshot.words);
-  updateMetrics(snapshot);
-
-  focusCodePanel(elements.opType.value);
-  clearCodeHighlights();
-
-  const message = `Loaded ${snapshot.words.length} unique words.`;
-  updateStatus(message);
-  appendLog(`${message} [${snapshot.words.join(", ")}]`, "ok");
-}
-
-function handleLoadWords() {
-  const parsed = parseWordsInput(elements.initialWordsInput.value);
-  if (parsed.error) {
-    updateStatus(parsed.error);
-    appendLog(parsed.error);
-    return;
-  }
-  loadWords(parsed.words);
-}
-
-function handleSampleWords() {
-  const words = randomSampleWords();
-  elements.initialWordsInput.value = words.join(", ");
-  loadWords(words);
-}
-
-function setOperationType(opType) {
-  elements.opType.value = opType;
-  focusCodePanel(opType);
-  clearCodeHighlights();
-  updateStatus(`Shortcut: switched to ${opType} mode.`);
-}
-
-function finishCurrentOperation() {
-  operationRunner.finishCurrent();
-}
-
-function init() {
-  operationRunner = createOperationRunner({
-    getSpeedMs: () => state.speedMs,
-    prepareOperation,
-    applyEvent,
-    updateMetrics,
-    finalizeOperation: finalizePendingOperation,
-    onPrepared: (operation) => {
-      appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
-    },
-    onNoPending: () => {
-      updateStatus("No pending operation.");
-    },
-  });
-
-  elements.loadWordsBtn.addEventListener("click", handleLoadWords);
-  elements.sampleWordsBtn.addEventListener("click", handleSampleWords);
-
-  elements.opType.addEventListener("change", () => {
-    focusCodePanel(elements.opType.value);
-    clearCodeHighlights();
-  });
-
-  setupRunnerControls({
-    elements,
-    runAnimated: () => operationRunner.runAnimated(),
-    runStep: () => operationRunner.step(),
-    runInstant: () => operationRunner.runInstant(),
-    runFinish: finishCurrentOperation,
-    getSpeedMs: () => state.speedMs,
-    setSpeedMs: (speedMs) => {
-      state.speedMs = speedMs;
-    },
-    clearLog: () => logger.clear(),
-    extraShortcuts: {
-      l: () => handleLoadWords(),
-      r: () => handleSampleWords(),
-      1: () => setOperationType("insert"),
-      2: () => setOperationType("search"),
-      3: () => setOperationType("prefix"),
-      4: () => setOperationType("delete"),
-    },
-  });
-
-  bindDebouncedResize({
-    onResize: () => {
-      rerenderTreeForResize();
-    },
-    delayMs: 120,
-  });
-
-  handleLoadWords();
-}
-
-init();
+import { html } from "../shared/lit.js";
+import { defineTutorialLitHost } from "../shared/tutorial-lit-host.js";
+
+defineTutorialLitHost({
+  tagName: "trie-tutorial-app",
+  runtimeModulePath: new URL("./app-runtime.js", import.meta.url).href,
+  renderTemplate: () => html`
+    <div class="bg-shape shape-a"></div>
+    <div class="bg-shape shape-b"></div>
+
+    <main class="layout">
+      <header class="panel hero">
+        <p class="eyebrow">String Data Structure</p>
+        <h1>Trie Tutorial Lab</h1>
+        <p>
+          Learn how words share prefixes in a Trie. Trace each insert/search/prefix operation step-by-step,
+          and watch the traversal path through the tree.
+        </p>
+      </header>
+
+      <section class="panel controls">
+        <div class="control-group">
+          <label for="initialWordsInput">Initial Words (comma/space separated)</label>
+          <div class="row">
+            <input id="initialWordsInput" type="text" value="cat, car, dog, dot, deal" />
+            <button id="loadWordsBtn" class="btn">Load Words</button>
+            <button id="sampleWordsBtn" class="btn btn-muted">Sample</button>
+          </div>
+        </div>
+
+        <div class="control-grid">
+          <div class="control-group">
+            <label for="opType">Operation</label>
+            <select id="opType">
+              <option value="insert">Insert Word</option>
+              <option value="search">Search Word</option>
+              <option value="prefix">Starts With Prefix</option>
+              <option value="delete">Delete Word</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="wordInput">Word / Prefix</label>
+            <input id="wordInput" type="text" value="cart" />
+          </div>
+        </div>
+
+        <div class="row wrap">
+          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+          <button id="stepBtn" class="btn">Step</button>
+          <button id="instantBtn" class="btn">Apply Instantly</button>
+          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+
+          <div class="speed-wrap">
+            <label for="speedRange">Speed</label>
+            <input id="speedRange" type="range" min="120" max="1200" step="20" value="440" />
+            <span id="speedLabel">440 ms</span>
+          </div>
+        </div>
+
+        <p class="key-hint">
+          Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd> finish,
+          <kbd>L</kbd> load, <kbd>R</kbd> sample, <kbd>1</kbd> insert, <kbd>2</kbd> search,
+          <kbd>3</kbd> prefix, <kbd>4</kbd> delete.
+        </p>
+      </section>
+
+      <section class="panel tree-view">
+        <h2>Trie Structure</h2>
+        <p class="hint">
+          Node label shows character. Root is <code>#0</code>. Green badge marks <code>end-of-word</code>.
+        </p>
+        <div id="treeContainer" class="tree-container"></div>
+      </section>
+
+      <section class="panel status">
+        <div>
+          <h2>Status</h2>
+          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready.</p>
+        </div>
+        <div class="metrics">
+          <p><span class="metric-label">Words:</span> <span id="wordCount">0</span></p>
+          <p><span class="metric-label">Nodes:</span> <span id="nodeCount">0</span></p>
+          <p><span class="metric-label">Last Result:</span> <span id="lastResult">-</span></p>
+          <p><span class="metric-label">Step:</span> <span id="stepCounter">0 / 0</span></p>
+        </div>
+      </section>
+
+      <section class="panel words-view">
+        <h2>Dictionary (Stored Words)</h2>
+        <div id="wordsList" class="words-list"></div>
+      </section>
+
+      <section class="panel code-view">
+        <h2>Pseudocode Lens</h2>
+        <div class="code-grid">
+          <div class="code-panel" data-op="insert">
+            <h3>Insert(word)</h3>
+            <ol>
+              <li data-line="1">node = root</li>
+              <li data-line="2">for each char c in word:</li>
+              <li data-line="3">if child c not exists: create it</li>
+              <li data-line="4">node = child c</li>
+              <li data-line="5">mark node as end-of-word</li>
+            </ol>
+          </div>
+
+          <div class="code-panel" data-op="search">
+            <h3>Search(word)</h3>
+            <ol>
+              <li data-line="1">node = root</li>
+              <li data-line="2">for each char c in word:</li>
+              <li data-line="3">if child c missing: return false</li>
+              <li data-line="4">node = child c</li>
+              <li data-line="5">return node.isEnd</li>
+            </ol>
+          </div>
+
+          <div class="code-panel" data-op="prefix">
+            <h3>StartsWith(prefix)</h3>
+            <ol>
+              <li data-line="1">node = root</li>
+              <li data-line="2">for each char c in prefix:</li>
+              <li data-line="3">if child c missing: return false</li>
+              <li data-line="4">node = child c</li>
+              <li data-line="5">return true</li>
+            </ol>
+          </div>
+
+          <div class="code-panel" data-op="delete">
+            <h3>Delete(word)</h3>
+            <ol>
+              <li data-line="1">node = root</li>
+              <li data-line="2">for each char c in word: traverse and store path</li>
+              <li data-line="3">if child c missing: return false</li>
+              <li data-line="4">if node.isEnd is false: return false</li>
+              <li data-line="5">unmark end-of-word</li>
+              <li data-line="6">prune empty suffix nodes bottom-up</li>
+              <li data-line="7">return true</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel log-view">
+        <div class="row between">
+          <h2>Trace Log</h2>
+          <button id="clearLogBtn" class="btn btn-muted">Clear Log</button>
+        </div>
+        <div id="logOutput" class="log-output" role="log" aria-live="polite" aria-relevant="additions"></div>
+      </section>
+    </main>
+  `,
+});

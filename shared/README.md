@@ -6,7 +6,9 @@ Reusable module for all algorithm tutorials in this repo.
 
 - `shared/tutorial-core.js`
 - `shared/tutorial-bootstrap.js`
+- `shared/tutorial-lit-host.js`
 - `shared/tutorial-base.css`
+- `shared/lit.js`
 - `shared/cache-bust.js`
 - `shared/graph-core.js`
 - `shared/graph-renderer.js`
@@ -32,6 +34,12 @@ Reusable module for all algorithm tutorials in this repo.
 - `cache-bust.js`
   - Shared dev helper to append cache-busting query params to local tutorial CSS and JS files.
   - Exposes `window.loadTutorialModule("./app.js")` for no-stale script loading.
+- `tutorial-lit-host.js`
+  - Shared Lit host wrapper that mounts light-DOM templates and lazy-loads `app-runtime.js`.
+  - Replaces repeated custom-element bootstrap boilerplate across tutorials.
+- `lit.js`
+  - Shared Lit runtime import wrapper for browser ESM usage (via CDN URL imports).
+  - Exposes `LitElement` and `html` for Lit component migration.
 - Shared CSS foundation (`tutorial-base.css`)
   - Layout shell (`body`, `.layout`, `.panel`)
   - Controls (`.control-group`, form fields, `.btn*`)
@@ -57,14 +65,38 @@ Reusable module for all algorithm tutorials in this repo.
 
 ## How to use in a tutorial
 
-1. Add shared CSS + module script in HTML:
+1. Add shared CSS + cache-bust loader in HTML:
 
 ```html
 <link rel="stylesheet" href="../shared/tutorial-base.css" />
-<script type="module" src="app.js"></script>
+<script src="../shared/cache-bust.js"></script>
 ```
 
-2. Define tutorial theme variables in local `styles.css`:
+2. Mount your Lit host component and load `app.js` through cache busting:
+
+```html
+<your-tutorial-app></your-tutorial-app>
+<script>
+  window.loadTutorialModule("./app.js");
+</script>
+```
+
+3. Define the Lit host in `app.js`:
+
+```js
+import { html } from "../shared/lit.js";
+import { defineTutorialLitHost } from "../shared/tutorial-lit-host.js";
+
+defineTutorialLitHost({
+  tagName: "your-tutorial-app",
+  runtimeModulePath: "./app-runtime.js",
+  renderTemplate: () => html`<main class="layout">...</main>`,
+});
+```
+
+This ensures existing imperative DOM wiring in `app-runtime.js` initializes only after IDs are rendered.
+
+4. Define tutorial theme variables in local `styles.css`:
 
 ```css
 :root {
@@ -77,7 +109,7 @@ Reusable module for all algorithm tutorials in this repo.
 }
 ```
 
-3. Import helpers in tutorial JS:
+5. Import helpers in tutorial JS:
 
 ```js
 import {
@@ -88,7 +120,7 @@ import {
 } from "../shared/tutorial-core.js";
 ```
 
-4. Wire the runner:
+6. Wire the runner:
 
 ```js
 const runner = createOperationRunner({
@@ -102,7 +134,7 @@ const runner = createOperationRunner({
 });
 ```
 
-5. Use runner actions in buttons + shortcuts:
+7. Use runner actions in buttons + shortcuts:
 
 - `runner.runAnimated()`
 - `runner.step()`

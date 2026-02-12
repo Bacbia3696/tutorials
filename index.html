@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Algorithm Tutorials Playground</title>
+    <meta name="description"
+        content="Interactive, browser-based labs for learning core data structures and graph algorithms. Step-by-step tracing for Trie, Segment Tree, Fenwick Tree, Dijkstra, Bellman-Ford, and Topological Sort." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-primary: #0f1117;
+            --bg-card: #1a1c25;
+            --bg-card-hover: #22252f;
+            --border-card: #2a2d3a;
+            --border-hover: #4a5568;
+            --text-primary: #f0f0f5;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-ds: #6ee7b7;
+            --accent-ds-dim: rgba(110, 231, 183, 0.12);
+            --accent-graph: #93c5fd;
+            --accent-graph-dim: rgba(147, 197, 253, 0.12);
+            --gradient-hero: linear-gradient(135deg,
+                    #6ee7b7 0%,
+                    #60a5fa 50%,
+                    #a78bfa 100%);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3),
+                0 4px 16px rgba(0, 0, 0, 0.2);
+            --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4),
+                0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: "Outfit", system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 1px 1px,
+                    rgba(255, 255, 255, 0.03) 1px,
+                    transparent 0);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: -40%;
+            left: 50%;
+            width: 120%;
+            height: 80%;
+            transform: translateX(-50%);
+            background: radial-gradient(ellipse at center,
+                    rgba(96, 165, 250, 0.06) 0%,
+                    rgba(110, 231, 183, 0.03) 40%,
+                    transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            text-align: center;
+            padding: 80px 0 48px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+            margin-bottom: 24px;
+        }
+
+        .hero-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-ds);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ── Section headers ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-top: 8px;
+        }
+
+        .section-header h2 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .section-header::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border-card);
+        }
+
+        /* ── Card grid ── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+            margin-bottom: 48px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            padding: 28px 26px 24px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--shadow-card);
+            transition: background var(--transition), border-color var(--transition),
+                box-shadow var(--transition), transform var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity var(--transition);
+            pointer-events: none;
+            border-radius: var(--radius-lg);
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-3px);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card[data-category="ds"]::before {
+            background: linear-gradient(135deg,
+                    rgba(110, 231, 183, 0.04),
+                    transparent 60%);
+        }
+
+        .card[data-category="graph"]::before {
+            background: linear-gradient(135deg,
+                    rgba(147, 197, 253, 0.04),
+                    transparent 60%);
+        }
+
+        .card-badge {
+            display: inline-flex;
+            align-self: flex-start;
+            padding: 3px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 14px;
+        }
+
+        .card[data-category="ds"] .card-badge {
+            background: var(--accent-ds-dim);
+            color: var(--accent-ds);
+        }
+
+        .card[data-category="graph"] .card-badge {
+            background: var(--accent-graph-dim);
+            color: var(--accent-graph);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .card .desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            flex: 1;
+            margin-bottom: 16px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .card-tags span {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+        }
+
+        .card-arrow {
+            position: absolute;
+            top: 26px;
+            right: 24px;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            transition: color var(--transition), transform var(--transition);
+        }
+
+        .card:hover .card-arrow {
+            color: var(--text-primary);
+            transform: translate(3px, -3px);
+        }
+
+        /* ── Footer ── */
+        .footer {
+            border-top: 1px solid var(--border-card);
+            padding: 32px 0 48px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .footer code {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.78rem;
+            padding: 2px 7px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        @media (max-width: 720px) {
+            .hero {
+                padding: 56px 0 36px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <!-- Hero -->
+        <header class="hero">
+            <div class="hero-badge"><span class="dot"></span> 6 interactive labs</div>
+            <h1>Algorithm Tutorials Playground</h1>
+            <p>
+                Step-by-step animated visualizations for core data structures and
+                graph algorithms. Watch each operation unfold, trace the pseudocode,
+                and build real intuition.
+            </p>
+        </header>
+
+        <!-- Data Structures -->
+        <div class="section-header">
+            <h2>Data Structures</h2>
+        </div>
+        <div class="grid">
+            <a href="trie/" class="card" data-category="ds">
+                <span class="card-badge">Data Structure</span>
+                <span class="card-arrow">↗</span>
+                <h3>Trie</h3>
+                <p class="desc">
+                    Insert, search, prefix-check, and delete words in a prefix tree.
+                    Watch nodes appear and edges light up as each character is
+                    consumed.
+                </p>
+                <div class="card-tags">
+                    <span>insert</span><span>search</span><span>prefix</span><span>delete</span>
+                </div>
+            </a>
+
+            <a href="segment_tree/" class="card" data-category="ds">
+                <span class="card-badge">Data Structure</span>
+                <span class="card-arrow">↗</span>
+                <h3>Segment Tree + Lazy Propagation</h3>
+                <p class="desc">
+                    Range updates and range queries on an array backed by a segment
+                    tree. See how lazy values propagate down through the tree.
+                </p>
+                <div class="card-tags">
+                    <span>range-add</span><span>range-query</span><span>lazy-propagation</span>
+                </div>
+            </a>
+
+            <a href="fenwick_tree/" class="card" data-category="ds">
+                <span class="card-badge">Data Structure</span>
+                <span class="card-arrow">↗</span>
+                <h3>Fenwick Tree (BIT)</h3>
+                <p class="desc">
+                    Point updates, prefix sums, and range queries. Follow the lowbit
+                    jumps through the coverage map and the binary index timeline.
+                </p>
+                <div class="card-tags">
+                    <span>point-update</span><span>prefix-sum</span><span>range-query</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Graph Algorithms -->
+        <div class="section-header">
+            <h2>Graph Algorithms</h2>
+        </div>
+        <div class="grid">
+            <a href="dijkstra/" class="card" data-category="graph">
+                <span class="card-badge">Graph Algorithm</span>
+                <span class="card-arrow">↗</span>
+                <h3>Dijkstra's Algorithm</h3>
+                <p class="desc">
+                    Find shortest paths in weighted graphs with non-negative edges.
+                    Watch the priority queue, edge relaxation, and distance table
+                    update in real time.
+                </p>
+                <div class="card-tags">
+                    <span>shortest-path</span><span>priority-queue</span><span>relaxation</span>
+                </div>
+            </a>
+
+            <a href="bellman_ford/" class="card" data-category="graph">
+                <span class="card-badge">Graph Algorithm</span>
+                <span class="card-arrow">↗</span>
+                <h3>Bellman-Ford</h3>
+                <p class="desc">
+                    Shortest paths with negative-weight edges. Trace each relaxation
+                    pass across every edge and see negative-cycle detection
+                    in action.
+                </p>
+                <div class="card-tags">
+                    <span>shortest-path</span><span>negative-weights</span><span>cycle-detection</span>
+                </div>
+            </a>
+
+            <a href="topological_sort/" class="card" data-category="graph">
+                <span class="card-badge">Graph Algorithm</span>
+                <span class="card-arrow">↗</span>
+                <h3>Topological Sort</h3>
+                <p class="desc">
+                    Order a directed acyclic graph with Kahn's algorithm. Watch the
+                    indegree table, the BFS queue, and the output ordering evolve.
+                </p>
+                <div class="card-tags">
+                    <span>kahn's</span><span>indegree</span><span>DAG</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                Built with vanilla HTML, CSS, JS &amp;
+                <a href="https://lit.dev" style="color: var(--accent-ds); text-decoration: none">Lit</a>
+                — no build step required.<br />
+                Serve locally with
+                <code>python3 -m http.server</code> and open in your browser.
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>
