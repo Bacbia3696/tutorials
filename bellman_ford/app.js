@@ -1,9 +1,15 @@
 import {
-  bindShortcutHandler,
   createCodeHighlighter,
   createLogger,
   createOperationRunner,
 } from "../shared/tutorial-core.js";
+import {
+  createLabelToIndex,
+  edgeKeyForMode,
+  parseNodeLabelsInput,
+  parseWeightedEdgesInput,
+} from "../shared/graph-input.js";
+import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
 import {
   computeCircularNodePositions,
   createSvgElement,
@@ -29,115 +35,8 @@ D A 10
 E D -1`,
 };
 
-function normalizeLabel(raw) {
-  return raw.trim().toUpperCase();
-}
-
 function formatDistance(value) {
   return Number.isFinite(value) ? String(value) : "inf";
-}
-
-function parseNodesInput(text) {
-  const tokens = text
-    .trim()
-    .split(/[\s,]+/)
-    .map((token) => normalizeLabel(token))
-    .filter((token) => token.length > 0);
-
-  if (tokens.length < 2) {
-    return { error: "Please provide at least 2 nodes." };
-  }
-  if (tokens.length > 10) {
-    return { error: "Please use at most 10 nodes." };
-  }
-
-  const nodes = [];
-  const seen = new Set();
-  for (const token of tokens) {
-    if (!/^[A-Z][A-Z0-9_]*$/.test(token)) {
-      return {
-        error: `Invalid node label '${token}'. Use letters/numbers/underscore and start with a letter.`,
-      };
-    }
-    if (seen.has(token)) {
-      return { error: `Duplicate node label '${token}'.` };
-    }
-    seen.add(token);
-    nodes.push(token);
-  }
-
-  return { nodes };
-}
-
-function edgeKey(mode, fromIndex, toIndex) {
-  if (mode === "directed") {
-    return `${fromIndex}->${toIndex}`;
-  }
-  return fromIndex < toIndex ? `${fromIndex}--${toIndex}` : `${toIndex}--${fromIndex}`;
-}
-
-function parseEdgesInput(text, labelToIndex, mode) {
-  const lines = text
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0 && !line.startsWith("#"));
-
-  if (lines.length === 0) {
-    return { error: "Please provide at least one edge line." };
-  }
-
-  const displayEdges = [];
-  const seen = new Set();
-
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
-    const parts = line.split(/[\s,]+/).filter((token) => token.length > 0);
-    if (parts.length !== 3) {
-      return { error: `Edge line ${i + 1} is invalid. Use: FROM TO WEIGHT` };
-    }
-
-    const fromLabel = normalizeLabel(parts[0]);
-    const toLabel = normalizeLabel(parts[1]);
-    const weight = Number(parts[2]);
-
-    if (!labelToIndex.has(fromLabel)) {
-      return { error: `Edge line ${i + 1}: unknown node '${fromLabel}'.` };
-    }
-    if (!labelToIndex.has(toLabel)) {
-      return { error: `Edge line ${i + 1}: unknown node '${toLabel}'.` };
-    }
-    if (!Number.isFinite(weight) || !Number.isInteger(weight)) {
-      return { error: `Edge line ${i + 1}: weight must be an integer.` };
-    }
-
-    if (mode === "undirected" && weight < 0) {
-      return {
-        error:
-          "Undirected mode disallows negative weights (it immediately creates a negative cycle). Use directed mode.",
-      };
-    }
-
-    const from = labelToIndex.get(fromLabel);
-    const to = labelToIndex.get(toLabel);
-    if (from === to) {
-      return { error: `Edge line ${i + 1}: self-loop is not allowed.` };
-    }
-
-    const key = edgeKey(mode, from, to);
-    if (seen.has(key)) {
-      return { error: `Edge line ${i + 1}: duplicate edge '${fromLabel} ${toLabel}'.` };
-    }
-
-    seen.add(key);
-    displayEdges.push({
-      id: displayEdges.length + 1,
-      from,
-      to,
-      weight,
-    });
-  }
-
-  return { displayEdges };
 }
 
 function buildGraph(nodes, displayEdges, mode) {
@@ -769,7 +668,9 @@ function loadGraphFromInputs() {
   operationRunner.stop();
   operationRunner.ensureNoPending();
 
-  const parsedNodes = parseNodesInput(elements.nodesInput.value);
+  const parsedNodes = parseNodeLabelsInput(elements.nodesInput.value, {
+    maxNodes: 10,
+  });
   if (parsedNodes.error) {
     clearGraphState();
     updateStatus(parsedNodes.error);
@@ -777,12 +678,15 @@ function loadGraphFromInputs() {
     return false;
   }
 
-  const labelToIndex = new Map();
-  parsedNodes.nodes.forEach((label, index) => {
-    labelToIndex.set(label, index);
+  const labelToIndex = createLabelToIndex(parsedNodes.nodes);
+  const parsedEdges = parseWeightedEdgesInput(elements.edgesInput.value, {
+    labelToIndex,
+    mode: state.mode,
+    lineFormatMessage: (lineNumber) => `Edge line ${lineNumber} is invalid. Use: FROM TO WEIGHT`,
+    invalidWeightMessage: (lineNumber) => `Edge line ${lineNumber}: weight must be an integer.`,
+    allowNegativeWeightInUndirected: false,
+    selfLoopMessage: (lineNumber) => `Edge line ${lineNumber}: self-loop is not allowed.`,
   });
-
-  const parsedEdges = parseEdgesInput(elements.edgesInput.value, labelToIndex, state.mode);
   if (parsedEdges.error) {
     clearGraphState();
     updateStatus(parsedEdges.error);
@@ -790,7 +694,7 @@ function loadGraphFromInputs() {
     return false;
   }
 
-  state.graph = buildGraph(parsedNodes.nodes, parsedEdges.displayEdges, state.mode);
+  state.graph = buildGraph(parsedNodes.nodes, parsedEdges.edges, state.mode);
   state.tracer = new BellmanFordTracer(state.graph);
 
   populateSourceSelect(state.graph.nodes);
@@ -848,7 +752,7 @@ function generateRandomGraph(mode) {
     if (from === to) {
       return false;
     }
-    const key = edgeKey(mode, from, to);
+    const key = edgeKeyForMode(mode, from, to);
     if (seen.has(key)) {
       return false;
     }
@@ -958,26 +862,18 @@ function init() {
     applyModeAndReload(elements.graphMode.value);
   });
 
-  elements.animateBtn.addEventListener("click", runAnimatedOperation);
-  elements.stepBtn.addEventListener("click", runStepOperation);
-  elements.instantBtn.addEventListener("click", runInstantOperation);
-  elements.finishBtn.addEventListener("click", finishCurrentOperation);
-
-  elements.speedRange.addEventListener("input", () => {
-    state.speedMs = Number(elements.speedRange.value);
-    elements.speedLabel.textContent = `${state.speedMs} ms`;
-  });
-
-  elements.clearLogBtn.addEventListener("click", () => {
-    logger.clear();
-  });
-
-  bindShortcutHandler({
-    actions: {
-      a: () => runAnimatedOperation(),
-      s: () => runStepOperation(),
-      i: () => runInstantOperation(),
-      f: () => finishCurrentOperation(),
+  setupRunnerControls({
+    elements,
+    runAnimated: runAnimatedOperation,
+    runStep: runStepOperation,
+    runInstant: runInstantOperation,
+    runFinish: finishCurrentOperation,
+    getSpeedMs: () => state.speedMs,
+    setSpeedMs: (speedMs) => {
+      state.speedMs = speedMs;
+    },
+    clearLog: () => logger.clear(),
+    extraShortcuts: {
       l: () => loadGraphFromInputs(),
       m: () => loadSampleGraph(),
       r: () => loadRandomGraph(),

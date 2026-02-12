@@ -1,9 +1,9 @@
 import {
-  bindShortcutHandler,
   createCodeHighlighter,
   createLogger,
   createOperationRunner,
 } from "../shared/tutorial-core.js";
+import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
 
 class FenwickTracer {
   constructor(values) {
@@ -823,26 +823,18 @@ function init() {
   elements.leftIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
   elements.rightIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
 
-  elements.animateBtn.addEventListener("click", () => operationRunner.runAnimated());
-  elements.stepBtn.addEventListener("click", () => operationRunner.step());
-  elements.instantBtn.addEventListener("click", () => operationRunner.runInstant());
-  elements.finishBtn.addEventListener("click", finishCurrentOperation);
-
-  elements.speedRange.addEventListener("input", () => {
-    state.speedMs = Number(elements.speedRange.value);
-    elements.speedLabel.textContent = `${state.speedMs} ms`;
-  });
-
-  elements.clearLogBtn.addEventListener("click", () => {
-    logger.clear();
-  });
-
-  bindShortcutHandler({
-    actions: {
-      a: () => operationRunner.runAnimated(),
-      s: () => operationRunner.step(),
-      i: () => operationRunner.runInstant(),
-      f: () => operationRunner.finishCurrent(),
+  setupRunnerControls({
+    elements,
+    runAnimated: () => operationRunner.runAnimated(),
+    runStep: () => operationRunner.step(),
+    runInstant: () => operationRunner.runInstant(),
+    runFinish: finishCurrentOperation,
+    getSpeedMs: () => state.speedMs,
+    setSpeedMs: (speedMs) => {
+      state.speedMs = speedMs;
+    },
+    clearLog: () => logger.clear(),
+    extraShortcuts: {
       l: () => handleArrayLoadInput(),
       r: () => handleRandomArray(),
       1: () => setOperationType("update"),

@@ -1,9 +1,12 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository contains three standalone tutorial apps and one shared core:
-- `trie/`, `segment_tree/`, `fenwick_tree/`: each module has `index.html`, `styles.css`, and `app.js`.
+This repository contains six standalone tutorial apps and a shared core:
+- `trie/`, `segment_tree/`, `fenwick_tree/`, `dijkstra/`, `bellman_ford/`, `topological_sort/`: each module has `index.html`, `styles.css`, and `app.js`.
 - `shared/tutorial-core.js`: reusable interaction/runtime helpers (runner, logger, shortcuts, code highlighting).
+- `shared/tutorial-bootstrap.js`: common UI wiring helpers for runner controls and debounced resize listeners.
+- `shared/graph-core.js`, `shared/graph-renderer.js`: reusable graph geometry/rendering helpers.
+- `shared/graph-input.js`: reusable graph input normalization/parsing/validation helpers.
 - `shared/tutorial-base.css`: shared layout/control primitives used by all tutorials.
 
 Keep algorithm-specific logic inside each module folder. Put cross-tutorial utilities in `shared/` only when reused by at least two modules.
@@ -17,8 +20,13 @@ No build step or package manager is required; this is plain HTML/CSS/ES modules.
   - `http://localhost:4173/trie/`
   - `http://localhost:4173/segment_tree/`
   - `http://localhost:4173/fenwick_tree/`
+  - `http://localhost:4173/dijkstra/`
+  - `http://localhost:4173/bellman_ford/`
+  - `http://localhost:4173/topological_sort/`
 - Optional syntax check:
   - `node --input-type=module --check < trie/app.js` (repeat for other JS files)
+- Deterministic shared-logic tests:
+  - `node shared/tests/shared-logic.test.mjs`
 
 ## Coding Style & Naming Conventions
 - Use 2-space indentation in HTML, CSS, and JavaScript.
@@ -30,13 +38,14 @@ No build step or package manager is required; this is plain HTML/CSS/ES modules.
 - Prefer small, pure helper functions for parsing/validation and keep DOM wiring near the bottom of `app.js`.
 
 ## Testing Guidelines
-There is no automated test framework configured yet. Use manual regression checks per module:
+Use manual regression checks per module:
 - load sample/default data;
 - run animated, step, instant, and finish flows;
 - verify keyboard shortcuts and status/metric updates;
 - confirm edge cases (empty input, invalid tokens, out-of-range indices).
 
-If you introduce non-trivial shared logic in `shared/tutorial-core.js`, include deterministic unit tests when a test harness is added.
+Run deterministic shared tests after changing shared parsing/runner logic:
+- `node shared/tests/shared-logic.test.mjs`
 
 ## Commit & Pull Request Guidelines
 - Follow Conventional Commits (existing history uses `feat:`), e.g. `feat(trie): add delete trace pruning`.

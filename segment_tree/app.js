@@ -1,9 +1,12 @@
 import {
-  bindShortcutHandler,
   createCodeHighlighter,
   createLogger,
   createOperationRunner,
 } from "../shared/tutorial-core.js";
+import {
+  bindDebouncedResize,
+  setupRunnerControls,
+} from "../shared/tutorial-bootstrap.js";
 
 class LazySegTreeTracer {
   constructor(values) {
@@ -251,7 +254,6 @@ const appState = {
 const logger = createLogger(elements.logOutput);
 const codeHighlighter = createCodeHighlighter(".code-panel");
 let operationRunner = null;
-let treeResizeTimer = null;
 
 function parseArrayInput(text) {
   const tokens = text
@@ -641,41 +643,30 @@ function init() {
 
   elements.opType.addEventListener("change", handleOperationTypeChange);
 
-  elements.animateBtn.addEventListener("click", () => operationRunner.runAnimated());
-  elements.stepBtn.addEventListener("click", () => operationRunner.step());
-  elements.instantBtn.addEventListener("click", () => operationRunner.runInstant());
-  elements.finishBtn.addEventListener("click", finishCurrentOperation);
-
-  elements.speedRange.addEventListener("input", () => {
-    appState.speedMs = Number(elements.speedRange.value);
-    elements.speedLabel.textContent = `${appState.speedMs} ms`;
-  });
-
-  elements.clearLogBtn.addEventListener("click", () => {
-    logger.clear();
-  });
-
-  window.addEventListener("resize", () => {
-    if (treeResizeTimer !== null) {
-      clearTimeout(treeResizeTimer);
-    }
-    treeResizeTimer = window.setTimeout(() => {
-      treeResizeTimer = null;
-      rerenderTreeForResize();
-    }, 120);
-  });
-
-  bindShortcutHandler({
-    actions: {
-      a: () => operationRunner.runAnimated(),
-      s: () => operationRunner.step(),
-      i: () => operationRunner.runInstant(),
-      f: () => operationRunner.finishCurrent(),
+  setupRunnerControls({
+    elements,
+    runAnimated: () => operationRunner.runAnimated(),
+    runStep: () => operationRunner.step(),
+    runInstant: () => operationRunner.runInstant(),
+    runFinish: finishCurrentOperation,
+    getSpeedMs: () => appState.speedMs,
+    setSpeedMs: (speedMs) => {
+      appState.speedMs = speedMs;
+    },
+    clearLog: () => logger.clear(),
+    extraShortcuts: {
       l: () => handleArrayLoadInput(),
       r: () => handleRandomArray(),
       u: () => setOperationType("update"),
       q: () => setOperationType("query"),
     },
+  });
+
+  bindDebouncedResize({
+    onResize: () => {
+      rerenderTreeForResize();
+    },
+    delayMs: 120,
   });
 
   handleOperationTypeChange();

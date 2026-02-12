@@ -33,10 +33,13 @@ Then open:
   - `styles.css`: module-specific theme and layout
   - `app.js`: algorithm tracer + UI wiring
 - `shared/tutorial-core.js`: common operation runner, logger, shortcuts, code highlighter
+- `shared/tutorial-bootstrap.js`: common runner-control bindings and debounced resize wiring
 - `shared/cache-bust.js`: shared dev cache-busting loader for local CSS/JS assets
 - `shared/graph-core.js`: shared SVG graph geometry/math helpers for graph tutorials
 - `shared/graph-renderer.js`: shared SVG graph rendering helpers (canvas prep, edges, nodes, arrow markers)
+- `shared/graph-input.js`: shared graph input normalization/parsing/validation helpers
 - `shared/tutorial-base.css`: shared layout/control primitives
+- `shared/tests/shared-logic.test.mjs`: deterministic shared logic tests (parser + runner behavior)
 - `AGENTS.md`: contributor guide for coding, testing, and PR expectations
 
 ## Development Notes
@@ -53,6 +56,7 @@ node --input-type=module --check < fenwick_tree/app.js
 node --input-type=module --check < dijkstra/app.js
 node --input-type=module --check < bellman_ford/app.js
 node --input-type=module --check < topological_sort/app.js
+node shared/tests/shared-logic.test.mjs
 ```
 
 ## Manual Testing Checklist

@@ -1,9 +1,12 @@
 import {
-  bindShortcutHandler,
   createCodeHighlighter,
   createLogger,
   createOperationRunner,
 } from "../shared/tutorial-core.js";
+import {
+  bindDebouncedResize,
+  setupRunnerControls,
+} from "../shared/tutorial-bootstrap.js";
 
 class TrieNode {
   constructor(id, char) {
@@ -296,7 +299,6 @@ const state = {
 const logger = createLogger(elements.logOutput);
 const codeHighlighter = createCodeHighlighter(".code-panel");
 let operationRunner = null;
-let treeResizeTimer = null;
 
 function normalizeWord(raw) {
   return raw.trim().toLowerCase();
@@ -698,36 +700,18 @@ function init() {
     clearCodeHighlights();
   });
 
-  elements.animateBtn.addEventListener("click", () => operationRunner.runAnimated());
-  elements.stepBtn.addEventListener("click", () => operationRunner.step());
-  elements.instantBtn.addEventListener("click", () => operationRunner.runInstant());
-  elements.finishBtn.addEventListener("click", finishCurrentOperation);
-
-  elements.speedRange.addEventListener("input", () => {
-    state.speedMs = Number(elements.speedRange.value);
-    elements.speedLabel.textContent = `${state.speedMs} ms`;
-  });
-
-  elements.clearLogBtn.addEventListener("click", () => {
-    logger.clear();
-  });
-
-  window.addEventListener("resize", () => {
-    if (treeResizeTimer !== null) {
-      clearTimeout(treeResizeTimer);
-    }
-    treeResizeTimer = window.setTimeout(() => {
-      treeResizeTimer = null;
-      rerenderTreeForResize();
-    }, 120);
-  });
-
-  bindShortcutHandler({
-    actions: {
-      a: () => operationRunner.runAnimated(),
-      s: () => operationRunner.step(),
-      i: () => operationRunner.runInstant(),
-      f: () => operationRunner.finishCurrent(),
+  setupRunnerControls({
+    elements,
+    runAnimated: () => operationRunner.runAnimated(),
+    runStep: () => operationRunner.step(),
+    runInstant: () => operationRunner.runInstant(),
+    runFinish: finishCurrentOperation,
+    getSpeedMs: () => state.speedMs,
+    setSpeedMs: (speedMs) => {
+      state.speedMs = speedMs;
+    },
+    clearLog: () => logger.clear(),
+    extraShortcuts: {
       l: () => handleLoadWords(),
       r: () => handleSampleWords(),
       1: () => setOperationType("insert"),
@@ -735,6 +719,13 @@ function init() {
       3: () => setOperationType("prefix"),
       4: () => setOperationType("delete"),
     },
+  });
+
+  bindDebouncedResize({
+    onResize: () => {
+      rerenderTreeForResize();
+    },
+    delayMs: 120,
   });
 
   handleLoadWords();

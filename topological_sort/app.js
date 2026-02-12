@@ -1,9 +1,14 @@
 import {
-  bindShortcutHandler,
   createCodeHighlighter,
   createLogger,
   createOperationRunner,
 } from "../shared/tutorial-core.js";
+import {
+  createLabelToIndex,
+  parseDirectedEdgesInput,
+  parseNodeLabelsInput,
+} from "../shared/graph-input.js";
+import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
 import {
   computeCircularNodePositions,
   createSvgElement,
@@ -31,89 +36,6 @@ F H
 G H`,
 };
 
-function normalizeLabel(raw) {
-  return raw.trim().toUpperCase();
-}
-
-function parseNodesInput(text) {
-  const tokens = text
-    .trim()
-    .split(/[\s,]+/)
-    .map((token) => normalizeLabel(token))
-    .filter((token) => token.length > 0);
-
-  if (tokens.length < 2) {
-    return { error: "Please provide at least 2 nodes." };
-  }
-  if (tokens.length > 12) {
-    return { error: "Please use at most 12 nodes." };
-  }
-
-  const nodes = [];
-  const seen = new Set();
-  for (const token of tokens) {
-    if (!/^[A-Z][A-Z0-9_]*$/.test(token)) {
-      return {
-        error: `Invalid node label '${token}'. Use letters/numbers/underscore and start with a letter.`,
-      };
-    }
-    if (seen.has(token)) {
-      return { error: `Duplicate node label '${token}'.` };
-    }
-    seen.add(token);
-    nodes.push(token);
-  }
-
-  return { nodes };
-}
-
-function parseEdgesInput(text, labelToIndex) {
-  const lines = text
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0 && !line.startsWith("#"));
-
-  if (lines.length === 0) {
-    return { error: "Please provide at least one edge line." };
-  }
-
-  const edges = [];
-  const seen = new Set();
-
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
-    const parts = line.split(/[\s,]+/).filter((token) => token.length > 0);
-    if (parts.length !== 2) {
-      return { error: `Edge line ${i + 1} is invalid. Use: FROM TO` };
-    }
-
-    const fromLabel = normalizeLabel(parts[0]);
-    const toLabel = normalizeLabel(parts[1]);
-
-    if (!labelToIndex.has(fromLabel)) {
-      return { error: `Edge line ${i + 1}: unknown node '${fromLabel}'.` };
-    }
-    if (!labelToIndex.has(toLabel)) {
-      return { error: `Edge line ${i + 1}: unknown node '${toLabel}'.` };
-    }
-
-    const from = labelToIndex.get(fromLabel);
-    const to = labelToIndex.get(toLabel);
-    const key = `${from}->${to}`;
-    if (seen.has(key)) {
-      return { error: `Edge line ${i + 1}: duplicate edge '${fromLabel} ${toLabel}'.` };
-    }
-
-    seen.add(key);
-    edges.push({
-      id: edges.length + 1,
-      from,
-      to,
-    });
-  }
-
-  return { edges };
-}
 
 function buildGraph(nodes, edges) {
   const adjacency = Array.from({ length: nodes.length }, () => []);
@@ -603,19 +525,21 @@ function loadGraphFromInputs() {
   operationRunner.stop();
   operationRunner.ensureNoPending();
 
-  const parsedNodes = parseNodesInput(elements.nodesInput.value);
+  const parsedNodes = parseNodeLabelsInput(elements.nodesInput.value, {
+    maxNodes: 12,
+  });
   if (parsedNodes.error) {
     updateStatus(parsedNodes.error);
     appendLog(parsedNodes.error);
     return;
   }
 
-  const labelToIndex = new Map();
-  parsedNodes.nodes.forEach((label, index) => {
-    labelToIndex.set(label, index);
+  const labelToIndex = createLabelToIndex(parsedNodes.nodes);
+  const parsedEdges = parseDirectedEdgesInput(elements.edgesInput.value, {
+    labelToIndex,
+    lineFormatMessage: (lineNumber) => `Edge line ${lineNumber} is invalid. Use: FROM TO`,
+    allowSelfLoops: true,
   });
-
-  const parsedEdges = parseEdgesInput(elements.edgesInput.value, labelToIndex);
   if (parsedEdges.error) {
     updateStatus(parsedEdges.error);
     appendLog(parsedEdges.error);
@@ -765,26 +689,18 @@ function init() {
   elements.sampleGraphBtn.addEventListener("click", loadSampleGraph);
   elements.randomGraphBtn.addEventListener("click", loadRandomGraph);
 
-  elements.animateBtn.addEventListener("click", runAnimatedOperation);
-  elements.stepBtn.addEventListener("click", runStepOperation);
-  elements.instantBtn.addEventListener("click", runInstantOperation);
-  elements.finishBtn.addEventListener("click", finishCurrentOperation);
-
-  elements.speedRange.addEventListener("input", () => {
-    state.speedMs = Number(elements.speedRange.value);
-    elements.speedLabel.textContent = `${state.speedMs} ms`;
-  });
-
-  elements.clearLogBtn.addEventListener("click", () => {
-    logger.clear();
-  });
-
-  bindShortcutHandler({
-    actions: {
-      a: () => runAnimatedOperation(),
-      s: () => runStepOperation(),
-      i: () => runInstantOperation(),
-      f: () => finishCurrentOperation(),
+  setupRunnerControls({
+    elements,
+    runAnimated: runAnimatedOperation,
+    runStep: runStepOperation,
+    runInstant: runInstantOperation,
+    runFinish: finishCurrentOperation,
+    getSpeedMs: () => state.speedMs,
+    setSpeedMs: (speedMs) => {
+      state.speedMs = speedMs;
+    },
+    clearLog: () => logger.clear(),
+    extraShortcuts: {
       l: () => loadGraphFromInputs(),
       m: () => loadSampleGraph(),
       r: () => loadRandomGraph(),

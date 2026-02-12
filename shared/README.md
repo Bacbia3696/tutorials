@@ -5,10 +5,12 @@ Reusable module for all algorithm tutorials in this repo.
 ## File
 
 - `shared/tutorial-core.js`
+- `shared/tutorial-bootstrap.js`
 - `shared/tutorial-base.css`
 - `shared/cache-bust.js`
 - `shared/graph-core.js`
 - `shared/graph-renderer.js`
+- `shared/graph-input.js`
 
 ## What it provides
 
@@ -23,6 +25,10 @@ Reusable module for all algorithm tutorials in this repo.
   - Shared keyboard shortcut binding with typing-safe default behavior.
 - `isTypingTarget(target)`
   - Utility for input-focus checks.
+- `setupRunnerControls(...)` (`tutorial-bootstrap.js`)
+  - Shared wiring for animate/step/instant/finish controls, speed slider, clear-log action, and keyboard shortcuts.
+- `bindDebouncedResize(...)` (`tutorial-bootstrap.js`)
+  - Shared debounced `resize` listener binding used by tree-based tutorials.
 - `cache-bust.js`
   - Shared dev helper to append cache-busting query params to local tutorial CSS and JS files.
   - Exposes `window.loadTutorialModule("./app.js")` for no-stale script loading.
@@ -43,6 +49,11 @@ Reusable module for all algorithm tutorials in this repo.
   - `renderGraphEdges(...)`: shared edge path/label rendering pipeline.
   - `renderGraphNodes(...)`: shared node group rendering pipeline.
   - `createDirectedPairSet(...)`, `getReverseCurveOffset(...)`: shared helpers for bidirectional edge curvature.
+- Graph input helpers (`graph-input.js`)
+  - `parseNodeLabelsInput(...)`: shared node-label parsing/normalization/validation.
+  - `parseWeightedEdgesInput(...)`: shared weighted edge parsing/validation for directed/undirected modes.
+  - `parseDirectedEdgesInput(...)`: shared unweighted directed edge parsing/validation.
+  - `createLabelToIndex(...)`, `edgeKeyForMode(...)`: utility helpers reused by graph tutorials.
 
 ## How to use in a tutorial
 
@@ -99,3 +110,13 @@ const runner = createOperationRunner({
 - `runner.finishCurrent()`
 
 This keeps future tutorials consistent and reduces duplicated control logic.
+
+## Deterministic shared tests
+
+Run:
+
+```bash
+node shared/tests/shared-logic.test.mjs
+```
+
+This validates shared parser behavior and `createOperationRunner(...)` lifecycle semantics.
