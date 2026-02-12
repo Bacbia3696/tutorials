@@ -1,9 +1,12 @@
 # Algorithm Tutorials Playground
 
-Interactive, browser-based labs for learning core data structures:
+Interactive, browser-based labs for learning core data structures and graph algorithms:
 - `trie/`: insert/search/prefix/delete tracing for Trie
 - `segment_tree/`: range update and range query with lazy propagation
 - `fenwick_tree/`: point updates and prefix/range sums with BIT
+- `dijkstra/`: shortest paths in weighted graphs with step-by-step relaxation tracing
+- `bellman_ford/`: pass-by-pass relaxation tracing with negative-cycle detection
+- `topological_sort/`: Kahn's algorithm tracing for queue/indegree/order evolution
 
 Each tutorial is a standalone HTML/CSS/JS module and reuses shared runtime utilities from `shared/`.
 
@@ -19,14 +22,19 @@ Then open:
 - `http://localhost:4173/trie/`
 - `http://localhost:4173/segment_tree/`
 - `http://localhost:4173/fenwick_tree/`
+- `http://localhost:4173/dijkstra/`
+- `http://localhost:4173/bellman_ford/`
+- `http://localhost:4173/topological_sort/`
 
 ## Repository Layout
 
-- `trie/`, `segment_tree/`, `fenwick_tree/`
+- `trie/`, `segment_tree/`, `fenwick_tree/`, `dijkstra/`, `bellman_ford/`, `topological_sort/`
   - `index.html`: page structure and controls
   - `styles.css`: module-specific theme and layout
   - `app.js`: algorithm tracer + UI wiring
 - `shared/tutorial-core.js`: common operation runner, logger, shortcuts, code highlighter
+- `shared/graph-core.js`: shared SVG graph geometry/math helpers for graph tutorials
+- `shared/graph-renderer.js`: shared SVG graph rendering helpers (canvas prep, edges, nodes, arrow markers)
 - `shared/tutorial-base.css`: shared layout/control primitives
 - `AGENTS.md`: contributor guide for coding, testing, and PR expectations
 
@@ -40,6 +48,9 @@ Then open:
 node --input-type=module --check < trie/app.js
 node --input-type=module --check < segment_tree/app.js
 node --input-type=module --check < fenwick_tree/app.js
+node --input-type=module --check < dijkstra/app.js
+node --input-type=module --check < bellman_ford/app.js
+node --input-type=module --check < topological_sort/app.js
 ```
 
 ## Manual Testing Checklist

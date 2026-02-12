@@ -6,6 +6,8 @@ Reusable module for all algorithm tutorials in this repo.
 
 - `shared/tutorial-core.js`
 - `shared/tutorial-base.css`
+- `shared/graph-core.js`
+- `shared/graph-renderer.js`
 
 ## What it provides
 
@@ -26,6 +28,17 @@ Reusable module for all algorithm tutorials in this repo.
   - Utility rows (`.row`, `.row.wrap`, `.row.between`)
   - Status + log primitives (`.status`, `.metric-label`, `.log-entry`)
   - Shortcut styling (`.key-hint`, `kbd`)
+- Graph SVG utilities (`graph-core.js`)
+  - `createSvgElement(tag, attrs)`: SVG element creation helper.
+  - `getSvgCanvasSize(svg, fallback)`: safe responsive canvas sizing.
+  - `computeCircularNodePositions(...)`: reusable node layout in circular/elliptic form.
+  - `computeEdgeGeometry(...)`: reusable edge path + label geometry (line or curved).
+- Graph SVG rendering helpers (`graph-renderer.js`)
+  - `prepareGraphCanvas(...)`: shared canvas sizing + empty-state rendering.
+  - `ensureArrowMarker(...)`: reusable directed-edge marker setup.
+  - `renderGraphEdges(...)`: shared edge path/label rendering pipeline.
+  - `renderGraphNodes(...)`: shared node group rendering pipeline.
+  - `createDirectedPairSet(...)`, `getReverseCurveOffset(...)`: shared helpers for bidirectional edge curvature.
 
 ## How to use in a tutorial
 

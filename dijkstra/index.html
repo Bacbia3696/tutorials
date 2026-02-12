@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dijkstra Shortest Path Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Fira+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/tutorial-base.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-beam beam-a"></div>
+    <div class="bg-beam beam-b"></div>
+
+    <main class="layout">
+      <header class="panel hero">
+        <p class="eyebrow">Weighted Graphs</p>
+        <h1>Dijkstra Shortest Path Lab</h1>
+        <p>
+          Trace every priority-queue decision in Dijkstra's algorithm. Watch settled nodes, distance
+          relaxations, and predecessor links that reconstruct the shortest path.
+        </p>
+      </header>
+
+      <section class="panel controls">
+        <div class="control-group">
+          <label for="nodesInput">Nodes (labels, comma/space separated, max 10)</label>
+          <div class="row">
+            <input id="nodesInput" type="text" value="A, B, C, D, E, F" />
+            <button id="loadGraphBtn" class="btn">Load Graph</button>
+            <button id="sampleGraphBtn" class="btn btn-muted">Sample</button>
+            <button id="randomGraphBtn" class="btn btn-muted">Random</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="edgesInput">
+            Edges (one per line): <code>FROM TO WEIGHT</code> (example: <code>A B 4</code>)
+          </label>
+          <textarea id="edgesInput" rows="7">A B 4
+A C 2
+B C 1
+B D 5
+C D 8
+C E 10
+D E 2
+D F 6
+E F 3</textarea>
+        </div>
+
+        <div class="control-grid">
+          <div class="control-group">
+            <label for="graphMode">Graph Mode</label>
+            <select id="graphMode">
+              <option value="undirected">Undirected</option>
+              <option value="directed">Directed</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="sourceSelect">Source</label>
+            <select id="sourceSelect"></select>
+          </div>
+
+          <div class="control-group">
+            <label for="targetSelect">Target (optional)</label>
+            <select id="targetSelect"></select>
+          </div>
+        </div>
+
+        <div class="row wrap">
+          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+          <button id="stepBtn" class="btn">Step</button>
+          <button id="instantBtn" class="btn">Apply Instantly</button>
+          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+
+          <div class="speed-wrap">
+            <label for="speedRange">Speed</label>
+            <input id="speedRange" type="range" min="120" max="1200" step="20" value="420" />
+            <span id="speedLabel">420 ms</span>
+          </div>
+        </div>
+
+        <p class="key-hint">
+          Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd> finish,
+          <kbd>L</kbd> load, <kbd>M</kbd> sample, <kbd>R</kbd> random, <kbd>U</kbd> undirected,
+          <kbd>D</kbd> directed.
+        </p>
+      </section>
+
+      <section class="panel concept">
+        <h2>Core Idea</h2>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h3>Greedy Settling</h3>
+            <p>
+              Once a node is extracted with minimum tentative distance, its shortest distance is fixed.
+            </p>
+          </div>
+          <div class="concept-card">
+            <h3>Relaxation</h3>
+            <p>
+              For each edge <code>u → v</code>, try improving <code>dist[v]</code> with
+              <code>dist[u] + w(u, v)</code>.
+            </p>
+          </div>
+          <div class="concept-card">
+            <h3>Predecessor Links</h3>
+            <p>
+              Store <code>prev[v]</code> on each improvement. Backtrack from target to rebuild the path.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="graphViewPanel" class="panel graph-view mode-undirected">
+        <div class="graph-grid">
+          <div class="graph-main">
+            <h3>Graph Canvas</h3>
+            <div class="graph-canvas-wrap">
+              <svg id="graphCanvas" class="graph-canvas" viewBox="0 0 980 560" role="img" aria-label="Graph visualization"></svg>
+            </div>
+            <div class="legend-pills">
+              <span class="legend-pill current">Current</span>
+              <span class="legend-pill frontier">Frontier</span>
+              <span class="legend-pill settled">Settled</span>
+              <span class="legend-pill path">Best Path</span>
+            </div>
+            <p class="canvas-hint">
+              Blue: frontier, green: settled, amber outline: current node. Arrows indicate edge direction.
+            </p>
+
+            <h3>Node Details</h3>
+            <div id="nodeCards" class="node-grid"></div>
+          </div>
+
+          <aside class="graph-side">
+            <section class="runtime-card">
+              <h3>Frontier (priority queue)</h3>
+              <div id="frontierStrip" class="frontier-strip"></div>
+            </section>
+
+            <section class="runtime-card">
+              <h3>Edges</h3>
+              <div class="edge-table-wrap">
+                <table class="edge-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Edge</th>
+                      <th>Weight</th>
+                    </tr>
+                  </thead>
+                  <tbody id="edgeRows"></tbody>
+                </table>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section class="panel status">
+        <div>
+          <h2>Status</h2>
+          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready.</p>
+        </div>
+        <div class="metrics">
+          <p><span class="metric-label">Settled Nodes:</span> <span id="settledCount">0 / 0</span></p>
+          <p><span class="metric-label">Target Distance:</span> <span id="distanceResult">-</span></p>
+          <p><span class="metric-label">Path:</span> <span id="pathResult">-</span></p>
+          <p><span class="metric-label">Step:</span> <span id="stepCounter">0 / 0</span></p>
+        </div>
+      </section>
+
+      <section class="panel code-view">
+        <h2>Pseudocode Lens</h2>
+        <div class="code-grid">
+          <div class="code-panel" data-op="dijkstra">
+            <h3>Dijkstra(source)</h3>
+            <ol>
+              <li data-line="1">Initialize dist[*] = inf, dist[source] = 0; push source</li>
+              <li data-line="2">while priority queue is not empty:</li>
+              <li data-line="3">u = extract-min()</li>
+              <li data-line="4">if u already settled: continue; otherwise settle u</li>
+              <li data-line="5">for each edge (u, v, w):</li>
+              <li data-line="6">candidate = dist[u] + w</li>
+              <li data-line="7">if candidate &lt; dist[v]:</li>
+              <li data-line="8">dist[v] = candidate, prev[v] = u, push/update v</li>
+              <li data-line="9">finish (or stop early when target settles)</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel log-view">
+        <div class="row between">
+          <h2>Trace Log</h2>
+          <button id="clearLogBtn" class="btn btn-muted">Clear Log</button>
+        </div>
+        <div id="logOutput" class="log-output" role="log" aria-live="polite" aria-relevant="additions"></div>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
