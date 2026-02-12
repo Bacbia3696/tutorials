@@ -9,6 +9,7 @@ MODULES=(
   dsu
   dijkstra
   bellman_ford
+  kruskal
   topological_sort
 )
 

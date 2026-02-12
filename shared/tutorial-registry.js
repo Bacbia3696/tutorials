@@ -6,6 +6,7 @@ const tutorialOrder = [
   "dsu",
   "dijkstra",
   "bellman_ford",
+  "kruskal",
   "topological_sort",
 ];
 
@@ -127,6 +128,22 @@ export const tutorialRegistry = Object.freeze({
     fontHref:
       "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap",
     tagName: "bellman-ford-tutorial-app",
+    moduleEntryPath: "./app.js",
+  }),
+  kruskal: freezeTutorial({
+    id: "kruskal",
+    category: "graph",
+    route: "kruskal/",
+    title: "Kruskal's Algorithm Tutorial Lab",
+    description:
+      "Interactive Kruskal's algorithm tutorial. Trace sorted-edge processing and DSU-based cycle checks while building a minimum spanning tree step-by-step.",
+    landingTitle: "Kruskal's Algorithm",
+    landingDescription:
+      "Build a minimum spanning tree by processing edges in weight order and using Union-Find to reject cycle-forming edges.",
+    landingTags: ["mst", "union-find", "greedy", "cycle-check"],
+    fontHref:
+      "https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Roboto+Mono:wght@400;500&display=swap",
+    tagName: "kruskal-tutorial-app",
     moduleEntryPath: "./app.js",
   }),
   topological_sort: freezeTutorial({
