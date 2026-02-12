@@ -1,15 +1,9 @@
 {
   "name": "algorithm-tutorials-playground",
   "private": true,
-  "packageManager": "yarn@1.22.22",
   "scripts": {
     "start": "python3 -m http.server 4173",
-    "dev": "node ./node_modules/live-server/live-server.js . --port=5173 --open=/ --ignore=.git,node_modules",
-    "dev:no-open": "node ./node_modules/live-server/live-server.js . --port=5173 --no-browser --ignore=.git,node_modules",
     "check:shared": "node shared/tests/shared-logic.test.mjs",
     "check:smoke": "shared/tests/smoke-check.sh"
-  },
-  "devDependencies": {
-    "live-server": "^1.2.2"
   }
 }

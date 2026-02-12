@@ -18,6 +18,17 @@ defineTutorialApp(import.meta.url, {
       </header>
 
       <section class="controls panel">
+        <div class="control-group">
+          <label for="initialValuesInput">
+            Initial Values at [L, L+1, ...] (comma or space separated, max 24)
+          </label>
+          <div class="row seed-row">
+            <input id="initialValuesInput" type="text" value="4, 1, 0, 7, 2, 3" />
+            <button id="loadInitialBtn" class="btn">Load Initial Values</button>
+            <button id="randomInitialBtn" class="btn btn-muted">Random Seed</button>
+          </div>
+        </div>
+
         <div class="control-grid bounds-grid">
           <div class="control-group">
             <label for="boundLeft">Universe Left (L)</label>
@@ -26,7 +37,7 @@ defineTutorialApp(import.meta.url, {
 
           <div class="control-group">
             <label for="boundRight">Universe Right (R)</label>
-            <input id="boundRight" type="number" value="1023" />
+            <input id="boundRight" type="number" value="63" />
           </div>
 
           <div class="control-group control-group-end">
@@ -80,6 +91,7 @@ defineTutorialApp(import.meta.url, {
         <p class="key-hint">
           Shortcuts: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant,
           <kbd>F</kbd> finish, <kbd>B</kbd> reset tree,
+          <kbd>L</kbd> load initial, <kbd>R</kbd> random seed,
           <kbd>U</kbd> update mode, <kbd>Q</kbd> query mode.
         </p>
       </section>
@@ -101,7 +113,7 @@ defineTutorialApp(import.meta.url, {
       <section class="status panel">
         <div>
           <h2>Status</h2>
-          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready. Set bounds and run operations.</p>
+          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready. Load initial values (or reset empty), then run operations.</p>
         </div>
         <div class="status-metrics">
           <p><span class="metric-label">Current Sum (root):</span> <span id="rootSum">-</span></p>

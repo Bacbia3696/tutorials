@@ -3,6 +3,7 @@ import {
   bindDebouncedResize,
   setupRunnerControls,
 } from "../shared/tutorial-bootstrap.js";
+import { parseArrayInput, randomIntegerArray } from "../shared/array-input.js";
 import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
 
 class SparseSegTreeTracer {
@@ -136,6 +137,41 @@ class SparseSegTreeTracer {
     return { events };
   }
 
+  applyPointAdd(index, delta) {
+    if (!Number.isSafeInteger(index) || index < this.leftBound || index > this.rightBound) {
+      return;
+    }
+    if (!Number.isSafeInteger(delta) || delta === 0) {
+      return;
+    }
+
+    const update = (node) => {
+      if (node.left === node.right) {
+        node.sum += delta;
+        return;
+      }
+
+      const mid = Math.floor((node.left + node.right) / 2);
+      if (index <= mid) {
+        if (!node.leftChild) {
+          node.leftChild = this.#createNode(node.left, mid, node.depth + 1, node.id);
+        }
+        update(node.leftChild);
+      } else {
+        if (!node.rightChild) {
+          node.rightChild = this.#createNode(mid + 1, node.right, node.depth + 1, node.id);
+        }
+        update(node.rightChild);
+      }
+
+      const leftSum = node.leftChild ? node.leftChild.sum : 0;
+      const rightSum = node.rightChild ? node.rightChild.sum : 0;
+      node.sum = leftSum + rightSum;
+    };
+
+    update(this.root);
+  }
+
   generateRangeQuery(queryLeft, queryRight) {
     const events = [];
 
@@ -205,6 +241,9 @@ class SparseSegTreeTracer {
 }
 
 const elements = {
+  initialValuesInput: document.getElementById("initialValuesInput"),
+  loadInitialBtn: document.getElementById("loadInitialBtn"),
+  randomInitialBtn: document.getElementById("randomInitialBtn"),
   boundLeft: document.getElementById("boundLeft"),
   boundRight: document.getElementById("boundRight"),
   resetTreeBtn: document.getElementById("resetTreeBtn"),
@@ -250,6 +289,7 @@ const helpers = createRuntimeHelpers({
   statusMessage: elements.statusMessage,
 });
 let operationRunner = null;
+const MAX_INITIAL_VALUES = 24;
 
 function renderPoints() {
   elements.pointStrip.innerHTML = "";
@@ -446,6 +486,41 @@ function parseBoundsInputs() {
   return { left, right };
 }
 
+function parseInitialValuesInput(left, right, { allowEmpty = true } = {}) {
+  const text = String(elements.initialValuesInput.value ?? "").trim();
+  if (text.length === 0) {
+    if (allowEmpty) {
+      return { values: [] };
+    }
+    return { error: "Initial values cannot be empty." };
+  }
+
+  const parsed = parseArrayInput(text, {
+    maxValues: MAX_INITIAL_VALUES,
+    maxValuesMessage: `Please use at most ${MAX_INITIAL_VALUES} initial values.`,
+  });
+  if (parsed.error) {
+    return parsed;
+  }
+
+  for (const value of parsed.values) {
+    if (!Number.isSafeInteger(value)) {
+      return { error: `Initial value ${value} is outside the safe integer range.` };
+    }
+  }
+
+  const universeSize = right - left + 1;
+  if (parsed.values.length > universeSize) {
+    return {
+      error:
+        `Initial values length (${parsed.values.length}) exceeds universe size ` +
+        `(${universeSize}) for [${left}, ${right}].`,
+    };
+  }
+
+  return { values: parsed.values };
+}
+
 function syncInputBounds() {
   const min = String(state.leftBound);
   const max = String(state.rightBound);
@@ -465,7 +540,7 @@ function clampToBounds(value) {
   return Math.min(state.rightBound, Math.max(state.leftBound, Math.trunc(value)));
 }
 
-function loadTree(left, right) {
+function loadTree(left, right, initialValues = []) {
   if (operationRunner) {
     operationRunner.stop();
     operationRunner.ensureNoPending();
@@ -475,6 +550,15 @@ function loadTree(left, right) {
   state.rightBound = right;
   state.tracer = new SparseSegTreeTracer(left, right);
   state.pointValues = new Map();
+  for (let offset = 0; offset < initialValues.length; offset += 1) {
+    const value = initialValues[offset];
+    if (value === 0) {
+      continue;
+    }
+    const index = left + offset;
+    state.tracer.applyPointAdd(index, value);
+    state.pointValues.set(index, value);
+  }
   state.lastQueryResult = null;
 
   syncInputBounds();
@@ -506,7 +590,14 @@ function loadTree(left, right) {
   helpers.focusCodePanel(elements.opType.value);
   helpers.clearCodeHighlights();
 
-  const message = `Sparse tree reset for universe [${left}, ${right}].`;
+  const initialCount = initialValues.length;
+  const seededCount = state.pointValues.size;
+  const message =
+    initialCount === 0
+      ? `Sparse tree reset for universe [${left}, ${right}].`
+      : seededCount === 0
+        ? `Sparse tree loaded for [${left}, ${right}] with ${initialCount} initial values (all zero).`
+        : `Sparse tree loaded for [${left}, ${right}] with ${initialCount} initial values (${seededCount} non-zero).`;
   helpers.updateStatus(message);
   helpers.appendLog(message, "ok");
 }
@@ -519,7 +610,48 @@ function handleResetTree() {
     return;
   }
 
-  loadTree(parsed.left, parsed.right);
+  loadTree(parsed.left, parsed.right, []);
+}
+
+function handleLoadInitialValues() {
+  const parsedBounds = parseBoundsInputs();
+  if (parsedBounds.error) {
+    helpers.updateStatus(parsedBounds.error);
+    helpers.appendLog(parsedBounds.error);
+    return;
+  }
+
+  const parsedInitial = parseInitialValuesInput(parsedBounds.left, parsedBounds.right, {
+    allowEmpty: false,
+  });
+  if (parsedInitial.error) {
+    helpers.updateStatus(parsedInitial.error);
+    helpers.appendLog(parsedInitial.error);
+    return;
+  }
+
+  loadTree(parsedBounds.left, parsedBounds.right, parsedInitial.values);
+}
+
+function handleRandomInitialValues() {
+  const parsedBounds = parseBoundsInputs();
+  if (parsedBounds.error) {
+    helpers.updateStatus(parsedBounds.error);
+    helpers.appendLog(parsedBounds.error);
+    return;
+  }
+
+  const universeSize = parsedBounds.right - parsedBounds.left + 1;
+  const maxLength = Math.max(1, Math.min(10, universeSize, MAX_INITIAL_VALUES));
+  const minLength = Math.min(6, maxLength);
+  const values = randomIntegerArray({
+    minLength,
+    maxLength,
+    maxValue: 10,
+  });
+
+  elements.initialValuesInput.value = values.join(", ");
+  loadTree(parsedBounds.left, parsedBounds.right, values);
 }
 
 function handleOperationTypeChange() {
@@ -691,6 +823,8 @@ function init() {
   });
 
   elements.resetTreeBtn.addEventListener("click", handleResetTree);
+  elements.loadInitialBtn.addEventListener("click", handleLoadInitialValues);
+  elements.randomInitialBtn.addEventListener("click", handleRandomInitialValues);
   elements.opType.addEventListener("change", handleOperationTypeChange);
 
   setupRunnerControls({
@@ -706,6 +840,8 @@ function init() {
     clearLog: () => helpers.clearLog(),
     extraShortcuts: {
       b: () => handleResetTree(),
+      l: () => handleLoadInitialValues(),
+      r: () => handleRandomInitialValues(),
       u: () => setOperationType("update"),
       q: () => setOperationType("query"),
     },
@@ -719,7 +855,7 @@ function init() {
   });
 
   handleOperationTypeChange();
-  handleResetTree();
+  handleLoadInitialValues();
 }
 
 init();

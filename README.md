@@ -20,24 +20,6 @@ All tutorials are mounted through Lit custom elements in `app.js`, and algorithm
 No build step is required.
 Internet access is required at runtime to fetch Lit ESM imports from CDN (`shared/lit.js`).
 
-### Live Reload (Yarn)
-
-```bash
-yarn install
-yarn dev
-```
-
-Then open `http://localhost:5173/`.
-Edits to HTML/CSS/JS files reload automatically in the browser.
-
-To run without auto-opening a browser tab:
-
-```bash
-yarn dev:no-open
-```
-
-Default Yarn live-reload URL: `http://localhost:5173/`
-
 ### Basic Static Server (No Live Reload)
 
 ```bash

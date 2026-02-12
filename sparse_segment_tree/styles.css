@@ -103,6 +103,11 @@ body {
   gap: 10px;
 }
 
+.seed-row input {
+  flex: 1 1 320px;
+  min-width: 220px;
+}
+
 .bounds-grid {
   grid-template-columns: repeat(3, minmax(150px, 1fr));
 }
