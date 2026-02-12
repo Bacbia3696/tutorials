@@ -283,6 +283,15 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     refY: 4,
     fill: "rgba(59, 101, 129, 0.9)",
   });
+  ensureArrowMarker({
+    svgElement: elements.graphCanvas,
+    id: "topo-arrow-active",
+    markerWidth: 6,
+    markerHeight: 6,
+    refX: 5.5,
+    refY: 3,
+    fill: "rgba(191, 130, 41, 0.96)",
+  });
 
   const points = computeCircularNodePositions(state.graph.nodes.length, width, height, {
     marginX: 95,
@@ -298,6 +307,7 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     nodeRadius: 20,
     directed: true,
     markerId: "topo-arrow",
+    activeMarkerId: "topo-arrow-active",
     activeEdgeId,
     curveOffsetForEdge: (edge) => getReverseCurveOffset(edge, directedPairs, 18),
     labelOffset: 10,

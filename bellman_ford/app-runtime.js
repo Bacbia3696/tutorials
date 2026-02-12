@@ -392,6 +392,15 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
       refY: 4,
       fill: "rgba(124, 85, 64, 0.9)",
     });
+    ensureArrowMarker({
+      svgElement: elements.graphCanvas,
+      id: "bf-arrow-active",
+      markerWidth: 6,
+      markerHeight: 6,
+      refX: 5.5,
+      refY: 3,
+      fill: "rgba(205, 110, 42, 0.98)",
+    });
   }
 
   const directedPairs = createDirectedPairSet(state.graph.displayEdges);
@@ -402,6 +411,7 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
     nodeRadius: 23,
     directed: drawDirected,
     markerId: "bf-arrow",
+    activeMarkerId: "bf-arrow-active",
     activeEdgeId: activeDisplayEdgeId,
     curveOffsetForEdge: (edge) =>
       drawDirected ? getReverseCurveOffset(edge, directedPairs, 22) : 0,

@@ -89,6 +89,7 @@ export function renderGraphEdges({
   nodeRadius = 20,
   directed = false,
   markerId = "graph-arrow",
+  activeMarkerId = null,
   activeEdgeId = null,
   curveOffsetForEdge = () => 0,
   labelOffset = 10,
@@ -118,7 +119,8 @@ export function renderGraphEdges({
       path.classList.add("active");
     }
     if (directed) {
-      path.setAttribute("marker-end", `url(#${markerId})`);
+      const markerToUse = isActive && activeMarkerId ? activeMarkerId : markerId;
+      path.setAttribute("marker-end", `url(#${markerToUse})`);
     }
     edgesLayer.appendChild(path);
 
