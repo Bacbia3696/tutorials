@@ -86,8 +86,12 @@ fenwick-tree-tutorial-app {
 .control-grid {
   margin-top: 10px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(132px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
+}
+
+.controls-main {
+  min-width: 0;
 }
 
 .status h2,
@@ -438,8 +442,7 @@ fenwick-tree-tutorial-app {
     grid-template-columns: minmax(680px, 1.6fr) minmax(380px, 1fr);
     grid-template-areas:
       "hero hero"
-      "controls controls"
-      "bit-view status"
+      "controls status"
       "bit-view code-view"
       "bit-view concept"
       "array-view array-view"

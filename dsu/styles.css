@@ -340,8 +340,7 @@ code,
     grid-template-columns: minmax(720px, 1.85fr) minmax(360px, 1fr);
     grid-template-areas:
       "hero hero"
-      "controls controls"
-      "forest-view status"
+      "controls status"
       "forest-view code-view"
       "parent-view components-view"
       "log-view log-view";

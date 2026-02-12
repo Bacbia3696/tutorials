@@ -5,6 +5,7 @@ import {
 } from "../shared/tutorial-bootstrap.js";
 import { parseArrayInput, randomIntegerArray } from "../shared/array-input.js";
 import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+import { mountAutoFitTree } from "../shared/tree-view.js";
 
 class SparseSegTreeTracer {
   constructor(left, right) {
@@ -364,9 +365,6 @@ function renderTree(snapshot, activeNodeId = null) {
   const diagramHeight = topPadding + bottomPadding + (maxDepth + 1) * rowHeight;
   const diagramWidth = Math.max(panelWidth, minSpacingWidth);
 
-  const scroll = document.createElement("div");
-  scroll.className = "tree-scroll";
-
   const diagram = document.createElement("div");
   diagram.className = "tree-diagram";
   diagram.style.width = `${diagramWidth}px`;
@@ -447,8 +445,7 @@ function renderTree(snapshot, activeNodeId = null) {
     diagram.appendChild(card);
   }
 
-  scroll.appendChild(diagram);
-  elements.treeContainer.appendChild(scroll);
+  mountAutoFitTree(elements.treeContainer, diagram);
 }
 
 function rerenderTreeForResize() {

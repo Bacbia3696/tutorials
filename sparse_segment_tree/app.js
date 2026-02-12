@@ -18,82 +18,91 @@ defineTutorialApp(import.meta.url, {
       </header>
 
       <section class="controls panel">
-        <div class="control-group">
-          <label for="initialValuesInput">
-            Initial Values at [L, L+1, ...] (comma or space separated, max 24)
-          </label>
-          <div class="row seed-row">
-            <input id="initialValuesInput" type="text" value="4, 1, 0, 7, 2, 3" />
-            <button id="loadInitialBtn" class="btn">Load Initial Values</button>
-            <button id="randomInitialBtn" class="btn btn-muted">Random Seed</button>
+        <div class="controls-grid">
+          <div class="controls-main">
+            <div class="control-group">
+              <label for="initialValuesInput">
+                Initial Values at [L, L+1, ...] (comma or space separated, max 24)
+              </label>
+              <div class="row seed-row controls-row">
+                <input id="initialValuesInput" type="text" value="4, 1, 0, 7, 2, 3" />
+                <button id="loadInitialBtn" class="btn">Load Initial Values</button>
+                <button id="randomInitialBtn" class="btn btn-muted">Random Seed</button>
+              </div>
+            </div>
+
+            <div class="control-grid bounds-grid">
+              <div class="control-group">
+                <label for="boundLeft">Universe Left (L)</label>
+                <input id="boundLeft" type="number" value="0" />
+              </div>
+
+              <div class="control-group">
+                <label for="boundRight">Universe Right (R)</label>
+                <input id="boundRight" type="number" value="63" />
+              </div>
+
+              <div class="control-group control-group-end">
+                <label>&nbsp;</label>
+                <button id="resetTreeBtn" class="btn">Reset Tree</button>
+              </div>
+            </div>
+
+            <div class="control-grid">
+              <div class="control-group">
+                <label for="opType">Operation</label>
+                <select id="opType">
+                  <option value="update">Point Add Update</option>
+                  <option value="query">Range Sum Query</option>
+                </select>
+              </div>
+
+              <div class="control-group" id="pointIndexWrap">
+                <label for="pointIndex">Point Index</label>
+                <input id="pointIndex" type="number" value="42" />
+              </div>
+
+              <div class="control-group" id="deltaWrap">
+                <label for="deltaValue">Delta (+V)</label>
+                <input id="deltaValue" type="number" value="5" />
+              </div>
+
+              <div class="control-group" id="leftWrap">
+                <label for="leftIndex">Left Index (L)</label>
+                <input id="leftIndex" type="number" value="0" />
+              </div>
+
+              <div class="control-group" id="rightWrap">
+                <label for="rightIndex">Right Index (R)</label>
+                <input id="rightIndex" type="number" value="127" />
+              </div>
+            </div>
           </div>
+
+          <aside class="controls-runner">
+            <h3>Playback Controls</h3>
+
+            <div class="runner-grid">
+              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+              <button id="stepBtn" class="btn">Step</button>
+              <button id="instantBtn" class="btn">Apply Instantly</button>
+              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+            </div>
+
+            <div class="runner-speed">
+              <label for="speedRange">Animation Speed</label>
+              <input id="speedRange" type="range" min="120" max="1400" step="20" value="520" />
+              <span id="speedLabel">520 ms</span>
+            </div>
+
+            <p class="key-hint">
+              Shortcuts: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant,
+              <kbd>F</kbd> finish, <kbd>B</kbd> reset tree,
+              <kbd>L</kbd> load initial, <kbd>R</kbd> random seed,
+              <kbd>U</kbd> update mode, <kbd>Q</kbd> query mode.
+            </p>
+          </aside>
         </div>
-
-        <div class="control-grid bounds-grid">
-          <div class="control-group">
-            <label for="boundLeft">Universe Left (L)</label>
-            <input id="boundLeft" type="number" value="0" />
-          </div>
-
-          <div class="control-group">
-            <label for="boundRight">Universe Right (R)</label>
-            <input id="boundRight" type="number" value="63" />
-          </div>
-
-          <div class="control-group control-group-end">
-            <label>&nbsp;</label>
-            <button id="resetTreeBtn" class="btn">Reset Tree</button>
-          </div>
-        </div>
-
-        <div class="control-grid">
-          <div class="control-group">
-            <label for="opType">Operation</label>
-            <select id="opType">
-              <option value="update">Point Add Update</option>
-              <option value="query">Range Sum Query</option>
-            </select>
-          </div>
-
-          <div class="control-group" id="pointIndexWrap">
-            <label for="pointIndex">Point Index</label>
-            <input id="pointIndex" type="number" value="42" />
-          </div>
-
-          <div class="control-group" id="deltaWrap">
-            <label for="deltaValue">Delta (+V)</label>
-            <input id="deltaValue" type="number" value="5" />
-          </div>
-
-          <div class="control-group" id="leftWrap">
-            <label for="leftIndex">Left Index (L)</label>
-            <input id="leftIndex" type="number" value="0" />
-          </div>
-
-          <div class="control-group" id="rightWrap">
-            <label for="rightIndex">Right Index (R)</label>
-            <input id="rightIndex" type="number" value="127" />
-          </div>
-        </div>
-
-        <div class="row wrap">
-          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-          <button id="stepBtn" class="btn">Step</button>
-          <button id="instantBtn" class="btn">Apply Instantly</button>
-          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-
-          <div class="speed-wrap">
-            <label for="speedRange">Animation Speed</label>
-            <input id="speedRange" type="range" min="120" max="1400" step="20" value="520" />
-            <span id="speedLabel">520 ms</span>
-          </div>
-        </div>
-        <p class="key-hint">
-          Shortcuts: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant,
-          <kbd>F</kbd> finish, <kbd>B</kbd> reset tree,
-          <kbd>L</kbd> load initial, <kbd>R</kbd> random seed,
-          <kbd>U</kbd> update mode, <kbd>Q</kbd> query mode.
-        </p>
       </section>
 
       <section class="array-view panel">
@@ -105,7 +114,7 @@ defineTutorialApp(import.meta.url, {
         <h2>Sparse Tree Nodes</h2>
         <p class="hint">
           Card format: <code>#id [l,r]</code>, <code>sum</code>. Only materialized nodes are shown.
-          Active recursion node pulses.
+          Active recursion node pulses. The view auto-fits to keep the full materialized tree visible.
         </p>
         <div id="treeContainer" class="tree-container"></div>
       </section>

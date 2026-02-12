@@ -18,64 +18,72 @@ defineTutorialApp(import.meta.url, {
       </header>
 
       <section class="panel controls">
-        <div class="control-group">
-          <label for="arrayInput">Initial Array (integers, comma/space separated, max 20)</label>
-          <div class="row">
-            <input id="arrayInput" type="text" value="5, 2, 7, 1, 3, 6, 4, 9" />
-            <button id="loadArrayBtn" class="btn">Load Array</button>
-            <button id="randomArrayBtn" class="btn btn-muted">Random</button>
+        <div class="controls-grid">
+          <div class="controls-main">
+            <div class="control-group">
+              <label for="arrayInput">Initial Array (integers, comma/space separated, max 20)</label>
+              <div class="row controls-row">
+                <input id="arrayInput" type="text" value="5, 2, 7, 1, 3, 6, 4, 9" />
+                <button id="loadArrayBtn" class="btn">Load Array</button>
+                <button id="randomArrayBtn" class="btn btn-muted">Random</button>
+              </div>
+            </div>
+
+            <div class="control-grid">
+              <div class="control-group">
+                <label for="opType">Operation</label>
+                <select id="opType">
+                  <option value="update">Point Update: add delta at index</option>
+                  <option value="prefix">Prefix Query: sum(1..i)</option>
+                  <option value="range">Range Query: sum(l..r)</option>
+                </select>
+              </div>
+
+              <div class="control-group" id="singleIndexWrap">
+                <label for="singleIndex">Index i (1-based)</label>
+                <input id="singleIndex" type="number" min="1" value="5" />
+              </div>
+
+              <div class="control-group" id="leftWrap">
+                <label for="leftIndex">Left l (1-based)</label>
+                <input id="leftIndex" type="number" min="1" value="3" />
+              </div>
+
+              <div class="control-group" id="rightWrap">
+                <label for="rightIndex">Right r (1-based)</label>
+                <input id="rightIndex" type="number" min="1" value="7" />
+              </div>
+
+              <div class="control-group" id="deltaWrap">
+                <label for="deltaValue">Delta (+/-)</label>
+                <input id="deltaValue" type="number" value="4" />
+              </div>
+            </div>
           </div>
+
+          <aside class="controls-runner">
+            <h3>Playback Controls</h3>
+
+            <div class="runner-grid">
+              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+              <button id="stepBtn" class="btn">Step</button>
+              <button id="instantBtn" class="btn">Apply Instantly</button>
+              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+            </div>
+
+            <div class="runner-speed">
+              <label for="speedRange">Speed</label>
+              <input id="speedRange" type="range" min="120" max="1200" step="20" value="460" />
+              <span id="speedLabel">460 ms</span>
+            </div>
+
+            <p class="key-hint">
+              Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd>
+              finish, <kbd>L</kbd> load, <kbd>R</kbd> random, <kbd>1</kbd> update, <kbd>2</kbd>
+              prefix, <kbd>3</kbd> range.
+            </p>
+          </aside>
         </div>
-
-        <div class="control-grid">
-          <div class="control-group">
-            <label for="opType">Operation</label>
-            <select id="opType">
-              <option value="update">Point Update: add delta at index</option>
-              <option value="prefix">Prefix Query: sum(1..i)</option>
-              <option value="range">Range Query: sum(l..r)</option>
-            </select>
-          </div>
-
-          <div class="control-group" id="singleIndexWrap">
-            <label for="singleIndex">Index i (1-based)</label>
-            <input id="singleIndex" type="number" min="1" value="5" />
-          </div>
-
-          <div class="control-group" id="leftWrap">
-            <label for="leftIndex">Left l (1-based)</label>
-            <input id="leftIndex" type="number" min="1" value="3" />
-          </div>
-
-          <div class="control-group" id="rightWrap">
-            <label for="rightIndex">Right r (1-based)</label>
-            <input id="rightIndex" type="number" min="1" value="7" />
-          </div>
-
-          <div class="control-group" id="deltaWrap">
-            <label for="deltaValue">Delta (+/-)</label>
-            <input id="deltaValue" type="number" value="4" />
-          </div>
-        </div>
-
-        <div class="row wrap">
-          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-          <button id="stepBtn" class="btn">Step</button>
-          <button id="instantBtn" class="btn">Apply Instantly</button>
-          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-
-          <div class="speed-wrap">
-            <label for="speedRange">Speed</label>
-            <input id="speedRange" type="range" min="120" max="1200" step="20" value="460" />
-            <span id="speedLabel">460 ms</span>
-          </div>
-        </div>
-
-        <p class="key-hint">
-          Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd> finish,
-          <kbd>L</kbd> load, <kbd>R</kbd> random, <kbd>1</kbd> update, <kbd>2</kbd> prefix,
-          <kbd>3</kbd> range.
-        </p>
       </section>
 
       <section class="panel concept">

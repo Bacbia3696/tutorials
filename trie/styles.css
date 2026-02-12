@@ -276,8 +276,7 @@ code,
     grid-template-columns: minmax(720px, 1.85fr) minmax(360px, 1fr);
     grid-template-areas:
       "hero hero"
-      "controls controls"
-      "tree-view status"
+      "controls status"
       "tree-view code-view"
       "tree-view words-view"
       "log-view log-view";

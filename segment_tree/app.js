@@ -18,57 +18,66 @@ defineTutorialApp(import.meta.url, {
       </header>
 
       <section class="controls panel">
-        <div class="control-group">
-          <label for="arrayInput">Initial Array (comma or space separated, max 16)</label>
-          <div class="row">
-            <input id="arrayInput" type="text" value="3, 1, 4, 1, 5, 9, 2, 6" />
-            <button id="loadArrayBtn" class="btn">Load Array</button>
-            <button id="randomArrayBtn" class="btn btn-muted">Random</button>
+        <div class="controls-grid">
+          <div class="controls-main">
+            <div class="control-group">
+              <label for="arrayInput">Initial Array (comma or space separated, max 16)</label>
+              <div class="row controls-row">
+                <input id="arrayInput" type="text" value="3, 1, 4, 1, 5, 9, 2, 6" />
+                <button id="loadArrayBtn" class="btn">Load Array</button>
+                <button id="randomArrayBtn" class="btn btn-muted">Random</button>
+              </div>
+            </div>
+
+            <div class="control-grid">
+              <div class="control-group">
+                <label for="opType">Operation</label>
+                <select id="opType">
+                  <option value="update">Range Add Update</option>
+                  <option value="query">Range Sum Query</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label for="leftIndex">Left Index (L)</label>
+                <input id="leftIndex" type="number" min="0" value="2" />
+              </div>
+
+              <div class="control-group">
+                <label for="rightIndex">Right Index (R)</label>
+                <input id="rightIndex" type="number" min="0" value="6" />
+              </div>
+
+              <div class="control-group" id="deltaWrap">
+                <label for="deltaValue">Delta (+V)</label>
+                <input id="deltaValue" type="number" value="3" />
+              </div>
+            </div>
           </div>
+
+          <aside class="controls-runner">
+            <h3>Playback Controls</h3>
+
+            <div class="runner-grid">
+              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+              <button id="stepBtn" class="btn">Step</button>
+              <button id="instantBtn" class="btn">Apply Instantly</button>
+              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+            </div>
+
+            <div class="runner-speed">
+              <label for="speedRange">Animation Speed</label>
+              <input id="speedRange" type="range" min="120" max="1400" step="20" value="520" />
+              <span id="speedLabel">520 ms</span>
+            </div>
+
+            <p class="key-hint">
+              Shortcuts: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant,
+              <kbd>F</kbd> finish, <kbd>L</kbd> load array, <kbd>R</kbd> random,
+              <kbd>U</kbd> update mode, <kbd>Q</kbd> query mode.
+            </p>
+          </aside>
         </div>
-
-        <div class="control-grid">
-          <div class="control-group">
-            <label for="opType">Operation</label>
-            <select id="opType">
-              <option value="update">Range Add Update</option>
-              <option value="query">Range Sum Query</option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label for="leftIndex">Left Index (L)</label>
-            <input id="leftIndex" type="number" min="0" value="2" />
-          </div>
-
-          <div class="control-group">
-            <label for="rightIndex">Right Index (R)</label>
-            <input id="rightIndex" type="number" min="0" value="6" />
-          </div>
-
-          <div class="control-group" id="deltaWrap">
-            <label for="deltaValue">Delta (+V)</label>
-            <input id="deltaValue" type="number" value="3" />
-          </div>
-        </div>
-
-        <div class="row wrap">
-          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-          <button id="stepBtn" class="btn">Step</button>
-          <button id="instantBtn" class="btn">Apply Instantly</button>
-          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-
-          <div class="speed-wrap">
-            <label for="speedRange">Animation Speed</label>
-            <input id="speedRange" type="range" min="120" max="1400" step="20" value="520" />
-            <span id="speedLabel">520 ms</span>
-          </div>
-        </div>
-        <p class="key-hint">
-          Shortcuts: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant,
-          <kbd>F</kbd> finish, <kbd>L</kbd> load array, <kbd>R</kbd> random,
-          <kbd>U</kbd> update mode, <kbd>Q</kbd> query mode.
-        </p>
       </section>
 
       <section class="array-view panel">
@@ -80,6 +89,7 @@ defineTutorialApp(import.meta.url, {
         <h2>Segment Tree Nodes</h2>
         <p class="hint">
           Card format: <code>#node [l,r]</code>, <code>sum</code>, <code>lazy</code>. Active recursion node pulses.
+          The view auto-fits to keep the full materialized tree visible.
         </p>
         <div id="treeContainer" class="tree-container"></div>
       </section>

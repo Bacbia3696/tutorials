@@ -18,50 +18,58 @@ defineTutorialApp(import.meta.url, {
       </header>
 
       <section class="panel controls">
-        <div class="control-group">
-          <label for="initialWordsInput">Initial Words (comma/space separated)</label>
-          <div class="row">
-            <input id="initialWordsInput" type="text" value="cat, car, dog, dot, deal" />
-            <button id="loadWordsBtn" class="btn">Load Words</button>
-            <button id="sampleWordsBtn" class="btn btn-muted">Sample</button>
+        <div class="controls-grid">
+          <div class="controls-main">
+            <div class="control-group">
+              <label for="initialWordsInput">Initial Words (comma/space separated)</label>
+              <div class="row controls-row">
+                <input id="initialWordsInput" type="text" value="cat, car, dog, dot, deal" />
+                <button id="loadWordsBtn" class="btn">Load Words</button>
+                <button id="sampleWordsBtn" class="btn btn-muted">Sample</button>
+              </div>
+            </div>
+
+            <div class="control-grid">
+              <div class="control-group">
+                <label for="opType">Operation</label>
+                <select id="opType">
+                  <option value="insert">Insert Word</option>
+                  <option value="search">Search Word</option>
+                  <option value="prefix">Starts With Prefix</option>
+                  <option value="delete">Delete Word</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label for="wordInput">Word / Prefix</label>
+                <input id="wordInput" type="text" value="cart" />
+              </div>
+            </div>
           </div>
+
+          <aside class="controls-runner">
+            <h3>Playback Controls</h3>
+
+            <div class="runner-grid">
+              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+              <button id="stepBtn" class="btn">Step</button>
+              <button id="instantBtn" class="btn">Apply Instantly</button>
+              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+            </div>
+
+            <div class="runner-speed">
+              <label for="speedRange">Speed</label>
+              <input id="speedRange" type="range" min="120" max="1200" step="20" value="440" />
+              <span id="speedLabel">440 ms</span>
+            </div>
+
+            <p class="key-hint">
+              Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd>
+              finish, <kbd>L</kbd> load, <kbd>R</kbd> sample, <kbd>1</kbd> insert, <kbd>2</kbd>
+              search, <kbd>3</kbd> prefix, <kbd>4</kbd> delete.
+            </p>
+          </aside>
         </div>
-
-        <div class="control-grid">
-          <div class="control-group">
-            <label for="opType">Operation</label>
-            <select id="opType">
-              <option value="insert">Insert Word</option>
-              <option value="search">Search Word</option>
-              <option value="prefix">Starts With Prefix</option>
-              <option value="delete">Delete Word</option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label for="wordInput">Word / Prefix</label>
-            <input id="wordInput" type="text" value="cart" />
-          </div>
-        </div>
-
-        <div class="row wrap">
-          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-          <button id="stepBtn" class="btn">Step</button>
-          <button id="instantBtn" class="btn">Apply Instantly</button>
-          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-
-          <div class="speed-wrap">
-            <label for="speedRange">Speed</label>
-            <input id="speedRange" type="range" min="120" max="1200" step="20" value="440" />
-            <span id="speedLabel">440 ms</span>
-          </div>
-        </div>
-
-        <p class="key-hint">
-          Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd> finish,
-          <kbd>L</kbd> load, <kbd>R</kbd> sample, <kbd>1</kbd> insert, <kbd>2</kbd> search,
-          <kbd>3</kbd> prefix, <kbd>4</kbd> delete.
-        </p>
       </section>
 
       <section class="panel tree-view">

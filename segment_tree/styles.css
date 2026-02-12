@@ -177,14 +177,16 @@ code {
   gap: 8px;
 }
 
-.tree-scroll {
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 4px;
+.tree-shell {
+  display: grid;
+  gap: 8px;
 }
 
-.tree-diagram {
+.tree-viewport {
   position: relative;
+  width: 100%;
+  min-height: 300px;
+  overflow: hidden;
   border: 1px solid var(--edge);
   border-radius: 14px;
   background:
@@ -196,6 +198,14 @@ code {
       rgba(23, 59, 49, 0.05) 118px,
       rgba(23, 59, 49, 0.05) 120px
     );
+}
+
+.tree-diagram {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .tree-links {
@@ -314,8 +324,7 @@ code {
     grid-template-columns: minmax(720px, 1.85fr) minmax(320px, 1fr);
     grid-template-areas:
       "hero hero"
-      "controls controls"
-      "tree-view status"
+      "controls status"
       "tree-view code"
       "tree-view log"
       "array-view array-view";

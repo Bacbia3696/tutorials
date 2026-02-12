@@ -18,21 +18,23 @@ defineTutorialApp(import.meta.url, {
       </header>
 
       <section class="panel controls">
-        <div class="control-group">
-          <label for="nodesInput">Nodes (labels, comma/space separated, max 10)</label>
-          <div class="row">
-            <input id="nodesInput" type="text" value="A, B, C, D, E, F, G" />
-            <button id="loadGraphBtn" class="btn">Load Graph</button>
-            <button id="sampleGraphBtn" class="btn btn-muted">Sample</button>
-            <button id="randomGraphBtn" class="btn btn-muted">Random</button>
-          </div>
-        </div>
+        <div class="controls-grid">
+          <div class="controls-main">
+            <div class="control-group">
+              <label for="nodesInput">Nodes (labels, comma/space separated, max 10)</label>
+              <div class="row controls-row">
+                <input id="nodesInput" type="text" value="A, B, C, D, E, F, G" />
+                <button id="loadGraphBtn" class="btn">Load Graph</button>
+                <button id="sampleGraphBtn" class="btn btn-muted">Sample</button>
+                <button id="randomGraphBtn" class="btn btn-muted">Random</button>
+              </div>
+            </div>
 
-        <div class="control-group">
-          <label for="edgesInput">
-            Undirected weighted edges (one per line): <code>FROM TO WEIGHT</code>
-          </label>
-          <textarea id="edgesInput" rows="8">A B 7
+            <div class="control-group">
+              <label for="edgesInput">
+                Undirected weighted edges (one per line): <code>FROM TO WEIGHT</code>
+              </label>
+              <textarea id="edgesInput" rows="8">A B 7
 A D 5
 B C 8
 B D 9
@@ -43,25 +45,31 @@ D F 6
 E F 8
 E G 9
 F G 11</textarea>
-        </div>
-
-        <div class="row wrap">
-          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-          <button id="stepBtn" class="btn">Step</button>
-          <button id="instantBtn" class="btn">Apply Instantly</button>
-          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-
-          <div class="speed-wrap">
-            <label for="speedRange">Speed</label>
-            <input id="speedRange" type="range" min="120" max="1200" step="20" value="420" />
-            <span id="speedLabel">420 ms</span>
+            </div>
           </div>
-        </div>
 
-        <p class="key-hint">
-          Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd> finish,
-          <kbd>L</kbd> load, <kbd>M</kbd> sample, <kbd>R</kbd> random.
-        </p>
+          <aside class="controls-runner">
+            <h3>Playback Controls</h3>
+
+            <div class="runner-grid">
+              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+              <button id="stepBtn" class="btn">Step</button>
+              <button id="instantBtn" class="btn">Apply Instantly</button>
+              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+            </div>
+
+            <div class="runner-speed">
+              <label for="speedRange">Speed</label>
+              <input id="speedRange" type="range" min="120" max="1200" step="20" value="420" />
+              <span id="speedLabel">420 ms</span>
+            </div>
+
+            <p class="key-hint">
+              Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd>
+              finish, <kbd>L</kbd> load, <kbd>M</kbd> sample, <kbd>R</kbd> random.
+            </p>
+          </aside>
+        </div>
       </section>
 
       <section class="panel concept">

@@ -645,8 +645,7 @@ textarea {
     grid-template-columns: minmax(860px, 1.75fr) minmax(360px, 1fr);
     grid-template-areas:
       "hero hero"
-      "controls controls"
-      "graph-view status"
+      "controls status"
       "graph-view code-view"
       "graph-view concept"
       "log-view log-view";

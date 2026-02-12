@@ -19,54 +19,62 @@ defineTutorialApp(import.meta.url, {
       </header>
 
       <section class="panel controls">
-        <div class="control-group">
-          <label for="elementsInput">Elements (comma/space separated integers)</label>
-          <div class="row">
-            <input id="elementsInput" type="text" value="0, 1, 2, 3, 4, 5, 6, 7" />
-            <button id="loadBtn" class="btn">Initialize</button>
-            <button id="sampleBtn" class="btn btn-muted">Sample</button>
+        <div class="controls-grid">
+          <div class="controls-main">
+            <div class="control-group">
+              <label for="elementsInput">Elements (comma/space separated integers)</label>
+              <div class="row controls-row">
+                <input id="elementsInput" type="text" value="0, 1, 2, 3, 4, 5, 6, 7" />
+                <button id="loadBtn" class="btn">Initialize</button>
+                <button id="sampleBtn" class="btn btn-muted">Sample</button>
+              </div>
+            </div>
+
+            <div class="control-grid">
+              <div class="control-group">
+                <label for="opType">Operation</label>
+                <select id="opType">
+                  <option value="union">Union(a, b)</option>
+                  <option value="find">Find(x)</option>
+                  <option value="connected">Connected(a, b)</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label for="paramA">Param A (x)</label>
+                <input id="paramA" type="number" value="1" min="0" />
+              </div>
+
+              <div class="control-group">
+                <label for="paramB">Param B</label>
+                <input id="paramB" type="number" value="3" min="0" />
+              </div>
+            </div>
           </div>
+
+          <aside class="controls-runner">
+            <h3>Playback Controls</h3>
+
+            <div class="runner-grid">
+              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
+              <button id="stepBtn" class="btn">Step</button>
+              <button id="instantBtn" class="btn">Apply Instantly</button>
+              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
+            </div>
+
+            <div class="runner-speed">
+              <label for="speedRange">Speed</label>
+              <input id="speedRange" type="range" min="120" max="1200" step="20" value="440" />
+              <span id="speedLabel">440 ms</span>
+            </div>
+
+            <p class="key-hint">
+              Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd>
+              finish, <kbd>L</kbd> load, <kbd>R</kbd> sample, <kbd>1</kbd> union, <kbd>2</kbd> find,
+              <kbd>3</kbd> connected.
+            </p>
+          </aside>
         </div>
-
-        <div class="control-grid">
-          <div class="control-group">
-            <label for="opType">Operation</label>
-            <select id="opType">
-              <option value="union">Union(a, b)</option>
-              <option value="find">Find(x)</option>
-              <option value="connected">Connected(a, b)</option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label for="paramA">Param A (x)</label>
-            <input id="paramA" type="number" value="1" min="0" />
-          </div>
-
-          <div class="control-group">
-            <label for="paramB">Param B</label>
-            <input id="paramB" type="number" value="3" min="0" />
-          </div>
-        </div>
-
-        <div class="row wrap">
-          <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-          <button id="stepBtn" class="btn">Step</button>
-          <button id="instantBtn" class="btn">Apply Instantly</button>
-          <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-
-          <div class="speed-wrap">
-            <label for="speedRange">Speed</label>
-            <input id="speedRange" type="range" min="120" max="1200" step="20" value="440" />
-            <span id="speedLabel">440 ms</span>
-          </div>
-        </div>
-
-        <p class="key-hint">
-          Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd> finish,
-          <kbd>L</kbd> load, <kbd>R</kbd> sample, <kbd>1</kbd> union, <kbd>2</kbd> find,
-          <kbd>3</kbd> connected.
-        </p>
       </section>
 
       <section class="panel forest-view">
