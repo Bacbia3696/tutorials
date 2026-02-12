@@ -275,7 +275,7 @@ code,
       "controls controls"
       "tree-view status"
       "tree-view code-view"
-      "words-view words-view"
+      "tree-view words-view"
       "log-view log-view";
     align-items: start;
   }
@@ -306,6 +306,12 @@ code,
 
   .log-view {
     grid-area: log-view;
+  }
+
+  .status,
+  .code-view,
+  .words-view {
+    align-self: start;
   }
 
   .log-output {

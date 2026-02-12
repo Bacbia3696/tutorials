@@ -10,8 +10,9 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../shared/tutorial-base.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/tutorial-base.css" data-cache-bust="1" />
+    <link rel="stylesheet" href="styles.css" data-cache-bust="1" />
+    <script src="../shared/cache-bust.js"></script>
   </head>
   <body>
     <div class="bg-shape shape-a"></div>
@@ -116,6 +117,13 @@
 
       <section class="panel bit-view">
         <h2>BIT Table</h2>
+        <h3>Coverage Map</h3>
+        <div id="coverageMap" class="coverage-map" aria-label="Fenwick coverage map"></div>
+        <h3>Jump Timeline</h3>
+        <div class="jump-map-wrap">
+          <svg id="jumpCanvas" class="jump-canvas" viewBox="0 0 540 150" role="img" aria-label="Fenwick jump timeline"></svg>
+          <p id="jumpCaption" class="jump-caption">Load an array to preview jump routes.</p>
+        </div>
         <div class="bit-table-wrap">
           <table class="bit-table">
             <thead>
@@ -190,6 +198,8 @@
       </section>
     </main>
 
-    <script type="module" src="app.js"></script>
+    <script>
+      window.loadTutorialModule("./app.js");
+    </script>
   </body>
 </html>

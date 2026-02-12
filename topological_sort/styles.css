@@ -511,7 +511,7 @@ textarea {
       "controls controls"
       "process-view status"
       "process-view code-view"
-      "concept concept"
+      "process-view concept"
       "log-view log-view";
     align-items: start;
   }
@@ -542,6 +542,12 @@ textarea {
 
   .log-view {
     grid-area: log-view;
+  }
+
+  .status,
+  .code-view,
+  .concept {
+    align-self: start;
   }
 
   .log-output {

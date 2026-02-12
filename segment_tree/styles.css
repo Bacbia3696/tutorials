@@ -313,7 +313,8 @@ code {
       "controls controls"
       "tree-view status"
       "tree-view code"
-      "array-view log";
+      "tree-view log"
+      "array-view array-view";
     align-items: start;
   }
 
@@ -343,6 +344,12 @@ code {
 
   .log {
     grid-area: log;
+  }
+
+  .status,
+  .code,
+  .log {
+    align-self: start;
   }
 
   .log-output {

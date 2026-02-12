@@ -535,7 +535,7 @@ textarea {
       "controls controls"
       "graph-view status"
       "graph-view code-view"
-      "concept concept"
+      "graph-view concept"
       "log-view log-view";
     align-items: start;
   }
@@ -566,6 +566,12 @@ textarea {
 
   .log-view {
     grid-area: log-view;
+  }
+
+  .status,
+  .code-view,
+  .concept {
+    align-self: start;
   }
 
   .log-output {

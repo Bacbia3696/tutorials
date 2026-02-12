@@ -10,8 +10,9 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Fira+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../shared/tutorial-base.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/tutorial-base.css" data-cache-bust="1" />
+    <link rel="stylesheet" href="styles.css" data-cache-bust="1" />
+    <script src="../shared/cache-bust.js"></script>
   </head>
   <body>
     <div class="bg-beam beam-a"></div>
@@ -206,6 +207,8 @@ E F 3</textarea>
       </section>
     </main>
 
-    <script type="module" src="app.js"></script>
+    <script>
+      window.loadTutorialModule("./app.js");
+    </script>
   </body>
 </html>

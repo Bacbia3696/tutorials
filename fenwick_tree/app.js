@@ -168,6 +168,9 @@ const elements = {
   queryResult: document.getElementById("queryResult"),
   stepCounter: document.getElementById("stepCounter"),
   arrayStrip: document.getElementById("arrayStrip"),
+  coverageMap: document.getElementById("coverageMap"),
+  jumpCanvas: document.getElementById("jumpCanvas"),
+  jumpCaption: document.getElementById("jumpCaption"),
   bitRows: document.getElementById("bitRows"),
   clearLogBtn: document.getElementById("clearLogBtn"),
   logOutput: document.getElementById("logOutput"),
@@ -237,11 +240,22 @@ function highlightCode(opType, line) {
   codeHighlighter.highlight(opType, line);
 }
 
-function renderArray() {
+function renderArray(activeIndex = null) {
   elements.arrayStrip.innerHTML = "";
+  const hasActive = Number.isInteger(activeIndex) && activeIndex > 0 && state.fenwick;
+  const low = hasActive ? activeIndex & -activeIndex : 0;
+  const left = hasActive ? activeIndex - low + 1 : 0;
+
   state.values.forEach((value, idx) => {
+    const oneBased = idx + 1;
     const cell = document.createElement("div");
     cell.className = "array-cell";
+    if (hasActive && oneBased >= left && oneBased <= activeIndex) {
+      cell.classList.add("covered");
+    }
+    if (hasActive && oneBased === activeIndex) {
+      cell.classList.add("pivot");
+    }
     cell.innerHTML = `<span class="idx">i=${idx + 1}</span><span class="val">${value}</span>`;
     elements.arrayStrip.appendChild(cell);
   });
@@ -249,6 +263,285 @@ function renderArray() {
 
 function toBinary(value) {
   return value.toString(2).padStart(4, "0");
+}
+
+function createSvgElement(tag, attrs = {}) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    node.setAttribute(key, String(value));
+  }
+  return node;
+}
+
+function parsePrefixIndexFromLabel(label) {
+  if (typeof label !== "string") {
+    return null;
+  }
+  const match = label.match(/prefix\((\d+)\)/);
+  if (!match) {
+    return null;
+  }
+  const value = Number(match[1]);
+  return Number.isInteger(value) ? value : null;
+}
+
+function getPreviewStartIndex(opType, label = null) {
+  const fromLabel = parsePrefixIndexFromLabel(label);
+  if (Number.isInteger(fromLabel)) {
+    return fromLabel;
+  }
+
+  if (opType === "update" || opType === "prefix") {
+    const value = Number(elements.singleIndex.value);
+    return Number.isInteger(value) ? value : null;
+  }
+
+  const right = Number(elements.rightIndex.value);
+  return Number.isInteger(right) ? right : null;
+}
+
+function buildJumpSequence(startIndex, opType) {
+  if (!state.fenwick || !Number.isInteger(startIndex)) {
+    return [];
+  }
+
+  const n = state.fenwick.n;
+  if (startIndex < 0 || startIndex > n) {
+    return [];
+  }
+
+  const sequence = [];
+  const guardLimit = n + 3;
+
+  if (opType === "update") {
+    let i = startIndex;
+    let guard = 0;
+    while (i >= 1 && i <= n && guard < guardLimit) {
+      sequence.push(i);
+      i += i & -i;
+      guard += 1;
+    }
+    return sequence;
+  }
+
+  let i = startIndex;
+  let guard = 0;
+  while (i > 0 && i <= n && guard < guardLimit) {
+    sequence.push(i);
+    i -= i & -i;
+    guard += 1;
+  }
+  sequence.push(0);
+  return sequence;
+}
+
+function ensureJumpArrowMarker(svgElement) {
+  const defs = createSvgElement("defs");
+  const marker = createSvgElement("marker", {
+    id: "jump-arrow",
+    markerWidth: 8,
+    markerHeight: 8,
+    refX: 7.2,
+    refY: 4,
+    orient: "auto",
+    markerUnits: "strokeWidth",
+  });
+  marker.appendChild(
+    createSvgElement("path", {
+      d: "M 0 0 L 8 4 L 0 8 z",
+      fill: "rgba(31, 71, 61, 0.66)",
+    }),
+  );
+  defs.appendChild(marker);
+  svgElement.appendChild(defs);
+}
+
+function renderJumpTimeline(activeIndex = null, opType = elements.opType.value, label = null) {
+  const svg = elements.jumpCanvas;
+  svg.innerHTML = "";
+  const jumpWrap = elements.jumpCanvas.closest(".jump-map-wrap");
+  if (jumpWrap) {
+    jumpWrap.dataset.op = opType;
+  }
+
+  if (!state.fenwick) {
+    const text = createSvgElement("text", {
+      class: "jump-empty",
+      x: 270,
+      y: 75,
+      "text-anchor": "middle",
+      "dominant-baseline": "middle",
+    });
+    text.textContent = "Load an array to preview jump routes.";
+    svg.appendChild(text);
+    elements.jumpCaption.textContent = "Load an array to preview jump routes.";
+    return;
+  }
+
+  const start = Number.isInteger(activeIndex)
+    ? activeIndex
+    : getPreviewStartIndex(opType, label);
+  const sequence = buildJumpSequence(start, opType);
+  if (sequence.length === 0) {
+    const text = createSvgElement("text", {
+      class: "jump-empty",
+      x: 270,
+      y: 75,
+      "text-anchor": "middle",
+      "dominant-baseline": "middle",
+    });
+    text.textContent = "Choose valid indices to see jump path.";
+    svg.appendChild(text);
+    elements.jumpCaption.textContent = "Choose valid indices to see jump path.";
+    return;
+  }
+
+  const isPreview = !Number.isInteger(activeIndex);
+  const width = Math.max(540, 90 + Math.max(0, sequence.length - 1) * 120);
+  const height = 150;
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+  ensureJumpArrowMarker(svg);
+
+  const leftPad = 44;
+  const gap = sequence.length > 1 ? (width - leftPad * 2) / (sequence.length - 1) : 0;
+  const y = 68;
+
+  for (let idx = 0; idx < sequence.length; idx += 1) {
+    const value = sequence[idx];
+    const x = leftPad + idx * gap;
+
+    if (idx < sequence.length - 1) {
+      const next = sequence[idx + 1];
+      const nextX = leftPad + (idx + 1) * gap;
+      const edge = createSvgElement("line", {
+        class: "jump-edge",
+        x1: x + 16,
+        y1: y,
+        x2: nextX - 16,
+        y2: y,
+        "marker-end": "url(#jump-arrow)",
+      });
+      if (idx === 0 && Number.isInteger(activeIndex)) {
+        edge.classList.add("active");
+      }
+      svg.appendChild(edge);
+
+      if (value > 0) {
+        const delta = value & -value;
+        const step = opType === "update" ? `+${delta}` : `-${delta}`;
+        const text = createSvgElement("text", {
+          class: "jump-edge-label",
+          x: (x + nextX) / 2,
+          y: y - 14,
+          "text-anchor": "middle",
+          "dominant-baseline": "middle",
+        });
+        text.textContent = step;
+        svg.appendChild(text);
+      }
+    }
+
+    const group = createSvgElement("g", { class: "jump-node" });
+    if (idx === 0 && Number.isInteger(activeIndex)) {
+      group.classList.add("active");
+    } else if (idx === 0 && isPreview) {
+      group.classList.add("preview");
+    }
+    if (value === 0) {
+      group.classList.add("terminal");
+    }
+
+    group.appendChild(
+      createSvgElement("circle", {
+        cx: x,
+        cy: y,
+        r: 16,
+      }),
+    );
+
+    const labelNode = createSvgElement("text", {
+      x,
+      y,
+    });
+    labelNode.textContent = String(value);
+    group.appendChild(labelNode);
+
+    const lb = value > 0 ? value & -value : 0;
+    const lowbit = createSvgElement("text", {
+      x,
+      y: y + 24,
+      class: "jump-edge-label",
+    });
+    lowbit.textContent = value > 0 ? `lb=${lb}` : "done";
+    group.appendChild(lowbit);
+
+    svg.appendChild(group);
+  }
+
+  const route = sequence.join(" -> ");
+  const modeText = opType === "update" ? "update jumps" : "query jumps";
+  elements.jumpCaption.textContent = isPreview
+    ? `Preview ${modeText}: ${route}`
+    : `Active ${modeText}: ${route}`;
+}
+
+function renderCoverage(bitValues, activeIndex = null, opType = elements.opType.value) {
+  if (!state.fenwick) {
+    elements.coverageMap.innerHTML = "";
+    return;
+  }
+
+  elements.coverageMap.dataset.op = opType;
+  elements.coverageMap.innerHTML = "";
+  const head = document.createElement("div");
+  head.className = "coverage-head";
+  head.innerHTML = "<span>BIT i</span><span>Range</span><span>Coverage</span><span>bit[i]</span>";
+  elements.coverageMap.appendChild(head);
+
+  const n = state.fenwick.n;
+  for (let i = 1; i <= n; i += 1) {
+    const low = i & -i;
+    const left = i - low + 1;
+    const row = document.createElement("div");
+    row.className = "coverage-row";
+    if (i === activeIndex) {
+      row.classList.add("active");
+    }
+
+    const label = document.createElement("span");
+    label.className = "coverage-label";
+    label.textContent = `i=${i}`;
+
+    const range = document.createElement("span");
+    range.className = "coverage-range";
+    range.textContent = `[${left}, ${i}]`;
+
+    const track = document.createElement("div");
+    track.className = "coverage-track";
+    track.style.gridTemplateColumns = `repeat(${n}, minmax(0, 1fr))`;
+    for (let idx = 1; idx <= n; idx += 1) {
+      const cell = document.createElement("div");
+      cell.className = "coverage-cell";
+      if (idx >= left && idx <= i) {
+        cell.classList.add("covered");
+      }
+      if (i === activeIndex && idx >= left && idx <= i) {
+        cell.classList.add("active");
+      }
+      track.appendChild(cell);
+    }
+
+    const value = document.createElement("span");
+    value.className = "coverage-value";
+    value.textContent = String(bitValues[i] ?? 0);
+
+    row.appendChild(label);
+    row.appendChild(range);
+    row.appendChild(track);
+    row.appendChild(value);
+    elements.coverageMap.appendChild(row);
+  }
 }
 
 function renderBit(bitValues, activeIndex = null) {
@@ -326,13 +619,18 @@ function finalizePendingOperation(meta) {
   updateStatus(summary);
   appendLog(summary, mismatch ? "" : "ok");
 
-  renderArray();
+  renderArray(null);
+  renderCoverage(state.fenwick.bit, null, meta.opType ?? elements.opType.value);
+  renderJumpTimeline(null, meta.opType ?? elements.opType.value, null);
   renderBit(state.fenwick.bit, null);
   clearCodeHighlights();
   updateMetrics();
 }
 
 function applyEvent(event) {
+  renderArray(event.activeIndex);
+  renderCoverage(event.bit, event.activeIndex, event.opType);
+  renderJumpTimeline(event.activeIndex, event.opType, event.label ?? null);
   renderBit(event.bit, event.activeIndex);
   highlightCode(event.opType, event.line);
   updateStatus(event.message);
@@ -451,7 +749,9 @@ function loadArray(values) {
   state.lastQueryResult = null;
 
   setIndexBounds();
-  renderArray();
+  renderArray(null);
+  renderCoverage(state.fenwick.bit, null, elements.opType.value);
+  renderJumpTimeline(null, elements.opType.value, null);
   renderBit(state.fenwick.bit, null);
   updateMetrics();
 
@@ -488,6 +788,7 @@ function handleOperationTypeChange() {
   elements.leftWrap.style.display = opType === "range" ? "flex" : "none";
   elements.rightWrap.style.display = opType === "range" ? "flex" : "none";
   elements.deltaWrap.style.display = opType === "update" ? "flex" : "none";
+  renderJumpTimeline(null, opType, null);
 }
 
 function setOperationType(opType) {
@@ -518,6 +819,9 @@ function init() {
   elements.loadArrayBtn.addEventListener("click", handleArrayLoadInput);
   elements.randomArrayBtn.addEventListener("click", handleRandomArray);
   elements.opType.addEventListener("change", handleOperationTypeChange);
+  elements.singleIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
+  elements.leftIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
+  elements.rightIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
 
   elements.animateBtn.addEventListener("click", () => operationRunner.runAnimated());
   elements.stepBtn.addEventListener("click", () => operationRunner.step());

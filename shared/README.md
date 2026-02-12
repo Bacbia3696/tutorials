@@ -6,6 +6,7 @@ Reusable module for all algorithm tutorials in this repo.
 
 - `shared/tutorial-core.js`
 - `shared/tutorial-base.css`
+- `shared/cache-bust.js`
 - `shared/graph-core.js`
 - `shared/graph-renderer.js`
 
@@ -22,6 +23,9 @@ Reusable module for all algorithm tutorials in this repo.
   - Shared keyboard shortcut binding with typing-safe default behavior.
 - `isTypingTarget(target)`
   - Utility for input-focus checks.
+- `cache-bust.js`
+  - Shared dev helper to append cache-busting query params to local tutorial CSS and JS files.
+  - Exposes `window.loadTutorialModule("./app.js")` for no-stale script loading.
 - Shared CSS foundation (`tutorial-base.css`)
   - Layout shell (`body`, `.layout`, `.panel`)
   - Controls (`.control-group`, form fields, `.btn*`)

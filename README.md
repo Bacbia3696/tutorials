@@ -33,6 +33,7 @@ Then open:
   - `styles.css`: module-specific theme and layout
   - `app.js`: algorithm tracer + UI wiring
 - `shared/tutorial-core.js`: common operation runner, logger, shortcuts, code highlighter
+- `shared/cache-bust.js`: shared dev cache-busting loader for local CSS/JS assets
 - `shared/graph-core.js`: shared SVG graph geometry/math helpers for graph tutorials
 - `shared/graph-renderer.js`: shared SVG graph rendering helpers (canvas prep, edges, nodes, arrow markers)
 - `shared/tutorial-base.css`: shared layout/control primitives
@@ -42,6 +43,7 @@ Then open:
 
 - Use modern ES modules (`import`/`export`) and 2-space indentation.
 - Keep reusable behavior in `shared/`; keep algorithm logic module-local unless reused.
+- Tutorial pages apply automatic cache-busting for local CSS/JS on each load, so browser stale-cache issues are avoided during development.
 - Validate syntax quickly with:
 
 ```bash
