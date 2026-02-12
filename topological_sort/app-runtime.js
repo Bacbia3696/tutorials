@@ -1,8 +1,4 @@
-import {
-  createCodeHighlighter,
-  createLogger,
-  createOperationRunner,
-} from "../shared/tutorial-core.js";
+import { createOperationRunner } from "../shared/tutorial-core.js";
 import {
   createLabelToIndex,
   parseDirectedEdgesInput,
@@ -21,6 +17,7 @@ import {
   renderGraphEdges,
   renderGraphNodes,
 } from "../shared/graph-renderer.js";
+import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
 
 const SAMPLE_DAG = {
   nodes: ["A", "B", "C", "D", "E", "F", "G", "H"],
@@ -240,32 +237,14 @@ const state = {
   lastProcessedCount: 0,
   lastOrderLabels: [],
 };
-const logger = createLogger(elements.logOutput);
-const codeHighlighter = createCodeHighlighter(".code-panel");
+const helpers = createRuntimeHelpers({
+  logOutput: elements.logOutput,
+  statusMessage: elements.statusMessage,
+});
 let operationRunner = null;
-
-function updateStatus(message) {
-  elements.statusMessage.textContent = message;
-}
 
 function setAnimationEmphasis(enabled) {
   elements.processViewPanel?.classList.toggle("playing", enabled);
-}
-
-function appendLog(message, tone = "") {
-  logger.append(message, tone);
-}
-
-function clearCodeHighlights() {
-  codeHighlighter.clear();
-}
-
-function focusCodePanel(opType) {
-  codeHighlighter.focus(opType);
-}
-
-function highlightCode(opType, line) {
-  codeHighlighter.highlight(opType, line);
 }
 
 function cloneSnapshot(snapshot) {
@@ -501,8 +480,8 @@ function applyEvent(event) {
   state.lastOrderLabels = event.snapshot.order.map((index) => state.graph.nodes[index]);
 
   renderSnapshot(state.lastSnapshot, event.activeEdgeId ?? null);
-  highlightCode(event.opType, event.line);
-  updateStatus(event.message);
+  helpers.highlightCode(event.opType, event.line);
+  helpers.updateStatus(event.message);
   updateMetrics();
 }
 
@@ -512,11 +491,11 @@ function finalizePendingOperation(meta) {
   state.lastProcessedCount = meta.processedCount;
   state.lastOrderLabels = meta.orderLabels;
 
-  updateStatus(meta.summary);
-  appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.updateStatus(meta.summary);
+  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
 
   renderSnapshot(state.lastSnapshot, null);
-  clearCodeHighlights();
+  helpers.clearCodeHighlights();
   updateMetrics();
 }
 
@@ -529,8 +508,8 @@ function loadGraphFromInputs() {
     maxNodes: 12,
   });
   if (parsedNodes.error) {
-    updateStatus(parsedNodes.error);
-    appendLog(parsedNodes.error);
+    helpers.updateStatus(parsedNodes.error);
+    helpers.appendLog(parsedNodes.error);
     return;
   }
 
@@ -541,8 +520,8 @@ function loadGraphFromInputs() {
     allowSelfLoops: true,
   });
   if (parsedEdges.error) {
-    updateStatus(parsedEdges.error);
-    appendLog(parsedEdges.error);
+    helpers.updateStatus(parsedEdges.error);
+    helpers.appendLog(parsedEdges.error);
     return;
   }
 
@@ -555,13 +534,13 @@ function loadGraphFromInputs() {
   state.lastSnapshot = state.tracer.createInitialSnapshot();
 
   renderSnapshot(state.lastSnapshot, null);
-  focusCodePanel("topo");
-  clearCodeHighlights();
+  helpers.focusCodePanel("topo");
+  helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.edges.length} directed edges.`;
-  updateStatus(message);
-  appendLog(message, "ok");
+  helpers.updateStatus(message);
+  helpers.appendLog(message, "ok");
 }
 
 function shuffle(values) {
@@ -633,7 +612,7 @@ function loadRandomGraph() {
 
 function prepareOperation() {
   if (!state.tracer || !state.graph) {
-    updateStatus("Load a graph first.");
+    helpers.updateStatus("Load a graph first.");
     return null;
   }
 
@@ -677,11 +656,11 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      appendLog(`Prepared ${operation.opType} run with ${operation.events.length} trace steps.`);
+      helpers.appendLog(`Prepared ${operation.opType} run with ${operation.events.length} trace steps.`);
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      updateStatus("No pending operation to finish.");
+      helpers.updateStatus("No pending operation to finish.");
     },
   });
 
@@ -699,7 +678,7 @@ function init() {
     setSpeedMs: (speedMs) => {
       state.speedMs = speedMs;
     },
-    clearLog: () => logger.clear(),
+    clearLog: () => helpers.clearLog(),
     extraShortcuts: {
       l: () => loadGraphFromInputs(),
       m: () => loadSampleGraph(),
@@ -707,7 +686,7 @@ function init() {
     },
   });
 
-  focusCodePanel("topo");
+  helpers.focusCodePanel("topo");
   loadSampleGraph();
 }
 

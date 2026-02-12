@@ -1,8 +1,4 @@
-import {
-  createCodeHighlighter,
-  createLogger,
-  createOperationRunner,
-} from "../shared/tutorial-core.js";
+import { createOperationRunner } from "../shared/tutorial-core.js";
 import {
   createLabelToIndex,
   edgeKeyForMode,
@@ -22,6 +18,7 @@ import {
   renderGraphEdges,
   renderGraphNodes,
 } from "../shared/graph-renderer.js";
+import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
 
 const SAMPLE_GRAPH = {
   nodes: ["S", "A", "B", "C", "D", "E"],
@@ -295,32 +292,14 @@ const state = {
   lastRelaxCount: 0,
   lastCycleDetected: false,
 };
-const logger = createLogger(elements.logOutput);
-const codeHighlighter = createCodeHighlighter(".code-panel");
+const helpers = createRuntimeHelpers({
+  logOutput: elements.logOutput,
+  statusMessage: elements.statusMessage,
+});
 let operationRunner = null;
-
-function updateStatus(message) {
-  elements.statusMessage.textContent = message;
-}
 
 function setAnimationEmphasis(enabled) {
   elements.graphViewPanel.classList.toggle("playing", enabled);
-}
-
-function appendLog(message, tone = "") {
-  logger.append(message, tone);
-}
-
-function clearCodeHighlights() {
-  codeHighlighter.clear();
-}
-
-function focusCodePanel(opType) {
-  codeHighlighter.focus(opType);
-}
-
-function highlightCode(opType, line) {
-  codeHighlighter.highlight(opType, line);
 }
 
 function cloneSnapshot(snapshot) {
@@ -618,8 +597,8 @@ function applyEvent(event) {
   state.lastCycleDetected = event.snapshot.cycleDetected;
 
   renderSnapshot(state.lastSnapshot, event.activeDisplayEdgeId ?? null);
-  highlightCode(event.opType, event.line);
-  updateStatus(event.message);
+  helpers.highlightCode(event.opType, event.line);
+  helpers.updateStatus(event.message);
   updateMetrics();
 }
 
@@ -628,11 +607,11 @@ function finalizePendingOperation(meta) {
   state.lastRelaxCount = meta.relaxCount;
   state.lastCycleDetected = meta.cycleDetected;
 
-  updateStatus(meta.summary);
-  appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.updateStatus(meta.summary);
+  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
 
   renderSnapshot(state.lastSnapshot, null);
-  clearCodeHighlights();
+  helpers.clearCodeHighlights();
   updateMetrics();
 }
 
@@ -659,7 +638,7 @@ function clearGraphState() {
   state.lastCycleDetected = false;
   state.lastSnapshot = null;
   renderSnapshot(null, null);
-  clearCodeHighlights();
+  helpers.clearCodeHighlights();
   updateMetrics();
 }
 
@@ -673,8 +652,8 @@ function loadGraphFromInputs() {
   });
   if (parsedNodes.error) {
     clearGraphState();
-    updateStatus(parsedNodes.error);
-    appendLog(parsedNodes.error);
+    helpers.updateStatus(parsedNodes.error);
+    helpers.appendLog(parsedNodes.error);
     return false;
   }
 
@@ -689,8 +668,8 @@ function loadGraphFromInputs() {
   });
   if (parsedEdges.error) {
     clearGraphState();
-    updateStatus(parsedEdges.error);
-    appendLog(parsedEdges.error);
+    helpers.updateStatus(parsedEdges.error);
+    helpers.appendLog(parsedEdges.error);
     return false;
   }
 
@@ -704,13 +683,13 @@ function loadGraphFromInputs() {
   state.lastSnapshot = state.tracer.createBlankSnapshot();
 
   renderSnapshot(state.lastSnapshot, null);
-  focusCodePanel("bellman");
-  clearCodeHighlights();
+  helpers.focusCodePanel("bellman");
+  helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.displayEdges.length} edges in ${state.mode} mode.`;
-  updateStatus(message);
-  appendLog(message, "ok");
+  helpers.updateStatus(message);
+  helpers.appendLog(message, "ok");
   return true;
 }
 
@@ -724,7 +703,7 @@ function applyModeAndReload(mode) {
   setGraphMode(mode);
   const ok = loadGraphFromInputs();
   if (!ok) {
-    updateStatus(
+    helpers.updateStatus(
       `Graph mode switched to ${mode}, but current inputs are invalid for this mode. Fix input and load again.`,
     );
   }
@@ -795,15 +774,15 @@ function loadRandomGraph() {
 
 function prepareOperation() {
   if (!state.tracer || !state.graph) {
-    updateStatus("Load a graph first.");
+    helpers.updateStatus("Load a graph first.");
     return null;
   }
 
   const sourceIndex = getSelectedSourceIndex();
   if (sourceIndex === null || sourceIndex < 0 || sourceIndex >= state.graph.nodes.length) {
     const message = "Choose a valid source node.";
-    updateStatus(message);
-    appendLog(message);
+    helpers.updateStatus(message);
+    helpers.appendLog(message);
     return null;
   }
 
@@ -846,11 +825,11 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      appendLog(`Prepared ${operation.opType} run with ${operation.events.length} trace steps.`);
+      helpers.appendLog(`Prepared ${operation.opType} run with ${operation.events.length} trace steps.`);
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      updateStatus("No pending operation to finish.");
+      helpers.updateStatus("No pending operation to finish.");
     },
   });
 
@@ -872,7 +851,7 @@ function init() {
     setSpeedMs: (speedMs) => {
       state.speedMs = speedMs;
     },
-    clearLog: () => logger.clear(),
+    clearLog: () => helpers.clearLog(),
     extraShortcuts: {
       l: () => loadGraphFromInputs(),
       m: () => loadSampleGraph(),
@@ -882,7 +861,7 @@ function init() {
     },
   });
 
-  focusCodePanel("bellman");
+  helpers.focusCodePanel("bellman");
   applyModeUi(state.mode);
   loadSampleGraph();
 }

@@ -1,8 +1,8 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository contains six standalone tutorial apps and a shared core:
-- `trie/`, `segment_tree/`, `fenwick_tree/`, `dijkstra/`, `bellman_ford/`, `topological_sort/`: each module has `index.html`, `styles.css`, and `app.js`.
+This repository contains eight standalone tutorial apps and a shared core:
+- `trie/`, `segment_tree/`, `sparse_segment_tree/`, `fenwick_tree/`, `dsu/`, `dijkstra/`, `bellman_ford/`, `topological_sort/`: each module has `index.html`, `styles.css`, and `app.js`.
 - `shared/tutorial-core.js`: reusable interaction/runtime helpers (runner, logger, shortcuts, code highlighting).
 - `shared/tutorial-bootstrap.js`: common UI wiring helpers for runner controls and debounced resize listeners.
 - `shared/graph-core.js`, `shared/graph-renderer.js`: reusable graph geometry/rendering helpers.
@@ -19,6 +19,7 @@ No build step or package manager is required; this is plain HTML/CSS/ES modules.
 - Open module pages directly:
   - `http://localhost:4173/trie/`
   - `http://localhost:4173/segment_tree/`
+  - `http://localhost:4173/sparse_segment_tree/`
   - `http://localhost:4173/fenwick_tree/`
   - `http://localhost:4173/dijkstra/`
   - `http://localhost:4173/bellman_ford/`

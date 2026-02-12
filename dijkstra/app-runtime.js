@@ -1,8 +1,4 @@
-import {
-  createCodeHighlighter,
-  createLogger,
-  createOperationRunner,
-} from "../shared/tutorial-core.js";
+import { createOperationRunner } from "../shared/tutorial-core.js";
 import {
   createLabelToIndex,
   edgeKeyForMode,
@@ -22,6 +18,7 @@ import {
   renderGraphEdges,
   renderGraphNodes,
 } from "../shared/graph-renderer.js";
+import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
 
 const SAMPLE_GRAPH = {
   nodes: ["A", "B", "C", "D", "E", "F"],
@@ -353,32 +350,14 @@ const state = {
   lastDistance: null,
   lastPathLabels: null,
 };
-const logger = createLogger(elements.logOutput);
-const codeHighlighter = createCodeHighlighter(".code-panel");
+const helpers = createRuntimeHelpers({
+  logOutput: elements.logOutput,
+  statusMessage: elements.statusMessage,
+});
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
   elements.graphViewPanel.classList.toggle("playing", enabled);
-}
-
-function updateStatus(message) {
-  elements.statusMessage.textContent = message;
-}
-
-function appendLog(message, tone = "") {
-  logger.append(message, tone);
-}
-
-function clearCodeHighlights() {
-  codeHighlighter.clear();
-}
-
-function focusCodePanel(opType) {
-  codeHighlighter.focus(opType);
-}
-
-function highlightCode(opType, line) {
-  codeHighlighter.highlight(opType, line);
 }
 
 function cloneSnapshot(snapshot) {
@@ -666,7 +645,7 @@ function clearGraphState() {
   state.lastSnapshot = null;
   renderSnapshot(null, null);
   renderEdges(null);
-  clearCodeHighlights();
+  helpers.clearCodeHighlights();
   updateMetrics();
 }
 
@@ -700,8 +679,8 @@ function applyEvent(event) {
   state.lastSnapshot = cloneSnapshot(event.snapshot);
   renderSnapshot(state.lastSnapshot, event.activeEdgeId ?? null);
   renderEdges(event.activeEdgeId ?? null);
-  highlightCode(event.opType, event.line);
-  updateStatus(event.message);
+  helpers.highlightCode(event.opType, event.line);
+  helpers.updateStatus(event.message);
 }
 
 function finalizePendingOperation(meta) {
@@ -709,12 +688,12 @@ function finalizePendingOperation(meta) {
   state.lastDistance = meta.targetSpecified ? meta.targetDistance : null;
   state.lastPathLabels = meta.targetSpecified ? meta.pathLabels : null;
 
-  updateStatus(meta.summary);
-  appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.updateStatus(meta.summary);
+  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(null);
-  clearCodeHighlights();
+  helpers.clearCodeHighlights();
   updateMetrics();
 }
 
@@ -769,8 +748,8 @@ function loadGraphFromInputs() {
   });
   if (nodesParsed.error) {
     clearGraphState();
-    updateStatus(nodesParsed.error);
-    appendLog(nodesParsed.error);
+    helpers.updateStatus(nodesParsed.error);
+    helpers.appendLog(nodesParsed.error);
     return false;
   }
 
@@ -787,8 +766,8 @@ function loadGraphFromInputs() {
   });
   if (edgesParsed.error) {
     clearGraphState();
-    updateStatus(edgesParsed.error);
-    appendLog(edgesParsed.error);
+    helpers.updateStatus(edgesParsed.error);
+    helpers.appendLog(edgesParsed.error);
     return false;
   }
 
@@ -803,13 +782,13 @@ function loadGraphFromInputs() {
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(null);
-  focusCodePanel("dijkstra");
-  clearCodeHighlights();
+  helpers.focusCodePanel("dijkstra");
+  helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.edges.length} edges in ${state.mode} mode.`;
-  updateStatus(message);
-  appendLog(message, "ok");
+  helpers.updateStatus(message);
+  helpers.appendLog(message, "ok");
   return true;
 }
 
@@ -823,7 +802,7 @@ function applyModeAndReload(mode) {
   setGraphMode(mode);
   const ok = loadGraphFromInputs();
   if (!ok) {
-    updateStatus(
+    helpers.updateStatus(
       `Graph mode switched to ${mode}, but current inputs are invalid for this mode. Fix input and load again.`,
     );
   }
@@ -898,23 +877,23 @@ function syncTargetInSnapshot() {
 
 function prepareOperation() {
   if (!state.tracer || !state.graph) {
-    updateStatus("Load a graph first.");
+    helpers.updateStatus("Load a graph first.");
     return null;
   }
 
   const sourceIndex = getSelectedSourceIndex();
   if (sourceIndex === null || sourceIndex < 0 || sourceIndex >= state.graph.nodes.length) {
     const message = "Choose a valid source node.";
-    updateStatus(message);
-    appendLog(message);
+    helpers.updateStatus(message);
+    helpers.appendLog(message);
     return null;
   }
 
   const targetIndex = getSelectedTargetIndex();
   if (targetIndex !== null && (targetIndex < 0 || targetIndex >= state.graph.nodes.length)) {
     const message = "Choose a valid target node.";
-    updateStatus(message);
-    appendLog(message);
+    helpers.updateStatus(message);
+    helpers.appendLog(message);
     return null;
   }
 
@@ -958,11 +937,11 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      updateStatus("No pending operation to finish.");
+      helpers.updateStatus("No pending operation to finish.");
     },
   });
 
@@ -975,7 +954,7 @@ function init() {
   });
   elements.targetSelect.addEventListener("change", syncTargetInSnapshot);
   elements.sourceSelect.addEventListener("change", () => {
-    updateStatus(`Source set to ${elements.sourceSelect.options[elements.sourceSelect.selectedIndex]?.text ?? "-"}.`);
+    helpers.updateStatus(`Source set to ${elements.sourceSelect.options[elements.sourceSelect.selectedIndex]?.text ?? "-"}.`);
   });
 
   setupRunnerControls({
@@ -988,7 +967,7 @@ function init() {
     setSpeedMs: (speedMs) => {
       state.speedMs = speedMs;
     },
-    clearLog: () => logger.clear(),
+    clearLog: () => helpers.clearLog(),
     extraShortcuts: {
       l: () => loadGraphFromInputs(),
       m: () => loadSampleGraph(),
@@ -998,7 +977,7 @@ function init() {
     },
   });
 
-  focusCodePanel("dijkstra");
+  helpers.focusCodePanel("dijkstra");
   applyModeUi(state.mode);
   loadSampleGraph();
 }

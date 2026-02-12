@@ -1,12 +1,9 @@
-import {
-  createCodeHighlighter,
-  createLogger,
-  createOperationRunner,
-} from "../shared/tutorial-core.js";
+import { createOperationRunner } from "../shared/tutorial-core.js";
 import {
   bindDebouncedResize,
   setupRunnerControls,
 } from "../shared/tutorial-bootstrap.js";
+import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
 
 class TrieNode {
   constructor(id, char) {
@@ -296,8 +293,10 @@ const state = {
   lastTreeSnapshot: null,
   lastActiveNodeId: null,
 };
-const logger = createLogger(elements.logOutput);
-const codeHighlighter = createCodeHighlighter(".code-panel");
+const helpers = createRuntimeHelpers({
+  logOutput: elements.logOutput,
+  statusMessage: elements.statusMessage,
+});
 let operationRunner = null;
 
 function normalizeWord(raw) {
@@ -363,26 +362,6 @@ function randomSampleWords() {
     }
   }
   return chosen;
-}
-
-function updateStatus(message) {
-  elements.statusMessage.textContent = message;
-}
-
-function appendLog(message, tone = "") {
-  logger.append(message, tone);
-}
-
-function clearCodeHighlights() {
-  codeHighlighter.clear();
-}
-
-function focusCodePanel(opType) {
-  codeHighlighter.focus(opType);
-}
-
-function highlightCode(opType, line) {
-  codeHighlighter.highlight(opType, line);
 }
 
 function renderWords(words) {
@@ -553,26 +532,26 @@ function finalizePendingOperation(meta) {
     state.lastResult = meta.summary;
   }
 
-  updateStatus(meta.summary);
-  appendLog(meta.summary, "ok");
+  helpers.updateStatus(meta.summary);
+  helpers.appendLog(meta.summary, "ok");
 
   const snapshot = state.trie.snapshot();
   renderTree(snapshot, null);
   renderWords(snapshot.words);
-  clearCodeHighlights();
+  helpers.clearCodeHighlights();
   updateMetrics(snapshot);
 }
 
 function applyEvent(event) {
   renderTree(event.snapshot, event.activeNodeId);
   renderWords(event.snapshot.words);
-  highlightCode(event.opType, event.line);
-  updateStatus(event.message);
+  helpers.highlightCode(event.opType, event.line);
+  helpers.updateStatus(event.message);
 }
 
 function prepareOperation() {
   if (!state.trie) {
-    updateStatus("Load words first.");
+    helpers.updateStatus("Load words first.");
     return null;
   }
 
@@ -581,8 +560,8 @@ function prepareOperation() {
 
   if (!word || !isValidWord(word)) {
     const message = "Word must contain letters a-z only.";
-    updateStatus(message);
-    appendLog(message);
+    helpers.updateStatus(message);
+    helpers.appendLog(message);
     return null;
   }
 
@@ -642,19 +621,19 @@ function loadWords(words) {
   renderWords(snapshot.words);
   updateMetrics(snapshot);
 
-  focusCodePanel(elements.opType.value);
-  clearCodeHighlights();
+  helpers.focusCodePanel(elements.opType.value);
+  helpers.clearCodeHighlights();
 
   const message = `Loaded ${snapshot.words.length} unique words.`;
-  updateStatus(message);
-  appendLog(`${message} [${snapshot.words.join(", ")}]`, "ok");
+  helpers.updateStatus(message);
+  helpers.appendLog(`${message} [${snapshot.words.join(", ")}]`, "ok");
 }
 
 function handleLoadWords() {
   const parsed = parseWordsInput(elements.initialWordsInput.value);
   if (parsed.error) {
-    updateStatus(parsed.error);
-    appendLog(parsed.error);
+    helpers.updateStatus(parsed.error);
+    helpers.appendLog(parsed.error);
     return;
   }
   loadWords(parsed.words);
@@ -668,9 +647,9 @@ function handleSampleWords() {
 
 function setOperationType(opType) {
   elements.opType.value = opType;
-  focusCodePanel(opType);
-  clearCodeHighlights();
-  updateStatus(`Shortcut: switched to ${opType} mode.`);
+  helpers.focusCodePanel(opType);
+  helpers.clearCodeHighlights();
+  helpers.updateStatus(`Shortcut: switched to ${opType} mode.`);
 }
 
 function finishCurrentOperation() {
@@ -685,10 +664,10 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
     },
     onNoPending: () => {
-      updateStatus("No pending operation.");
+      helpers.updateStatus("No pending operation.");
     },
   });
 
@@ -696,8 +675,8 @@ function init() {
   elements.sampleWordsBtn.addEventListener("click", handleSampleWords);
 
   elements.opType.addEventListener("change", () => {
-    focusCodePanel(elements.opType.value);
-    clearCodeHighlights();
+    helpers.focusCodePanel(elements.opType.value);
+    helpers.clearCodeHighlights();
   });
 
   setupRunnerControls({
@@ -710,7 +689,7 @@ function init() {
     setSpeedMs: (speedMs) => {
       state.speedMs = speedMs;
     },
-    clearLog: () => logger.clear(),
+    clearLog: () => helpers.clearLog(),
     extraShortcuts: {
       l: () => handleLoadWords(),
       r: () => handleSampleWords(),

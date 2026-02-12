@@ -1,13 +1,10 @@
-import {
-  createCodeHighlighter,
-  createLogger,
-  createOperationRunner,
-} from "../shared/tutorial-core.js";
+import { createOperationRunner } from "../shared/tutorial-core.js";
 import {
   bindDebouncedResize,
   setupRunnerControls,
 } from "../shared/tutorial-bootstrap.js";
 import { parseArrayInput, randomIntegerArray } from "../shared/array-input.js";
+import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
 
 class LazySegTreeTracer {
   constructor(values) {
@@ -252,31 +249,12 @@ const state = {
   lastRenderedLazy: null,
   lastActiveNode: null,
 };
-const logger = createLogger(elements.logOutput);
-const codeHighlighter = createCodeHighlighter(".code-panel");
+const helpers = createRuntimeHelpers({
+  logOutput: elements.logOutput,
+  statusMessage: elements.statusMessage,
+});
 let operationRunner = null;
 
-
-
-function updateStatus(message) {
-  elements.statusMessage.textContent = message;
-}
-
-function appendLog(message, tone = "") {
-  logger.append(message, tone);
-}
-
-function clearCodeHighlights() {
-  codeHighlighter.clear();
-}
-
-function focusCodePanel(opType) {
-  codeHighlighter.focus(opType);
-}
-
-function highlightCode(opType, line) {
-  codeHighlighter.highlight(opType, line);
-}
 
 function renderArray() {
   elements.arrayStrip.innerHTML = "";
@@ -448,19 +426,19 @@ function finalizePendingOperation(meta) {
     ? `${meta.summary} (warning: naive check is ${meta.naive})`
     : meta.summary;
 
-  updateStatus(text);
-  appendLog(text, mismatch ? "" : "ok");
+  helpers.updateStatus(text);
+  helpers.appendLog(text, mismatch ? "" : "ok");
 
   renderArray();
   renderTree(state.segTree.tree, state.segTree.lazy, null);
-  clearCodeHighlights();
+  helpers.clearCodeHighlights();
   updateMetrics();
 }
 
 function applyEvent(event) {
   renderTree(event.tree, event.lazy, event.node);
-  highlightCode(event.opType, event.line);
-  updateStatus(event.message);
+  helpers.highlightCode(event.opType, event.line);
+  helpers.updateStatus(event.message);
 }
 
 function validateRange(left, right, size) {
@@ -481,7 +459,7 @@ function validateRange(left, right, size) {
 
 function prepareOperation() {
   if (!state.segTree) {
-    updateStatus("Load an array first.");
+    helpers.updateStatus("Load an array first.");
     return null;
   }
 
@@ -491,8 +469,8 @@ function prepareOperation() {
   const rangeError = validateRange(left, right, state.segTree.n);
 
   if (rangeError) {
-    updateStatus(rangeError);
-    appendLog(rangeError);
+    helpers.updateStatus(rangeError);
+    helpers.appendLog(rangeError);
     return null;
   }
 
@@ -500,8 +478,8 @@ function prepareOperation() {
     const delta = Number(elements.deltaValue.value);
     if (!Number.isFinite(delta) || !Number.isInteger(delta)) {
       const message = "Delta must be an integer.";
-      updateStatus(message);
-      appendLog(message);
+      helpers.updateStatus(message);
+      helpers.appendLog(message);
       return null;
     }
 
@@ -547,12 +525,12 @@ function loadArray(values) {
   updateMetrics();
 
   const opType = elements.opType.value;
-  focusCodePanel(opType);
-  clearCodeHighlights();
+  helpers.focusCodePanel(opType);
+  helpers.clearCodeHighlights();
 
   const message = `Loaded array of length ${values.length}. Ready for operations.`;
-  updateStatus(message);
-  appendLog(`${message} Values: [${values.join(", ")}]`, "ok");
+  helpers.updateStatus(message);
+  helpers.appendLog(`${message} Values: [${values.join(", ")}]`, "ok");
 }
 
 function handleArrayLoadInput() {
@@ -561,8 +539,8 @@ function handleArrayLoadInput() {
     maxValuesMessage: "Please use at most 16 values so the tree stays readable.",
   });
   if (parsed.error) {
-    updateStatus(parsed.error);
-    appendLog(parsed.error);
+    helpers.updateStatus(parsed.error);
+    helpers.appendLog(parsed.error);
     return;
   }
   loadArray(parsed.values);
@@ -577,14 +555,14 @@ function handleRandomArray() {
 function handleOperationTypeChange() {
   const isUpdate = elements.opType.value === "update";
   elements.deltaWrap.style.display = isUpdate ? "flex" : "none";
-  focusCodePanel(elements.opType.value);
-  clearCodeHighlights();
+  helpers.focusCodePanel(elements.opType.value);
+  helpers.clearCodeHighlights();
 }
 
 function setOperationType(opType) {
   elements.opType.value = opType;
   handleOperationTypeChange();
-  updateStatus(
+  helpers.updateStatus(
     opType === "update"
       ? "Shortcut: switched to Range Add Update mode."
       : "Shortcut: switched to Range Sum Query mode.",
@@ -603,10 +581,10 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
     },
     onNoPending: () => {
-      updateStatus("No pending operation to finish.");
+      helpers.updateStatus("No pending operation to finish.");
     },
   });
 
@@ -625,7 +603,7 @@ function init() {
     setSpeedMs: (speedMs) => {
       state.speedMs = speedMs;
     },
-    clearLog: () => logger.clear(),
+    clearLog: () => helpers.clearLog(),
     extraShortcuts: {
       l: () => handleArrayLoadInput(),
       r: () => handleRandomArray(),

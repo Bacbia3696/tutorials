@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Algorithm Tutorials Playground</title>
     <meta name="description"
-        content="Interactive, browser-based labs for learning core data structures and graph algorithms. Step-by-step tracing for Trie, Segment Tree, Fenwick Tree, Dijkstra, Bellman-Ford, and Topological Sort." />
+        content="Interactive, browser-based labs for learning core data structures and graph algorithms. Step-by-step tracing for Trie, Segment Tree, Sparse Segment Tree, Fenwick Tree, Disjoint Set Union, Dijkstra, Bellman-Ford, and Topological Sort." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -340,7 +340,7 @@
     <div class="container">
         <!-- Hero -->
         <header class="hero">
-            <div class="hero-badge"><span class="dot"></span> 6 interactive labs</div>
+            <div class="hero-badge"><span class="dot"></span> 8 interactive labs</div>
             <h1>Algorithm Tutorials Playground</h1>
             <p>
                 Step-by-step animated visualizations for core data structures and
@@ -381,6 +381,19 @@
                 </div>
             </a>
 
+            <a href="sparse_segment_tree/" class="card" data-category="ds">
+                <span class="card-badge">Data Structure</span>
+                <span class="card-arrow">↗</span>
+                <h3>Sparse Segment Tree</h3>
+                <p class="desc">
+                    Dynamic segment tree for huge index spaces. Nodes are created lazily only along touched paths,
+                    so untouched ranges consume zero extra memory.
+                </p>
+                <div class="card-tags">
+                    <span>dynamic-nodes</span><span>point-update</span><span>range-query</span>
+                </div>
+            </a>
+
             <a href="fenwick_tree/" class="card" data-category="ds">
                 <span class="card-badge">Data Structure</span>
                 <span class="card-arrow">↗</span>
@@ -391,6 +404,20 @@
                 </p>
                 <div class="card-tags">
                     <span>point-update</span><span>prefix-sum</span><span>range-query</span>
+                </div>
+            </a>
+
+            <a href="dsu/" class="card" data-category="ds">
+                <span class="card-badge">Data Structure</span>
+                <span class="card-arrow">↗</span>
+                <h3>Disjoint Set Union (Union-Find)</h3>
+                <p class="desc">
+                    Merge sets and find representatives with path compression and
+                    union by rank. Watch the forest of trees evolve as elements
+                    are connected.
+                </p>
+                <div class="card-tags">
+                    <span>union</span><span>find</span><span>path-compression</span><span>union-by-rank</span>
                 </div>
             </a>
         </div>

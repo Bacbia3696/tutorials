@@ -4,6 +4,7 @@ set -euo pipefail
 MODULES=(
   trie
   segment_tree
+  sparse_segment_tree
   fenwick_tree
   dijkstra
   bellman_ford

@@ -1,0 +1,398 @@
+:root {
+  --bg-a: #eceaf6;
+  --bg-b: #d5dde8;
+  --ink: #1d2134;
+  --muted: #4f5a6a;
+  --panel: rgba(255, 255, 255, 0.86);
+  --edge: rgba(38, 50, 86, 0.18);
+  --accent: #5b5ede;
+  --accent-light: #838aff;
+  --ok: #1d7f60;
+  --font-sans: "Manrope", "Trebuchet MS", sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+  --page-padding: 22px;
+  --page-bg:
+    radial-gradient(circle at 14% 20%, #dad3f8 0%, transparent 36%),
+    radial-gradient(circle at 88% 82%, #bdd0e8 0%, transparent 40%),
+    linear-gradient(160deg, var(--bg-a), var(--bg-b));
+  --layout-max-width: 1540px;
+  --layout-gap: 14px;
+  --panel-bg: var(--panel);
+  --panel-border: 1px solid var(--edge);
+  --panel-padding: 14px 16px;
+  --panel-shadow: 0 8px 22px rgba(34, 40, 72, 0.08);
+  --field-border: 1px solid var(--edge);
+  --field-bg: #fff;
+  --btn-border: 1px solid var(--edge);
+  --btn-primary-bg: linear-gradient(135deg, var(--accent), var(--accent-light));
+  --btn-muted-bg: #f4f5fa;
+  --kbd-border: 1px solid var(--edge);
+}
+
+dsu-tutorial-app {
+  display: block;
+}
+
+.bg-shape {
+  position: fixed;
+  width: 280px;
+  height: 280px;
+  border-radius: 999px;
+  filter: blur(34px);
+  opacity: 0.26;
+  pointer-events: none;
+}
+
+.shape-a {
+  top: -90px;
+  left: -70px;
+  background: #8178e8;
+}
+
+.shape-b {
+  right: -80px;
+  bottom: -90px;
+  background: #64a4d4;
+}
+
+.layout {
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 {
+  margin: 4px 0;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+}
+
+.hero p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.control-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+kbd,
+code,
+.metrics,
+.log-output,
+.node-id {
+  font-family: var(--font-mono);
+}
+
+.status h2,
+.panel h2 {
+  margin: 0 0 10px;
+  font-size: 1.08rem;
+}
+
+.status p,
+.metrics p {
+  margin: 0;
+}
+
+.metrics {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.hint {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ── Forest / Graph container ── */
+.forest-container {
+  display: block;
+}
+
+.forest-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.forest-diagram {
+  position: relative;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(240, 242, 250, 0.85)),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 96px,
+      rgba(38, 50, 86, 0.04) 96px,
+      rgba(38, 50, 86, 0.04) 98px
+    );
+  min-height: 180px;
+}
+
+.forest-links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.forest-edge {
+  stroke: rgba(60, 70, 110, 0.3);
+  stroke-width: 2;
+  marker-end: url(#arrow);
+}
+
+.forest-edge.highlight {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  opacity: 0.9;
+}
+
+/* ── DSU Nodes ── */
+.dsu-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-width: 48px;
+  min-height: 48px;
+  border: 2px solid var(--edge);
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.dsu-node.active {
+  border-color: rgba(91, 94, 222, 0.85);
+  box-shadow: 0 0 0 4px rgba(91, 94, 222, 0.18), 0 6px 16px rgba(91, 94, 222, 0.2);
+  transform: translate(-50%, -50%) scale(1.12);
+}
+
+.dsu-node.root-node {
+  border-color: rgba(22, 127, 96, 0.55);
+  background: linear-gradient(160deg, #f0fff9, #e2fbf2);
+}
+
+.dsu-node.root-node.active {
+  border-color: rgba(91, 94, 222, 0.85);
+  background: linear-gradient(160deg, #ededff, #e4e5ff);
+}
+
+.node-label {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.node-rank {
+  display: block;
+  margin-top: 1px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--muted);
+}
+
+.root-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: inline-block;
+  border-radius: 999px;
+  background: rgba(22, 127, 96, 0.16);
+  color: #11674e;
+  font-size: 0.52rem;
+  padding: 1px 5px;
+  font-weight: 700;
+}
+
+/* ── Parent array table ── */
+.parent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+}
+
+.parent-table th,
+.parent-table td {
+  border: 1px solid var(--edge);
+  padding: 5px 8px;
+  text-align: center;
+}
+
+.parent-table th {
+  background: rgba(91, 94, 222, 0.06);
+  font-weight: 600;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.parent-table td {
+  background: #fff;
+}
+
+.parent-table td.highlight {
+  background: rgba(253, 213, 129, 0.56);
+}
+
+.parent-table-scroll {
+  overflow-x: auto;
+}
+
+/* ── Components list ── */
+.components-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.component-chip {
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  padding: 5px 10px;
+  background: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.component-chip.empty {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.component-chip .chip-label {
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 4px;
+}
+
+/* ── Code panels ── */
+.code-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.code-panel {
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+}
+
+.code-panel h3 {
+  margin: 0 0 8px;
+  font-size: 0.94rem;
+}
+
+.code-panel ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.code-panel li {
+  padding: 2px 5px;
+  border-radius: 6px;
+  color: #2f3e55;
+}
+
+.code-panel li.active {
+  background: rgba(253, 213, 129, 0.56);
+}
+
+.code-panel.dimmed {
+  opacity: 0.45;
+}
+
+/* ── Log ── */
+.log-output {
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: #f8f9fc;
+  padding: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: 0.82rem;
+}
+
+/* ── Responsive grid ── */
+@media (min-width: 1180px) {
+  .layout {
+    grid-template-columns: minmax(720px, 1.85fr) minmax(360px, 1fr);
+    grid-template-areas:
+      "hero hero"
+      "controls controls"
+      "forest-view status"
+      "forest-view code-view"
+      "parent-view components-view"
+      "log-view log-view";
+    align-items: start;
+  }
+
+  .hero {
+    grid-area: hero;
+  }
+
+  .controls {
+    grid-area: controls;
+  }
+
+  .forest-view {
+    grid-area: forest-view;
+  }
+
+  .status {
+    grid-area: status;
+  }
+
+  .code-view {
+    grid-area: code-view;
+  }
+
+  .parent-view {
+    grid-area: parent-view;
+  }
+
+  .components-view {
+    grid-area: components-view;
+  }
+
+  .log-view {
+    grid-area: log-view;
+  }
+
+  .status,
+  .code-view,
+  .components-view {
+    align-self: start;
+  }
+
+  .log-output {
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 980px) {
+  .control-grid {
+    grid-template-columns: 1fr;
+  }
+}

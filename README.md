@@ -3,7 +3,9 @@
 Interactive, browser-based labs for learning core data structures and graph algorithms:
 - `trie/`: insert/search/prefix/delete tracing for Trie
 - `segment_tree/`: range update and range query with lazy propagation
+- `sparse_segment_tree/`: dynamic segment tree with lazy node creation over large index spaces
 - `fenwick_tree/`: point updates and prefix/range sums with BIT
+- `dsu/`: union/find/connected tracing with path compression and union by rank
 - `dijkstra/`: shortest paths in weighted graphs with step-by-step relaxation tracing
 - `bellman_ford/`: pass-by-pass relaxation tracing with negative-cycle detection
 - `topological_sort/`: Kahn's algorithm tracing for queue/indegree/order evolution
@@ -24,15 +26,17 @@ python3 -m http.server 4173
 Then open `http://localhost:4173/` for the landing page, or navigate directly to a tutorial:
 - `http://localhost:4173/trie/`
 - `http://localhost:4173/segment_tree/`
+- `http://localhost:4173/sparse_segment_tree/`
 - `http://localhost:4173/fenwick_tree/`
 - `http://localhost:4173/dijkstra/`
+- `http://localhost:4173/dsu/`
 - `http://localhost:4173/bellman_ford/`
 - `http://localhost:4173/topological_sort/`
 
 ## Repository Layout
 
 - `index.html`: landing page linking to every tutorial
-- `trie/`, `segment_tree/`, `fenwick_tree/`, `dijkstra/`, `bellman_ford/`, `topological_sort/`
+- `trie/`, `segment_tree/`, `sparse_segment_tree/`, `fenwick_tree/`, `dsu/`, `dijkstra/`, `bellman_ford/`, `topological_sort/`
   - `index.html`: page shell that mounts a Lit custom element
   - `styles.css`: module-specific theme and layout
   - `app.js`: Lit host component template + runtime bootstrap
