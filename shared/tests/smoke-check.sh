@@ -10,6 +10,7 @@ MODULES=(
   dijkstra
   bellman_ford
   kruskal
+  eulerian_path
   topological_sort
 )
 

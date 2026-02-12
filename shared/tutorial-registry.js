@@ -7,6 +7,7 @@ const tutorialOrder = [
   "dijkstra",
   "bellman_ford",
   "kruskal",
+  "eulerian_path",
   "topological_sort",
 ];
 
@@ -144,6 +145,22 @@ export const tutorialRegistry = Object.freeze({
     fontHref:
       "https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Roboto+Mono:wght@400;500&display=swap",
     tagName: "kruskal-tutorial-app",
+    moduleEntryPath: "./app.js",
+  }),
+  eulerian_path: freezeTutorial({
+    id: "eulerian_path",
+    category: "graph",
+    route: "eulerian_path/",
+    title: "Eulerian Path Tutorial Lab",
+    description:
+      "Interactive Eulerian Path tutorial using Hierholzer's algorithm. Trace degree checks, connectivity validation, stack traversal, and backtracking step-by-step.",
+    landingTitle: "Eulerian Path",
+    landingDescription:
+      "Check odd-degree and connectivity conditions, then build an Eulerian path edge-by-edge with Hierholzer's stack-based traversal.",
+    landingTags: ["hierholzer", "degree-parity", "connectivity", "edge-traversal"],
+    fontHref:
+      "https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap",
+    tagName: "eulerian-path-tutorial-app",
     moduleEntryPath: "./app.js",
   }),
   topological_sort: freezeTutorial({
