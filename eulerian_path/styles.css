@@ -17,8 +17,7 @@ eulerian-path-tutorial-app {
   --font-sans: "Merriweather Sans", "Trebuchet MS", sans-serif;
   --font-mono: "IBM Plex Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 14% 10%, #d2ebdf 0%, transparent 36%),
+  --page-bg: radial-gradient(circle at 14% 10%, #d2ebdf 0%, transparent 36%),
     radial-gradient(circle at 86% 88%, #dde7d1 0%, transparent 34%),
     linear-gradient(166deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1200px;
@@ -189,10 +188,8 @@ textarea {
   overflow: hidden;
   min-height: 430px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  background:
-    radial-gradient(circle at 14% 14%, rgba(155, 213, 197, 0.23) 0%, transparent 34%),
-    radial-gradient(circle at 84% 86%, rgba(225, 227, 173, 0.25) 0%, transparent 38%),
-    #f8fdfc;
+  background: radial-gradient(circle at 14% 14%, rgba(155, 213, 197, 0.23) 0%, transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(225, 227, 173, 0.25) 0%, transparent 38%), #f8fdfc;
 }
 
 .graph-canvas {

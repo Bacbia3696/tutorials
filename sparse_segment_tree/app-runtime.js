@@ -1,11 +1,8 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import {
-  bindDebouncedResize,
-  setupRunnerControls,
-} from "../shared/tutorial-bootstrap.js";
-import { parseArrayInput, randomIntegerArray } from "../shared/array-input.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
-import { mountAutoFitTree } from "../shared/tree-view.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { bindDebouncedResize, setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { parseArrayInput, randomIntegerArray } from '../shared/array-input.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
+import { mountAutoFitTree } from '../shared/tree-view.js';
 
 class SparseSegTreeTracer {
   constructor(left, right) {
@@ -93,11 +90,7 @@ class SparseSegTreeTracer {
     }
 
     const pending = node.lazy;
-    emit(
-      `Resolve pending +${pending} on [${node.left}, ${node.right}]`,
-      2,
-      node,
-    );
+    emit(`Resolve pending +${pending} on [${node.left}, ${node.right}]`, 2, node);
 
     const mid = this.#midpoint(node);
     const leftChild = this.#ensureLeftChild(node, mid);
@@ -109,11 +102,7 @@ class SparseSegTreeTracer {
     leftChild.lazy += pending;
     rightChild.sum += rightLength * pending;
     rightChild.lazy += pending;
-    emit(
-      `Push pending +${pending} to children of [${node.left}, ${node.right}]`,
-      3,
-      node,
-    );
+    emit(`Push pending +${pending} to children of [${node.left}, ${node.right}]`, 3, node);
 
     node.lazy = 0;
     emit(`Clear lazy tag at [${node.left}, ${node.right}]`, 3, node);
@@ -143,7 +132,7 @@ class SparseSegTreeTracer {
 
     const emit = (message, line, activeNode, extras = {}) => {
       events.push({
-        opType: "update",
+        opType: 'update',
         message,
         line,
         activeNodeId: activeNode ? activeNode.id : null,
@@ -191,11 +180,7 @@ class SparseSegTreeTracer {
       }
 
       this.#recompute(node);
-      emit(
-        `Recompute [${left}, ${right}] from children, sum=${node.sum}`,
-        6,
-        node,
-      );
+      emit(`Recompute [${left}, ${right}] from children, sum=${node.sum}`, 6, node);
     };
 
     update(this.root, this.leftBound, this.rightBound);
@@ -260,7 +245,7 @@ class SparseSegTreeTracer {
 
     const emit = (message, line, activeNode, extras = {}) => {
       events.push({
-        opType: "query",
+        opType: 'query',
         message,
         line,
         activeNodeId: activeNode ? activeNode.id : null,
@@ -276,24 +261,18 @@ class SparseSegTreeTracer {
       }
 
       if (!node) {
-        emit(
-          `Node [${left}, ${right}] was never created, contribution is 0`,
-          1,
-          null,
-          { contribution: 0 },
-        );
+        emit(`Node [${left}, ${right}] was never created, contribution is 0`, 1, null, {
+          contribution: 0,
+        });
         return 0;
       }
 
       emit(`Visit materialized node [${left}, ${right}] with sum=${node.sum}`, 1, node);
 
       if (queryLeft <= left && right <= queryRight) {
-        emit(
-          `Total overlap for [${left}, ${right}], contribute ${node.sum}`,
-          5,
-          node,
-          { contribution: node.sum },
-        );
+        emit(`Total overlap for [${left}, ${right}], contribute ${node.sum}`, 5, node, {
+          contribution: node.sum,
+        });
         return node.sum;
       }
 
@@ -306,12 +285,9 @@ class SparseSegTreeTracer {
       const rightPart = query(node.rightChild, mid + 1, right);
       const total = leftPart + rightPart;
 
-      emit(
-        `Combine [${left}, ${right}] => ${leftPart} + ${rightPart} = ${total}`,
-        6,
-        node,
-        { contribution: total },
-      );
+      emit(`Combine [${left}, ${right}] => ${leftPart} + ${rightPart} = ${total}`, 6, node, {
+        contribution: total,
+      });
       return total;
     };
 
@@ -353,34 +329,34 @@ class SparseSegTreeTracer {
 }
 
 const elements = {
-  initialValuesInput: document.getElementById("initialValuesInput"),
-  loadInitialBtn: document.getElementById("loadInitialBtn"),
-  randomInitialBtn: document.getElementById("randomInitialBtn"),
-  boundLeft: document.getElementById("boundLeft"),
-  boundRight: document.getElementById("boundRight"),
-  resetTreeBtn: document.getElementById("resetTreeBtn"),
-  opType: document.getElementById("opType"),
-  deltaWrap: document.getElementById("deltaWrap"),
-  deltaValue: document.getElementById("deltaValue"),
-  leftWrap: document.getElementById("leftWrap"),
-  leftIndex: document.getElementById("leftIndex"),
-  rightWrap: document.getElementById("rightWrap"),
-  rightIndex: document.getElementById("rightIndex"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  rootSum: document.getElementById("rootSum"),
-  nodeCount: document.getElementById("nodeCount"),
-  queryResult: document.getElementById("queryResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  pointStrip: document.getElementById("pointStrip"),
-  treeContainer: document.getElementById("treeContainer"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  initialValuesInput: document.getElementById('initialValuesInput'),
+  loadInitialBtn: document.getElementById('loadInitialBtn'),
+  randomInitialBtn: document.getElementById('randomInitialBtn'),
+  boundLeft: document.getElementById('boundLeft'),
+  boundRight: document.getElementById('boundRight'),
+  resetTreeBtn: document.getElementById('resetTreeBtn'),
+  opType: document.getElementById('opType'),
+  deltaWrap: document.getElementById('deltaWrap'),
+  deltaValue: document.getElementById('deltaValue'),
+  leftWrap: document.getElementById('leftWrap'),
+  leftIndex: document.getElementById('leftIndex'),
+  rightWrap: document.getElementById('rightWrap'),
+  rightIndex: document.getElementById('rightIndex'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  rootSum: document.getElementById('rootSum'),
+  nodeCount: document.getElementById('nodeCount'),
+  queryResult: document.getElementById('queryResult'),
+  stepCounter: document.getElementById('stepCounter'),
+  pointStrip: document.getElementById('pointStrip'),
+  treeContainer: document.getElementById('treeContainer'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -422,28 +398,28 @@ function registerProbeRange(left, right) {
 }
 
 function renderPoints() {
-  elements.pointStrip.innerHTML = "";
+  elements.pointStrip.innerHTML = '';
   if (!state.tracer) {
-    const message = document.createElement("p");
-    message.className = "empty-state";
-    message.textContent = "Reset or load the tree to start probing sample indices.";
+    const message = document.createElement('p');
+    message.className = 'empty-state';
+    message.textContent = 'Reset or load the tree to start probing sample indices.';
     elements.pointStrip.appendChild(message);
     return;
   }
 
   const indices = Array.from(state.probeIndices).sort((a, b) => a - b);
   if (indices.length === 0) {
-    const message = document.createElement("p");
-    message.className = "empty-state";
-    message.textContent = "No probe points selected yet.";
+    const message = document.createElement('p');
+    message.className = 'empty-state';
+    message.textContent = 'No probe points selected yet.';
     elements.pointStrip.appendChild(message);
     return;
   }
 
   for (const index of indices) {
     const value = state.tracer.getPointValue(index);
-    const cell = document.createElement("div");
-    cell.className = "point-cell";
+    const cell = document.createElement('div');
+    cell.className = 'point-cell';
     cell.innerHTML = `<span class="idx">i=${index}</span><span class="val">${value}</span>`;
     elements.pointStrip.appendChild(cell);
   }
@@ -452,7 +428,7 @@ function renderPoints() {
 function renderTree(snapshot, activeNodeId = null) {
   state.lastSnapshot = snapshot;
   state.lastActiveNodeId = activeNodeId;
-  elements.treeContainer.innerHTML = "";
+  elements.treeContainer.innerHTML = '';
 
   if (!snapshot || snapshot.length === 0) {
     return;
@@ -494,16 +470,16 @@ function renderTree(snapshot, activeNodeId = null) {
   const diagramHeight = topPadding + bottomPadding + (maxDepth + 1) * rowHeight;
   const diagramWidth = Math.max(panelWidth, minSpacingWidth);
 
-  const diagram = document.createElement("div");
-  diagram.className = "tree-diagram";
+  const diagram = document.createElement('div');
+  diagram.className = 'tree-diagram';
   diagram.style.width = `${diagramWidth}px`;
   diagram.style.height = `${diagramHeight}px`;
-  diagram.style.setProperty("--tree-node-width", `${nodeWidth}px`);
+  diagram.style.setProperty('--tree-node-width', `${nodeWidth}px`);
 
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("class", "tree-links");
-  svg.setAttribute("viewBox", `0 0 ${diagramWidth} ${diagramHeight}`);
-  svg.setAttribute("preserveAspectRatio", "none");
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'tree-links');
+  svg.setAttribute('viewBox', `0 0 ${diagramWidth} ${diagramHeight}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
 
   const coords = new Map();
   for (let depth = 0; depth <= maxDepth; depth += 1) {
@@ -525,23 +501,23 @@ function renderTree(snapshot, activeNodeId = null) {
 
     if (node.leftChildId && coords.has(node.leftChildId)) {
       const child = coords.get(node.leftChildId);
-      const edge = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      edge.setAttribute("x1", String(parent.x));
-      edge.setAttribute("y1", String(parent.y + nodeHeight - 6));
-      edge.setAttribute("x2", String(child.x));
-      edge.setAttribute("y2", String(child.y + 4));
-      edge.setAttribute("class", "tree-edge");
+      const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      edge.setAttribute('x1', String(parent.x));
+      edge.setAttribute('y1', String(parent.y + nodeHeight - 6));
+      edge.setAttribute('x2', String(child.x));
+      edge.setAttribute('y2', String(child.y + 4));
+      edge.setAttribute('class', 'tree-edge');
       svg.appendChild(edge);
     }
 
     if (node.rightChildId && coords.has(node.rightChildId)) {
       const child = coords.get(node.rightChildId);
-      const edge = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      edge.setAttribute("x1", String(parent.x));
-      edge.setAttribute("y1", String(parent.y + nodeHeight - 6));
-      edge.setAttribute("x2", String(child.x));
-      edge.setAttribute("y2", String(child.y + 4));
-      edge.setAttribute("class", "tree-edge");
+      const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      edge.setAttribute('x1', String(parent.x));
+      edge.setAttribute('y1', String(parent.y + nodeHeight - 6));
+      edge.setAttribute('x2', String(child.x));
+      edge.setAttribute('y2', String(child.y + 4));
+      edge.setAttribute('class', 'tree-edge');
       svg.appendChild(edge);
     }
   }
@@ -554,19 +530,19 @@ function renderTree(snapshot, activeNodeId = null) {
       continue;
     }
 
-    const card = document.createElement("div");
-    card.className = "node-card tree-node";
+    const card = document.createElement('div');
+    card.className = 'node-card tree-node';
     if (node.lazy !== 0) {
-      card.classList.add("has-lazy");
+      card.classList.add('has-lazy');
     }
     if (node.id === activeNodeId) {
-      card.classList.add("active");
+      card.classList.add('active');
     }
     card.style.left = `${position.x}px`;
     card.style.top = `${position.y}px`;
 
-    const leftChildLabel = node.leftChildId ? `L:${node.leftChildId}` : "L:-";
-    const rightChildLabel = node.rightChildId ? `R:${node.rightChildId}` : "R:-";
+    const leftChildLabel = node.leftChildId ? `L:${node.leftChildId}` : 'L:-';
+    const rightChildLabel = node.rightChildId ? `R:${node.rightChildId}` : 'R:-';
 
     card.innerHTML = `
       <div class="node-head">#${node.id} [${node.left},${node.right}]</div>
@@ -589,10 +565,10 @@ function rerenderTreeForResize() {
 }
 
 function updateMetrics() {
-  elements.rootSum.textContent = state.tracer ? state.tracer.root.sum : "-";
-  elements.nodeCount.textContent = state.tracer ? String(state.tracer.nodeCount) : "0";
+  elements.rootSum.textContent = state.tracer ? state.tracer.root.sum : '-';
+  elements.nodeCount.textContent = state.tracer ? String(state.tracer.nodeCount) : '0';
   elements.queryResult.textContent =
-    state.lastQueryResult === null ? "-" : String(state.lastQueryResult);
+    state.lastQueryResult === null ? '-' : String(state.lastQueryResult);
 
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const total = operationRunner ? operationRunner.pendingLength : 0;
@@ -604,25 +580,25 @@ function parseBoundsInputs() {
   const right = elements.boundRight.valueAsNumber;
 
   if (!Number.isSafeInteger(left) || !Number.isSafeInteger(right)) {
-    return { error: "Universe bounds must be safe integers." };
+    return { error: 'Universe bounds must be safe integers.' };
   }
   if (left > right) {
-    return { error: "Universe requires left <= right." };
+    return { error: 'Universe requires left <= right.' };
   }
   if (right - left > 1_000_000_000) {
-    return { error: "Universe span is too large. Keep (R - L) <= 1,000,000,000." };
+    return { error: 'Universe span is too large. Keep (R - L) <= 1,000,000,000.' };
   }
 
   return { left, right };
 }
 
 function parseInitialValuesInput(left, right, { allowEmpty = true } = {}) {
-  const text = String(elements.initialValuesInput.value ?? "").trim();
+  const text = String(elements.initialValuesInput.value ?? '').trim();
   if (text.length === 0) {
     if (allowEmpty) {
       return { values: [] };
     }
-    return { error: "Initial values cannot be empty." };
+    return { error: 'Initial values cannot be empty.' };
   }
 
   const parsed = parseArrayInput(text, {
@@ -720,7 +696,7 @@ function loadTree(left, right, initialValues = []) {
       ? `Sparse tree reset for universe [${left}, ${right}].`
       : `Sparse tree loaded for [${left}, ${right}] with ${initialCount} initial values.`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
 }
 
 function handleResetTree() {
@@ -771,16 +747,16 @@ function handleRandomInitialValues() {
     maxValue: 10,
   });
 
-  elements.initialValuesInput.value = values.join(", ");
+  elements.initialValuesInput.value = values.join(', ');
   loadTree(parsedBounds.left, parsedBounds.right, values);
 }
 
 function handleOperationTypeChange() {
-  const isUpdate = elements.opType.value === "update";
+  const isUpdate = elements.opType.value === 'update';
 
-  elements.deltaWrap.style.display = isUpdate ? "flex" : "none";
-  elements.leftWrap.style.display = "flex";
-  elements.rightWrap.style.display = "flex";
+  elements.deltaWrap.style.display = isUpdate ? 'flex' : 'none';
+  elements.leftWrap.style.display = 'flex';
+  elements.rightWrap.style.display = 'flex';
 
   helpers.focusCodePanel(elements.opType.value);
   helpers.clearCodeHighlights();
@@ -790,18 +766,18 @@ function setOperationType(opType) {
   elements.opType.value = opType;
   handleOperationTypeChange();
   helpers.updateStatus(
-    opType === "update"
-      ? "Shortcut: switched to Range Add Update mode."
-      : "Shortcut: switched to Range Sum Query mode.",
+    opType === 'update'
+      ? 'Shortcut: switched to Range Add Update mode.'
+      : 'Shortcut: switched to Range Sum Query mode.',
   );
 }
 
 function validateRange(left, right) {
   if (!Number.isSafeInteger(left) || !Number.isSafeInteger(right)) {
-    return "L and R must be integers.";
+    return 'L and R must be integers.';
   }
   if (left > right) {
-    return "Require L <= R.";
+    return 'Require L <= R.';
   }
   if (left < state.leftBound || right > state.rightBound) {
     return `Query range must stay within [${state.leftBound}, ${state.rightBound}].`;
@@ -811,7 +787,7 @@ function validateRange(left, right) {
 
 function prepareOperation() {
   if (!state.tracer) {
-    const message = "Reset the sparse tree first.";
+    const message = 'Reset the sparse tree first.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
@@ -828,11 +804,11 @@ function prepareOperation() {
   }
   registerProbeRange(left, right);
 
-  if (opType === "update") {
+  if (opType === 'update') {
     const delta = elements.deltaValue.valueAsNumber;
 
     if (!Number.isSafeInteger(delta)) {
-      const message = "Delta must be an integer.";
+      const message = 'Delta must be an integer.';
       helpers.updateStatus(message);
       helpers.appendLog(message);
       return null;
@@ -858,14 +834,14 @@ function prepareOperation() {
 }
 
 function finalizePendingOperation(meta) {
-  if (typeof meta.result === "number") {
+  if (typeof meta.result === 'number') {
     state.lastQueryResult = meta.result;
   }
 
   const text = meta.summary;
 
   helpers.updateStatus(text);
-  helpers.appendLog(text, "ok");
+  helpers.appendLog(text, 'ok');
 
   renderPoints();
   renderTree(state.tracer.snapshot(), null);
@@ -891,17 +867,19 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.resetTreeBtn.addEventListener("click", handleResetTree);
-  elements.loadInitialBtn.addEventListener("click", handleLoadInitialValues);
-  elements.randomInitialBtn.addEventListener("click", handleRandomInitialValues);
-  elements.opType.addEventListener("change", handleOperationTypeChange);
+  elements.resetTreeBtn.addEventListener('click', handleResetTree);
+  elements.loadInitialBtn.addEventListener('click', handleLoadInitialValues);
+  elements.randomInitialBtn.addEventListener('click', handleRandomInitialValues);
+  elements.opType.addEventListener('change', handleOperationTypeChange);
 
   setupRunnerControls({
     elements,
@@ -918,8 +896,8 @@ function init() {
       b: () => handleResetTree(),
       l: () => handleLoadInitialValues(),
       r: () => handleRandomInitialValues(),
-      u: () => setOperationType("update"),
-      q: () => setOperationType("query"),
+      u: () => setOperationType('update'),
+      q: () => setOperationType('query'),
     },
   });
 

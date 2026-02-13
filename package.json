@@ -1,9 +1,14 @@
 {
   "name": "algorithm-tutorials-playground",
   "private": true,
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  },
   "scripts": {
     "start": "python3 -m http.server 4173",
     "check:shared": "node shared/tests/shared-logic.test.mjs",
-    "check:smoke": "shared/tests/smoke-check.sh"
+    "check:smoke": "shared/tests/smoke-check.sh",
+    "format": "biome format . --write",
+    "format:check": "biome check ."
   }
 }

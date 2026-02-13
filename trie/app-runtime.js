@@ -1,9 +1,6 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import {
-  bindDebouncedResize,
-  setupRunnerControls,
-} from "../shared/tutorial-bootstrap.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { bindDebouncedResize, setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 class TrieNode {
   constructor(id, char) {
@@ -16,7 +13,7 @@ class TrieNode {
 
 class TrieTracer {
   constructor(words = []) {
-    this.root = new TrieNode(0, "");
+    this.root = new TrieNode(0, '');
     this.nextId = 1;
     this.words = new Set();
 
@@ -72,7 +69,7 @@ class TrieTracer {
 
     const emit = (message, line, activeNodeId = null, extras = {}) => {
       events.push({
-        opType: "insert",
+        opType: 'insert',
         message,
         line,
         activeNodeId,
@@ -118,7 +115,7 @@ class TrieTracer {
 
     const emit = (message, line, activeNodeId = null, extras = {}) => {
       events.push({
-        opType: "search",
+        opType: 'search',
         message,
         line,
         activeNodeId,
@@ -157,7 +154,7 @@ class TrieTracer {
 
     const emit = (message, line, activeNodeId = null, extras = {}) => {
       events.push({
-        opType: "prefix",
+        opType: 'prefix',
         message,
         line,
         activeNodeId,
@@ -196,7 +193,7 @@ class TrieTracer {
 
     const emit = (message, line, activeNodeId = null, extras = {}) => {
       events.push({
-        opType: "delete",
+        opType: 'delete',
         message,
         line,
         activeNodeId,
@@ -264,26 +261,26 @@ class TrieTracer {
 }
 
 const elements = {
-  initialWordsInput: document.getElementById("initialWordsInput"),
-  loadWordsBtn: document.getElementById("loadWordsBtn"),
-  sampleWordsBtn: document.getElementById("sampleWordsBtn"),
-  opType: document.getElementById("opType"),
-  wordInput: document.getElementById("wordInput"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  wordCount: document.getElementById("wordCount"),
-  nodeCount: document.getElementById("nodeCount"),
-  lastResult: document.getElementById("lastResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  treeContainer: document.getElementById("treeContainer"),
-  wordsList: document.getElementById("wordsList"),
-  logOutput: document.getElementById("logOutput"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
+  initialWordsInput: document.getElementById('initialWordsInput'),
+  loadWordsBtn: document.getElementById('loadWordsBtn'),
+  sampleWordsBtn: document.getElementById('sampleWordsBtn'),
+  opType: document.getElementById('opType'),
+  wordInput: document.getElementById('wordInput'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  wordCount: document.getElementById('wordCount'),
+  nodeCount: document.getElementById('nodeCount'),
+  lastResult: document.getElementById('lastResult'),
+  stepCounter: document.getElementById('stepCounter'),
+  treeContainer: document.getElementById('treeContainer'),
+  wordsList: document.getElementById('wordsList'),
+  logOutput: document.getElementById('logOutput'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
 };
 
 const state = {
@@ -315,10 +312,10 @@ function parseWordsInput(text) {
     .filter((token) => token.length > 0);
 
   if (tokens.length === 0) {
-    return { error: "Please provide at least one word." };
+    return { error: 'Please provide at least one word.' };
   }
   if (tokens.length > 40) {
-    return { error: "Use at most 40 words." };
+    return { error: 'Use at most 40 words.' };
   }
 
   const unique = new Set();
@@ -334,23 +331,23 @@ function parseWordsInput(text) {
 
 function randomSampleWords() {
   const bank = [
-    "cat",
-    "car",
-    "cart",
-    "care",
-    "dog",
-    "dot",
-    "dove",
-    "deal",
-    "deer",
-    "doom",
-    "sun",
-    "sand",
-    "song",
-    "soon",
-    "tea",
-    "team",
-    "tear",
+    'cat',
+    'car',
+    'cart',
+    'care',
+    'dog',
+    'dot',
+    'dove',
+    'deal',
+    'deer',
+    'doom',
+    'sun',
+    'sand',
+    'song',
+    'soon',
+    'tea',
+    'team',
+    'tear',
   ];
 
   const chosen = [];
@@ -365,19 +362,19 @@ function randomSampleWords() {
 }
 
 function renderWords(words) {
-  elements.wordsList.innerHTML = "";
+  elements.wordsList.innerHTML = '';
 
   if (!words || words.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "word-chip empty";
-    empty.textContent = "(empty dictionary)";
+    const empty = document.createElement('div');
+    empty.className = 'word-chip empty';
+    empty.textContent = '(empty dictionary)';
     elements.wordsList.appendChild(empty);
     return;
   }
 
   for (const word of words) {
-    const chip = document.createElement("div");
-    chip.className = "word-chip";
+    const chip = document.createElement('div');
+    chip.className = 'word-chip';
     chip.textContent = word;
     elements.wordsList.appendChild(chip);
   }
@@ -424,10 +421,7 @@ function layoutTree(snapshot, containerWidth) {
   const coords = new Map();
   for (const node of snapshot.nodes) {
     const unit = xUnits.get(node.id) ?? 0;
-    const x =
-      leaves <= 1
-        ? width / 2
-        : sidePad + (unit / (leaves - 1)) * (width - sidePad * 2);
+    const x = leaves <= 1 ? width / 2 : sidePad + (unit / (leaves - 1)) * (width - sidePad * 2);
     const y = topPad + node.depth * rowHeight;
     coords.set(node.id, { x, y });
   }
@@ -438,7 +432,7 @@ function layoutTree(snapshot, containerWidth) {
 function renderTree(snapshot, activeNodeId = null) {
   state.lastTreeSnapshot = snapshot;
   state.lastActiveNodeId = activeNodeId;
-  elements.treeContainer.innerHTML = "";
+  elements.treeContainer.innerHTML = '';
 
   if (!snapshot || !snapshot.nodes || snapshot.nodes.length === 0) {
     return;
@@ -447,18 +441,18 @@ function renderTree(snapshot, activeNodeId = null) {
   const panelWidth = Math.max(elements.treeContainer.clientWidth - 6, 620);
   const { coords, width, height } = layoutTree(snapshot, panelWidth);
 
-  const scroll = document.createElement("div");
-  scroll.className = "tree-scroll";
+  const scroll = document.createElement('div');
+  scroll.className = 'tree-scroll';
 
-  const diagram = document.createElement("div");
-  diagram.className = "tree-diagram";
+  const diagram = document.createElement('div');
+  diagram.className = 'tree-diagram';
   diagram.style.width = `${width}px`;
   diagram.style.height = `${height}px`;
 
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("class", "tree-links");
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svg.setAttribute("preserveAspectRatio", "none");
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'tree-links');
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
 
   for (const node of snapshot.nodes) {
     const from = coords.get(node.id);
@@ -467,12 +461,12 @@ function renderTree(snapshot, activeNodeId = null) {
       if (!from || !to) {
         continue;
       }
-      const edge = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      edge.setAttribute("x1", String(from.x));
-      edge.setAttribute("y1", String(from.y + 30));
-      edge.setAttribute("x2", String(to.x));
-      edge.setAttribute("y2", String(to.y + 4));
-      edge.setAttribute("class", "tree-edge");
+      const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      edge.setAttribute('x1', String(from.x));
+      edge.setAttribute('y1', String(from.y + 30));
+      edge.setAttribute('x2', String(to.x));
+      edge.setAttribute('y2', String(to.y + 4));
+      edge.setAttribute('class', 'tree-edge');
       svg.appendChild(edge);
     }
   }
@@ -482,22 +476,22 @@ function renderTree(snapshot, activeNodeId = null) {
   const nodesOrdered = [...snapshot.nodes].sort((a, b) => a.depth - b.depth || a.id - b.id);
   for (const node of nodesOrdered) {
     const { x, y } = coords.get(node.id);
-    const card = document.createElement("div");
-    card.className = "trie-node";
+    const card = document.createElement('div');
+    card.className = 'trie-node';
     if (node.isEnd) {
-      card.classList.add("end");
+      card.classList.add('end');
     }
     if (activeNodeId === node.id) {
-      card.classList.add("active");
+      card.classList.add('active');
     }
     card.style.left = `${x}px`;
     card.style.top = `${y}px`;
 
-    const charLabel = node.id === 0 ? "ROOT" : node.char;
+    const charLabel = node.id === 0 ? 'ROOT' : node.char;
     card.innerHTML = `
-      <div class="node-char ${node.id === 0 ? "root" : ""}">${charLabel}</div>
+      <div class="node-char ${node.id === 0 ? 'root' : ''}">${charLabel}</div>
       <span class="node-id">#${node.id}</span>
-      ${node.isEnd ? '<span class="end-flag">END</span>' : ""}
+      ${node.isEnd ? '<span class="end-flag">END</span>' : ''}
     `;
     diagram.appendChild(card);
   }
@@ -517,21 +511,21 @@ function updateMetrics(snapshot) {
   const snap = snapshot || state.trie.snapshot();
   elements.wordCount.textContent = String(snap.words.length);
   elements.nodeCount.textContent = String(snap.nodes.length);
-  elements.lastResult.textContent = state.lastResult === null ? "-" : String(state.lastResult);
+  elements.lastResult.textContent = state.lastResult === null ? '-' : String(state.lastResult);
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const total = operationRunner ? operationRunner.pendingLength : 0;
   elements.stepCounter.textContent = `${step} / ${total}`;
 }
 
 function finalizePendingOperation(meta) {
-  if (Object.prototype.hasOwnProperty.call(meta, "result")) {
+  if (Object.prototype.hasOwnProperty.call(meta, 'result')) {
     state.lastResult = meta.result;
   } else {
     state.lastResult = meta.summary;
   }
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, "ok");
+  helpers.appendLog(meta.summary, 'ok');
 
   const snapshot = state.trie.snapshot();
   renderTree(snapshot, null);
@@ -549,7 +543,7 @@ function applyEvent(event) {
 
 function prepareOperation() {
   if (!state.trie) {
-    helpers.updateStatus("Load words first.");
+    helpers.updateStatus('Load words first.');
     return null;
   }
 
@@ -557,13 +551,13 @@ function prepareOperation() {
   const word = normalizeWord(elements.wordInput.value);
 
   if (!word || !isValidWord(word)) {
-    const message = "Word must contain letters a-z only.";
+    const message = 'Word must contain letters a-z only.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
   }
 
-  if (opType === "insert") {
+  if (opType === 'insert') {
     const trace = state.trie.generateInsert(word);
     return {
       opType,
@@ -574,7 +568,7 @@ function prepareOperation() {
     };
   }
 
-  if (opType === "search") {
+  if (opType === 'search') {
     const trace = state.trie.generateSearch(word);
     const naive = state.trie.words.has(word);
     return {
@@ -585,7 +579,7 @@ function prepareOperation() {
     };
   }
 
-  if (opType === "delete") {
+  if (opType === 'delete') {
     const existedBefore = state.trie.words.has(word);
     const trace = state.trie.generateDelete(word);
     const existsAfter = state.trie.words.has(word);
@@ -624,7 +618,7 @@ function loadWords(words) {
 
   const message = `Loaded ${snapshot.words.length} unique words.`;
   helpers.updateStatus(message);
-  helpers.appendLog(`${message} [${snapshot.words.join(", ")}]`, "ok");
+  helpers.appendLog(`${message} [${snapshot.words.join(', ')}]`, 'ok');
 }
 
 function handleLoadWords() {
@@ -639,7 +633,7 @@ function handleLoadWords() {
 
 function handleSampleWords() {
   const words = randomSampleWords();
-  elements.initialWordsInput.value = words.join(", ");
+  elements.initialWordsInput.value = words.join(', ');
   loadWords(words);
 }
 
@@ -662,17 +656,19 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
-      helpers.updateStatus("No pending operation.");
+      helpers.updateStatus('No pending operation.');
     },
   });
 
-  elements.loadWordsBtn.addEventListener("click", handleLoadWords);
-  elements.sampleWordsBtn.addEventListener("click", handleSampleWords);
+  elements.loadWordsBtn.addEventListener('click', handleLoadWords);
+  elements.sampleWordsBtn.addEventListener('click', handleSampleWords);
 
-  elements.opType.addEventListener("change", () => {
+  elements.opType.addEventListener('change', () => {
     helpers.focusCodePanel(elements.opType.value);
     helpers.clearCodeHighlights();
   });
@@ -691,10 +687,10 @@ function init() {
     extraShortcuts: {
       l: () => handleLoadWords(),
       r: () => handleSampleWords(),
-      1: () => setOperationType("insert"),
-      2: () => setOperationType("search"),
-      3: () => setOperationType("prefix"),
-      4: () => setOperationType("delete"),
+      1: () => setOperationType('insert'),
+      2: () => setOperationType('search'),
+      3: () => setOperationType('prefix'),
+      4: () => setOperationType('delete'),
     },
   });
 

@@ -1,24 +1,21 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
 import {
   createLabelToIndex,
   edgeKeyForMode,
   normalizeGraphLabel,
   parseNodeLabelsInput,
-} from "../shared/graph-input.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import {
-  computeCircularNodePositions,
-  createSvgElement,
-} from "../shared/graph-core.js";
+} from '../shared/graph-input.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { computeCircularNodePositions, createSvgElement } from '../shared/graph-core.js';
 import {
   prepareGraphCanvas,
   renderGraphEdges,
   renderGraphNodes,
-} from "../shared/graph-renderer.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+} from '../shared/graph-renderer.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 const SAMPLE_GRAPH = {
-  nodes: ["A", "B", "C", "D", "E", "F"],
+  nodes: ['A', 'B', 'C', 'D', 'E', 'F'],
   edgesText: `A B
 B C
 C D
@@ -36,7 +33,8 @@ function parseUndirectedEdgesInput(
   text,
   {
     labelToIndex,
-    lineFormatMessage = (lineNumber) => `Edge line ${lineNumber} is invalid. Format must be: FROM TO.`,
+    lineFormatMessage = (lineNumber) =>
+      `Edge line ${lineNumber} is invalid. Format must be: FROM TO.`,
     unknownNodeMessage = (lineNumber, label) => `Edge line ${lineNumber}: unknown node '${label}'.`,
     selfLoopMessage = (lineNumber) => `Edge line ${lineNumber}: self-loops are not allowed.`,
     duplicateEdgeMessage = (lineNumber, fromLabel, toLabel) =>
@@ -44,16 +42,16 @@ function parseUndirectedEdgesInput(
   } = {},
 ) {
   if (!(labelToIndex instanceof Map)) {
-    return { error: "Internal error: labelToIndex map is required." };
+    return { error: 'Internal error: labelToIndex map is required.' };
   }
 
-  const lines = String(text ?? "")
+  const lines = String(text ?? '')
     .split(/\n+/)
     .map((line) => line.trim())
-    .filter((line) => line.length > 0 && !line.startsWith("#"));
+    .filter((line) => line.length > 0 && !line.startsWith('#'));
 
   if (lines.length === 0) {
-    return { error: "Please provide at least one edge line." };
+    return { error: 'Please provide at least one edge line.' };
   }
 
   const seen = new Set();
@@ -83,7 +81,7 @@ function parseUndirectedEdgesInput(
       return { error: selfLoopMessage(lineNumber, fromLabel) };
     }
 
-    const key = edgeKeyForMode("undirected", from, to);
+    const key = edgeKeyForMode('undirected', from, to);
     if (seen.has(key)) {
       return { error: duplicateEdgeMessage(lineNumber, fromLabel, toLabel) };
     }
@@ -126,15 +124,15 @@ function buildGraph(nodes, edges) {
 
 function edgeStatusForSnapshot(snapshot, edgeId) {
   if (!snapshot) {
-    return "unused";
+    return 'unused';
   }
 
   const used = new Set(snapshot.usedEdgeIds);
-  return used.has(edgeId) ? "used" : "unused";
+  return used.has(edgeId) ? 'used' : 'unused';
 }
 
 function computeParityLabel(degree) {
-  return degree % 2 === 0 ? "even" : "odd";
+  return degree % 2 === 0 ? 'even' : 'odd';
 }
 
 class EulerianPathTracer {
@@ -186,7 +184,7 @@ class EulerianPathTracer {
   #emit(events, message, line, state, extras = {}) {
     const snapshot = this.#snapshot(state, extras);
     events.push({
-      opType: "eulerian",
+      opType: 'eulerian',
       message,
       line,
       snapshot,
@@ -255,13 +253,8 @@ class EulerianPathTracer {
     };
     const events = [];
 
-    const oddLabels = oddNodes.map((index) => labels[index]).join(", ") || "none";
-    this.#emit(
-      events,
-      `Compute degrees. Odd-degree vertices: ${oddLabels}.`,
-      1,
-      state,
-    );
+    const oddLabels = oddNodes.map((index) => labels[index]).join(', ') || 'none';
+    this.#emit(events, `Compute degrees. Odd-degree vertices: ${oddLabels}.`, 1, state);
 
     const activeVertices = state.degrees
       .map((degree, index) => ({ degree, index }))
@@ -273,8 +266,8 @@ class EulerianPathTracer {
     this.#emit(
       events,
       connected
-        ? "All non-zero-degree vertices are connected."
-        : "Non-zero-degree vertices are disconnected.",
+        ? 'All non-zero-degree vertices are connected.'
+        : 'Non-zero-degree vertices are disconnected.',
       2,
       state,
     );
@@ -286,13 +279,13 @@ class EulerianPathTracer {
       state.hasEulerPath = false;
       const reasons = [];
       if (!connected) {
-        reasons.push("graph is disconnected on non-zero-degree vertices");
+        reasons.push('graph is disconnected on non-zero-degree vertices');
       }
       if (!validOddCount) {
         reasons.push(`odd-degree count is ${oddCount} (must be 0 or 2)`);
       }
 
-      const summary = `No Eulerian path: ${reasons.join("; ")}.`;
+      const summary = `No Eulerian path: ${reasons.join('; ')}.`;
       this.#emit(events, summary, 3, state);
       return {
         events,
@@ -306,20 +299,11 @@ class EulerianPathTracer {
     state.hasEulerPath = true;
 
     const startNode =
-      oddCount === 2
-        ? oddNodes[0]
-        : activeVertices.length > 0
-          ? activeVertices[0]
-          : 0;
+      oddCount === 2 ? oddNodes[0] : activeVertices.length > 0 ? activeVertices[0] : 0;
 
     state.startNode = startNode;
     state.currentNode = startNode;
-    this.#emit(
-      events,
-      `Choose start vertex ${labels[startNode]}.`,
-      4,
-      state,
-    );
+    this.#emit(events, `Choose start vertex ${labels[startNode]}.`, 4, state);
 
     state.stack.push(startNode);
     this.#emit(events, `Initialize stack with ${labels[startNode]}.`, 5, state);
@@ -363,8 +347,7 @@ class EulerianPathTracer {
 
     if (finalPathIndices.length !== this.graph.edges.length + 1) {
       state.hasEulerPath = false;
-      const summary =
-        `Traversal ended with ${finalPathIndices.length} vertices, expected ${this.graph.edges.length + 1}. No Eulerian path.`;
+      const summary = `Traversal ended with ${finalPathIndices.length} vertices, expected ${this.graph.edges.length + 1}. No Eulerian path.`;
       this.#emit(events, summary, 9, state, { hasEulerPath: false });
 
       return {
@@ -376,7 +359,7 @@ class EulerianPathTracer {
       };
     }
 
-    const summary = `Eulerian path found: ${pathLabels.join(" -> ")}.`;
+    const summary = `Eulerian path found: ${pathLabels.join(' -> ')}.`;
     this.#emit(events, summary, 9, state, { hasEulerPath: true });
 
     return {
@@ -390,31 +373,31 @@ class EulerianPathTracer {
 }
 
 const elements = {
-  nodesInput: document.getElementById("nodesInput"),
-  edgesInput: document.getElementById("edgesInput"),
-  loadGraphBtn: document.getElementById("loadGraphBtn"),
-  sampleGraphBtn: document.getElementById("sampleGraphBtn"),
-  randomGraphBtn: document.getElementById("randomGraphBtn"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  oddMetric: document.getElementById("oddMetric"),
-  usedMetric: document.getElementById("usedMetric"),
-  resultMetric: document.getElementById("resultMetric"),
-  pathMetric: document.getElementById("pathMetric"),
-  stepCounter: document.getElementById("stepCounter"),
-  graphViewPanel: document.getElementById("graphViewPanel"),
-  graphCanvas: document.getElementById("graphCanvas"),
-  stackStrip: document.getElementById("stackStrip"),
-  pathStrip: document.getElementById("pathStrip"),
-  nodeCards: document.getElementById("nodeCards"),
-  edgeRows: document.getElementById("edgeRows"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  nodesInput: document.getElementById('nodesInput'),
+  edgesInput: document.getElementById('edgesInput'),
+  loadGraphBtn: document.getElementById('loadGraphBtn'),
+  sampleGraphBtn: document.getElementById('sampleGraphBtn'),
+  randomGraphBtn: document.getElementById('randomGraphBtn'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  oddMetric: document.getElementById('oddMetric'),
+  usedMetric: document.getElementById('usedMetric'),
+  resultMetric: document.getElementById('resultMetric'),
+  pathMetric: document.getElementById('pathMetric'),
+  stepCounter: document.getElementById('stepCounter'),
+  graphViewPanel: document.getElementById('graphViewPanel'),
+  graphCanvas: document.getElementById('graphCanvas'),
+  stackStrip: document.getElementById('stackStrip'),
+  pathStrip: document.getElementById('pathStrip'),
+  nodeCards: document.getElementById('nodeCards'),
+  edgeRows: document.getElementById('edgeRows'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -432,7 +415,7 @@ const helpers = createRuntimeHelpers({
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
-  elements.graphViewPanel.classList.toggle("playing", enabled);
+  elements.graphViewPanel.classList.toggle('playing', enabled);
 }
 
 function cloneSnapshot(snapshot) {
@@ -455,13 +438,13 @@ function cloneSnapshot(snapshot) {
 }
 
 function renderGraphCanvas(snapshot, activeEdgeId = null) {
-  elements.graphCanvas.classList.toggle("has-active-edge", activeEdgeId !== null);
+  elements.graphCanvas.classList.toggle('has-active-edge', activeEdgeId !== null);
 
   const prepared = prepareGraphCanvas({
     svgElement: elements.graphCanvas,
     fallbackSize: { width: 980, height: 560 },
     hasGraph: Boolean(state.graph),
-    emptyMessage: "Load a graph to visualize Eulerian traversal.",
+    emptyMessage: 'Load a graph to visualize Eulerian traversal.',
   });
   if (!prepared.ready) {
     return;
@@ -488,9 +471,9 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     edgeLabelTextFn: (edge) => `#${edge.id}`,
     edgeLabelWidthFn: (text) => 12 + text.length * 7,
     edgeLabelBgClassFn: (_edge, isActive) =>
-      isActive ? ["graph-edge-label-bg", "active"] : "graph-edge-label-bg",
+      isActive ? ['graph-edge-label-bg', 'active'] : 'graph-edge-label-bg',
     edgeLabelClassFn: (_edge, isActive) =>
-      isActive ? ["graph-edge-label", "active"] : "graph-edge-label",
+      isActive ? ['graph-edge-label', 'active'] : 'graph-edge-label',
   });
 
   const oddSet = new Set(snapshot?.oddNodes ?? []);
@@ -501,15 +484,15 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     nodeCount: state.graph.nodes.length,
     positions,
     nodeClassFn: (index) => [
-      oddSet.has(index) ? "odd" : "",
-      snapshot?.currentNode === index ? "current" : "",
-      snapshot?.startNode === index ? "start" : "",
-      stackSet.has(index) ? "stacked" : "",
+      oddSet.has(index) ? 'odd' : '',
+      snapshot?.currentNode === index ? 'current' : '',
+      snapshot?.startNode === index ? 'start' : '',
+      stackSet.has(index) ? 'stacked' : '',
     ],
     renderNodeContent: ({ group, index, position }) => {
       if (snapshot?.currentNode === index) {
-        const halo = createSvgElement("circle", {
-          class: "graph-current-halo",
+        const halo = createSvgElement('circle', {
+          class: 'graph-current-halo',
           cx: position.x,
           cy: position.y,
           r: nodeRadius + 8,
@@ -517,22 +500,22 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
         group.appendChild(halo);
       }
 
-      const circle = createSvgElement("circle", {
+      const circle = createSvgElement('circle', {
         cx: position.x,
         cy: position.y,
         r: nodeRadius,
       });
       group.appendChild(circle);
 
-      const label = createSvgElement("text", {
+      const label = createSvgElement('text', {
         x: position.x,
         y: position.y,
       });
       label.textContent = state.graph.nodes[index];
       group.appendChild(label);
 
-      const degreeLabel = createSvgElement("text", {
-        class: "graph-degree",
+      const degreeLabel = createSvgElement('text', {
+        class: 'graph-degree',
         x: position.x,
         y: position.y + 35,
       });
@@ -543,21 +526,21 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
 }
 
 function renderStrip(stripElement, nodes, emptyText, emphasizeLast = false) {
-  stripElement.innerHTML = "";
+  stripElement.innerHTML = '';
 
   if (!state.graph || nodes.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "strip-empty";
+    const empty = document.createElement('span');
+    empty.className = 'strip-empty';
     empty.textContent = emptyText;
     stripElement.appendChild(empty);
     return;
   }
 
   nodes.forEach((nodeIndex, index) => {
-    const pill = document.createElement("span");
-    pill.className = "strip-pill";
+    const pill = document.createElement('span');
+    pill.className = 'strip-pill';
     if (emphasizeLast && index === nodes.length - 1) {
-      pill.classList.add("top");
+      pill.classList.add('top');
     }
     pill.textContent = state.graph.nodes[nodeIndex];
     stripElement.appendChild(pill);
@@ -565,7 +548,7 @@ function renderStrip(stripElement, nodes, emptyText, emphasizeLast = false) {
 }
 
 function renderNodes(snapshot) {
-  elements.nodeCards.innerHTML = "";
+  elements.nodeCards.innerHTML = '';
 
   if (!state.graph || !snapshot) {
     return;
@@ -575,23 +558,23 @@ function renderNodes(snapshot) {
   const stackSet = new Set(snapshot.stack);
 
   for (let i = 0; i < state.graph.nodes.length; i += 1) {
-    const card = document.createElement("article");
-    card.className = "node-card";
+    const card = document.createElement('article');
+    card.className = 'node-card';
 
     if (oddSet.has(i)) {
-      card.classList.add("odd");
+      card.classList.add('odd');
     }
     if (snapshot.startNode === i) {
-      card.classList.add("start");
+      card.classList.add('start');
     }
     if (snapshot.currentNode === i) {
-      card.classList.add("current");
+      card.classList.add('current');
     }
     if (stackSet.has(i)) {
-      card.classList.add("stacked");
+      card.classList.add('stacked');
     }
 
-    const onStack = stackSet.has(i) ? "yes" : "no";
+    const onStack = stackSet.has(i) ? 'yes' : 'no';
     const parity = computeParityLabel(snapshot.degrees[i]);
 
     card.innerHTML = `
@@ -601,7 +584,7 @@ function renderNodes(snapshot) {
       </div>
       <div class="node-line">degree: ${snapshot.degrees[i]}</div>
       <div class="node-line">on stack: ${onStack}</div>
-      <div class="node-line">role: ${snapshot.startNode === i ? "start" : "normal"}</div>
+      <div class="node-line">role: ${snapshot.startNode === i ? 'start' : 'normal'}</div>
     `;
 
     elements.nodeCards.appendChild(card);
@@ -609,7 +592,7 @@ function renderNodes(snapshot) {
 }
 
 function renderEdges(snapshot, activeEdgeId = null) {
-  elements.edgeRows.innerHTML = "";
+  elements.edgeRows.innerHTML = '';
 
   if (!state.graph) {
     return;
@@ -617,11 +600,11 @@ function renderEdges(snapshot, activeEdgeId = null) {
 
   for (const edge of state.graph.edges) {
     const status = edgeStatusForSnapshot(snapshot, edge.id);
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     row.classList.add(`status-${status}`);
 
     if (activeEdgeId !== null && edge.id === activeEdgeId) {
-      row.classList.add("active-edge");
+      row.classList.add('active-edge');
     }
 
     const left = state.graph.nodes[edge.from];
@@ -639,8 +622,8 @@ function renderEdges(snapshot, activeEdgeId = null) {
 
 function renderSnapshot(snapshot, activeEdgeId = null) {
   renderGraphCanvas(snapshot, activeEdgeId);
-  renderStrip(elements.stackStrip, snapshot?.stack ?? [], "stack is empty", true);
-  renderStrip(elements.pathStrip, snapshot?.pathBacktrack ?? [], "path is empty", false);
+  renderStrip(elements.stackStrip, snapshot?.stack ?? [], 'stack is empty', true);
+  renderStrip(elements.pathStrip, snapshot?.pathBacktrack ?? [], 'path is empty', false);
   renderNodes(snapshot);
 }
 
@@ -666,12 +649,12 @@ function updateMetrics() {
   elements.usedMetric.textContent = `${usedEdges} / ${totalEdges}`;
 
   if (state.lastHasEulerPath === null) {
-    elements.resultMetric.textContent = "-";
+    elements.resultMetric.textContent = '-';
   } else {
-    elements.resultMetric.textContent = state.lastHasEulerPath ? "Path exists" : "No Eulerian path";
+    elements.resultMetric.textContent = state.lastHasEulerPath ? 'Path exists' : 'No Eulerian path';
   }
 
-  elements.pathMetric.textContent = state.lastPathLabels ? state.lastPathLabels.join(" -> ") : "-";
+  elements.pathMetric.textContent = state.lastPathLabels ? state.lastPathLabels.join(' -> ') : '-';
 
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const totalSteps = operationRunner ? operationRunner.pendingLength : 0;
@@ -693,7 +676,7 @@ function finalizePendingOperation(meta) {
   state.lastPathLabels = meta.pathLabels;
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.appendLog(meta.summary, meta.success ? 'ok' : '');
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(state.lastSnapshot, null);
@@ -737,13 +720,13 @@ function loadGraphFromInputs() {
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(state.lastSnapshot, null);
-  helpers.focusCodePanel("eulerian");
+  helpers.focusCodePanel('eulerian');
   helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.edges.length} undirected edges.`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
   return true;
 }
 
@@ -770,7 +753,7 @@ function generateRandomEulerianGraph() {
     if (from === to) {
       return;
     }
-    const key = edgeKeyForMode("undirected", from, to);
+    const key = edgeKeyForMode('undirected', from, to);
     if (seen.has(key)) {
       return;
     }
@@ -793,27 +776,27 @@ function generateRandomEulerianGraph() {
 }
 
 function loadSampleGraph() {
-  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(", ");
+  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(', ');
   elements.edgesInput.value = SAMPLE_GRAPH.edgesText;
   loadGraphFromInputs();
 }
 
 function loadRandomGraph() {
   const randomGraph = generateRandomEulerianGraph();
-  elements.nodesInput.value = randomGraph.nodes.join(", ");
-  elements.edgesInput.value = randomGraph.edgeLines.join("\n");
+  elements.nodesInput.value = randomGraph.nodes.join(', ');
+  elements.edgesInput.value = randomGraph.edgeLines.join('\n');
   loadGraphFromInputs();
 }
 
 function prepareOperation() {
   if (!state.graph || !state.tracer) {
-    helpers.updateStatus("Load a graph first.");
+    helpers.updateStatus('Load a graph first.');
     return null;
   }
 
   const trace = state.tracer.generateRun();
   return {
-    opType: "eulerian",
+    opType: 'eulerian',
     events: trace.events,
     hasEulerPath: trace.hasEulerPath,
     pathLabels: trace.pathLabels,
@@ -853,17 +836,19 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadGraphBtn.addEventListener("click", loadGraphFromInputs);
-  elements.sampleGraphBtn.addEventListener("click", loadSampleGraph);
-  elements.randomGraphBtn.addEventListener("click", loadRandomGraph);
+  elements.loadGraphBtn.addEventListener('click', loadGraphFromInputs);
+  elements.sampleGraphBtn.addEventListener('click', loadSampleGraph);
+  elements.randomGraphBtn.addEventListener('click', loadRandomGraph);
 
   setupRunnerControls({
     elements,
@@ -883,7 +868,7 @@ function init() {
     },
   });
 
-  helpers.focusCodePanel("eulerian");
+  helpers.focusCodePanel('eulerian');
   loadSampleGraph();
 }
 

@@ -17,8 +17,7 @@ line-sweep-tutorial-app {
   --font-sans: "Nunito Sans", "Trebuchet MS", sans-serif;
   --font-mono: "IBM Plex Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 10% 14%, #d4f2d8 0%, transparent 32%),
+  --page-bg: radial-gradient(circle at 10% 14%, #d4f2d8 0%, transparent 32%),
     radial-gradient(circle at 88% 88%, #d2e6f2 0%, transparent 34%),
     linear-gradient(168deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1240px;
@@ -101,8 +100,7 @@ textarea {
 }
 
 .controls {
-  background:
-    radial-gradient(circle at 90% 14%, rgba(134, 210, 201, 0.18), transparent 34%),
+  background: radial-gradient(circle at 90% 14%, rgba(134, 210, 201, 0.18), transparent 34%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 252, 254, 0.93));
 }
 
@@ -196,10 +194,8 @@ textarea {
   border-radius: 12px;
   overflow: hidden;
   min-height: 320px;
-  background:
-    radial-gradient(circle at 12% 12%, rgba(165, 221, 190, 0.2) 0%, transparent 38%),
-    radial-gradient(circle at 86% 88%, rgba(169, 206, 227, 0.2) 0%, transparent 36%),
-    #f8fdff;
+  background: radial-gradient(circle at 12% 12%, rgba(165, 221, 190, 0.2) 0%, transparent 38%),
+    radial-gradient(circle at 86% 88%, rgba(169, 206, 227, 0.2) 0%, transparent 36%), #f8fdff;
 }
 
 .timeline-canvas {

@@ -78,8 +78,27 @@ Then open `http://localhost:4173/` for the landing page, or navigate directly to
 
 - Use modern ES modules (`import`/`export`) and 2-space indentation.
 - Keep reusable behavior in `shared/`; keep algorithm logic module-local unless reused.
+- Formatting is configured with Biome (`biome.json`).
 - Tutorial pages apply automatic cache-busting for local CSS/JS on each load, so browser stale-cache issues are avoided during development.
 - **CDN dependency:** `shared/lit.js` fetches Lit from `https://esm.sh/lit@3.3.1`. Internet access is required at runtime. If the CDN or that exact version becomes unavailable, all tutorials will fail to load — consider pinning to a local copy if deploying in an offline or long-lived environment.
+- Install dev tools (once):
+
+```bash
+npm install
+```
+
+- Format the repository:
+
+```bash
+npm run format
+```
+
+- Check formatting in CI/local checks:
+
+```bash
+npm run format:check
+```
+
 - Validate syntax quickly with:
 
 ```bash

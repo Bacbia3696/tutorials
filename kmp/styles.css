@@ -16,8 +16,7 @@ kmp-tutorial-app {
   --font-sans: "DM Sans", "Trebuchet MS", sans-serif;
   --font-mono: "IBM Plex Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 14% 18%, #ffe3c3 0%, transparent 38%),
+  --page-bg: radial-gradient(circle at 14% 18%, #ffe3c3 0%, transparent 38%),
     radial-gradient(circle at 84% 84%, #bee3d4 0%, transparent 42%),
     linear-gradient(160deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1220px;
@@ -196,10 +195,8 @@ kbd {
 .lps-strip {
   border: 1px solid var(--edge);
   border-radius: 12px;
-  background:
-    radial-gradient(circle at 14% 15%, rgba(255, 227, 177, 0.22) 0%, transparent 40%),
-    radial-gradient(circle at 86% 86%, rgba(177, 228, 209, 0.18) 0%, transparent 42%),
-    #fbfefd;
+  background: radial-gradient(circle at 14% 15%, rgba(255, 227, 177, 0.22) 0%, transparent 40%),
+    radial-gradient(circle at 86% 86%, rgba(177, 228, 209, 0.18) 0%, transparent 42%), #fbfefd;
   padding: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(94px, 1fr));

@@ -1,14 +1,11 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
 import {
   createLabelToIndex,
   parseDirectedEdgesInput,
   parseNodeLabelsInput,
-} from "../shared/graph-input.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import {
-  computeCircularNodePositions,
-  createSvgElement,
-} from "../shared/graph-core.js";
+} from '../shared/graph-input.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { computeCircularNodePositions, createSvgElement } from '../shared/graph-core.js';
 import {
   createDirectedPairSet,
   ensureArrowMarker,
@@ -16,11 +13,11 @@ import {
   prepareGraphCanvas,
   renderGraphEdges,
   renderGraphNodes,
-} from "../shared/graph-renderer.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+} from '../shared/graph-renderer.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 const SAMPLE_DAG = {
-  nodes: ["A", "B", "C", "D", "E", "F", "G", "H"],
+  nodes: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
   edgesText: `A C
 A D
 B D
@@ -32,7 +29,6 @@ E G
 F H
 G H`,
 };
-
 
 function buildGraph(nodes, edges) {
   const adjacency = Array.from({ length: nodes.length }, () => []);
@@ -93,7 +89,7 @@ class TopologicalTracer {
 
   #emit(events, message, line, state, extras = {}) {
     events.push({
-      opType: "topo",
+      opType: 'topo',
       message,
       line,
       snapshot: this.#snapshot(state, extras),
@@ -106,7 +102,7 @@ class TopologicalTracer {
     const state = this.createInitialSnapshot();
     const events = [];
 
-    const queueLabels = state.queue.map((index) => labels[index]).join(", ") || "empty";
+    const queueLabels = state.queue.map((index) => labels[index]).join(', ') || 'empty';
     this.#emit(events, `Initialize indegrees and queue: [${queueLabels}].`, 1, state);
 
     while (state.queue.length > 0) {
@@ -124,16 +120,10 @@ class TopologicalTracer {
       });
 
       for (const edge of this.graph.adjacency[node]) {
-        this.#emit(
-          events,
-          `Inspect edge ${labels[edge.from]} -> ${labels[edge.to]}.`,
-          5,
-          state,
-          {
-            currentNode: node,
-            activeEdgeId: edge.id,
-          },
-        );
+        this.#emit(events, `Inspect edge ${labels[edge.from]} -> ${labels[edge.to]}.`, 5, state, {
+          currentNode: node,
+          activeEdgeId: edge.id,
+        });
 
         state.indegree[edge.to] -= 1;
         this.#emit(
@@ -149,16 +139,10 @@ class TopologicalTracer {
 
         if (state.indegree[edge.to] === 0) {
           state.queue.push(edge.to);
-          this.#emit(
-            events,
-            `${labels[edge.to]} now has indegree 0; enqueue it.`,
-            7,
-            state,
-            {
-              currentNode: edge.to,
-              activeEdgeId: edge.id,
-            },
-          );
+          this.#emit(events, `${labels[edge.to]} now has indegree 0; enqueue it.`, 7, state, {
+            currentNode: edge.to,
+            activeEdgeId: edge.id,
+          });
         }
       }
     }
@@ -167,7 +151,7 @@ class TopologicalTracer {
     if (state.order.length < this.graph.nodes.length) {
       cycleDetected = true;
       state.cycleDetected = true;
-      const remaining = labels.filter((_, index) => !state.processed[index]).join(", ");
+      const remaining = labels.filter((_, index) => !state.processed[index]).join(', ');
       this.#emit(
         events,
         `Queue is empty but nodes remain (${remaining}). Cycle detected.`,
@@ -177,7 +161,7 @@ class TopologicalTracer {
     } else {
       this.#emit(
         events,
-        `Topological order complete: ${state.order.map((index) => labels[index]).join(" -> ")}.`,
+        `Topological order complete: ${state.order.map((index) => labels[index]).join(' -> ')}.`,
         9,
         state,
       );
@@ -185,8 +169,8 @@ class TopologicalTracer {
 
     const orderLabels = state.order.map((index) => labels[index]);
     const summary = cycleDetected
-      ? "Graph contains a cycle. Topological ordering is not possible."
-      : `Topological sort complete: ${orderLabels.join(" -> ")}.`;
+      ? 'Graph contains a cycle. Topological ordering is not possible.'
+      : `Topological sort complete: ${orderLabels.join(' -> ')}.`;
 
     this.#emit(events, summary, cycleDetected ? 8 : 9, state);
 
@@ -202,30 +186,30 @@ class TopologicalTracer {
 }
 
 const elements = {
-  nodesInput: document.getElementById("nodesInput"),
-  edgesInput: document.getElementById("edgesInput"),
-  loadGraphBtn: document.getElementById("loadGraphBtn"),
-  sampleGraphBtn: document.getElementById("sampleGraphBtn"),
-  randomGraphBtn: document.getElementById("randomGraphBtn"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  processedMetric: document.getElementById("processedMetric"),
-  orderMetric: document.getElementById("orderMetric"),
-  cycleMetric: document.getElementById("cycleMetric"),
-  stepCounter: document.getElementById("stepCounter"),
-  processViewPanel: document.querySelector(".process-view"),
-  graphCanvas: document.getElementById("graphCanvas"),
-  queueStrip: document.getElementById("queueStrip"),
-  orderStrip: document.getElementById("orderStrip"),
-  nodeCards: document.getElementById("nodeCards"),
-  edgeRows: document.getElementById("edgeRows"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  nodesInput: document.getElementById('nodesInput'),
+  edgesInput: document.getElementById('edgesInput'),
+  loadGraphBtn: document.getElementById('loadGraphBtn'),
+  sampleGraphBtn: document.getElementById('sampleGraphBtn'),
+  randomGraphBtn: document.getElementById('randomGraphBtn'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  processedMetric: document.getElementById('processedMetric'),
+  orderMetric: document.getElementById('orderMetric'),
+  cycleMetric: document.getElementById('cycleMetric'),
+  stepCounter: document.getElementById('stepCounter'),
+  processViewPanel: document.querySelector('.process-view'),
+  graphCanvas: document.getElementById('graphCanvas'),
+  queueStrip: document.getElementById('queueStrip'),
+  orderStrip: document.getElementById('orderStrip'),
+  nodeCards: document.getElementById('nodeCards'),
+  edgeRows: document.getElementById('edgeRows'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -244,7 +228,7 @@ const helpers = createRuntimeHelpers({
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
-  elements.processViewPanel?.classList.toggle("playing", enabled);
+  elements.processViewPanel?.classList.toggle('playing', enabled);
 }
 
 function cloneSnapshot(snapshot) {
@@ -267,7 +251,7 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     svgElement: elements.graphCanvas,
     fallbackSize: { width: 920, height: 520 },
     hasGraph: Boolean(state.graph),
-    emptyMessage: "Load a graph to visualize it.",
+    emptyMessage: 'Load a graph to visualize it.',
   });
   if (!prepared.ready) {
     return;
@@ -276,21 +260,21 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
 
   ensureArrowMarker({
     svgElement: elements.graphCanvas,
-    id: "topo-arrow",
+    id: 'topo-arrow',
     markerWidth: 8,
     markerHeight: 8,
     refX: 7.1,
     refY: 4,
-    fill: "rgba(59, 101, 129, 0.9)",
+    fill: 'rgba(59, 101, 129, 0.9)',
   });
   ensureArrowMarker({
     svgElement: elements.graphCanvas,
-    id: "topo-arrow-active",
+    id: 'topo-arrow-active',
     markerWidth: 6,
     markerHeight: 6,
     refX: 5.5,
     refY: 3,
-    fill: "rgba(191, 130, 41, 0.96)",
+    fill: 'rgba(191, 130, 41, 0.96)',
   });
 
   const points = computeCircularNodePositions(state.graph.nodes.length, width, height, {
@@ -306,8 +290,8 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     positions: points,
     nodeRadius: 20,
     directed: true,
-    markerId: "topo-arrow",
-    activeMarkerId: "topo-arrow-active",
+    markerId: 'topo-arrow',
+    activeMarkerId: 'topo-arrow-active',
     activeEdgeId,
     curveOffsetForEdge: (edge) => getReverseCurveOffset(edge, directedPairs, 18),
     labelOffset: 10,
@@ -322,15 +306,15 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     nodeCount: state.graph.nodes.length,
     positions: points,
     nodeClassFn: (index) => [
-      snapshot?.processed[index] ? "processed" : "",
-      queued.has(index) ? "queued" : "",
-      snapshot?.currentNode === index ? "current" : "",
-      snapshot?.cycleDetected && !snapshot?.processed[index] ? "cycle" : "",
+      snapshot?.processed[index] ? 'processed' : '',
+      queued.has(index) ? 'queued' : '',
+      snapshot?.currentNode === index ? 'current' : '',
+      snapshot?.cycleDetected && !snapshot?.processed[index] ? 'cycle' : '',
     ],
     renderNodeContent: ({ group, index, position }) => {
       if (snapshot?.currentNode === index) {
-        const halo = createSvgElement("circle", {
-          class: "graph-current-halo",
+        const halo = createSvgElement('circle', {
+          class: 'graph-current-halo',
           cx: position.x,
           cy: position.y,
           r: 28,
@@ -338,23 +322,23 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
         group.appendChild(halo);
       }
 
-      const circle = createSvgElement("circle", {
+      const circle = createSvgElement('circle', {
         cx: position.x,
         cy: position.y,
         r: 20,
       });
       group.appendChild(circle);
 
-      const label = createSvgElement("text", {
-        class: "label",
+      const label = createSvgElement('text', {
+        class: 'label',
         x: position.x,
         y: position.y - 1,
       });
       label.textContent = state.graph.nodes[index];
       group.appendChild(label);
 
-      const indegree = createSvgElement("text", {
-        class: "indegree",
+      const indegree = createSvgElement('text', {
+        class: 'indegree',
         x: position.x,
         y: position.y + 30,
       });
@@ -365,69 +349,69 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
 }
 
 function renderQueue(snapshot) {
-  elements.queueStrip.innerHTML = "";
+  elements.queueStrip.innerHTML = '';
   if (!state.graph || !snapshot || snapshot.queue.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "empty-pill";
-    empty.textContent = "queue is empty";
+    const empty = document.createElement('span');
+    empty.className = 'empty-pill';
+    empty.textContent = 'queue is empty';
     elements.queueStrip.appendChild(empty);
     return;
   }
 
   for (const node of snapshot.queue) {
-    const pill = document.createElement("span");
-    pill.className = "queue-pill";
+    const pill = document.createElement('span');
+    pill.className = 'queue-pill';
     pill.textContent = state.graph.nodes[node];
     elements.queueStrip.appendChild(pill);
   }
 }
 
 function renderOrder(snapshot) {
-  elements.orderStrip.innerHTML = "";
+  elements.orderStrip.innerHTML = '';
   if (!state.graph || !snapshot || snapshot.order.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "empty-pill";
-    empty.textContent = "order not built yet";
+    const empty = document.createElement('span');
+    empty.className = 'empty-pill';
+    empty.textContent = 'order not built yet';
     elements.orderStrip.appendChild(empty);
     return;
   }
 
   snapshot.order.forEach((node, index) => {
-    const pill = document.createElement("span");
-    pill.className = "order-pill";
+    const pill = document.createElement('span');
+    pill.className = 'order-pill';
     pill.textContent = `${index + 1}:${state.graph.nodes[node]}`;
     elements.orderStrip.appendChild(pill);
   });
 }
 
 function renderNodes(snapshot) {
-  elements.nodeCards.innerHTML = "";
+  elements.nodeCards.innerHTML = '';
   if (!state.graph || !snapshot) {
     return;
   }
 
   const queued = new Set(snapshot.queue);
   for (let i = 0; i < state.graph.nodes.length; i += 1) {
-    const card = document.createElement("article");
-    card.className = "node-card";
+    const card = document.createElement('article');
+    card.className = 'node-card';
 
     if (snapshot.processed[i]) {
-      card.classList.add("processed");
+      card.classList.add('processed');
     }
     if (queued.has(i)) {
-      card.classList.add("queued");
+      card.classList.add('queued');
     }
     if (snapshot.currentNode === i) {
-      card.classList.add("current");
+      card.classList.add('current');
     }
 
-    let stateLabel = "waiting";
+    let stateLabel = 'waiting';
     if (snapshot.processed[i]) {
-      stateLabel = "done";
+      stateLabel = 'done';
     } else if (queued.has(i)) {
-      stateLabel = "queued";
+      stateLabel = 'queued';
     } else if (snapshot.indegree[i] === 0) {
-      stateLabel = "ready";
+      stateLabel = 'ready';
     }
 
     card.innerHTML = `
@@ -436,7 +420,7 @@ function renderNodes(snapshot) {
         <span class="node-state">${stateLabel}</span>
       </div>
       <div class="node-degree">in-degree: ${snapshot.indegree[i]}</div>
-      <div class="node-note">processed: ${snapshot.processed[i] ? "yes" : "no"}</div>
+      <div class="node-note">processed: ${snapshot.processed[i] ? 'yes' : 'no'}</div>
     `;
 
     elements.nodeCards.appendChild(card);
@@ -444,15 +428,15 @@ function renderNodes(snapshot) {
 }
 
 function renderEdges(activeEdgeId = null) {
-  elements.edgeRows.innerHTML = "";
+  elements.edgeRows.innerHTML = '';
   if (!state.graph) {
     return;
   }
 
   for (const edge of state.graph.edges) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     if (activeEdgeId !== null && edge.id === activeEdgeId) {
-      row.classList.add("active-edge");
+      row.classList.add('active-edge');
     }
 
     row.innerHTML = `
@@ -476,7 +460,7 @@ function updateMetrics() {
   const totalNodes = state.graph ? state.graph.nodes.length : 0;
   elements.processedMetric.textContent = `${state.lastProcessedCount} / ${totalNodes}`;
   elements.orderMetric.textContent = String(state.lastOrderLabels.length);
-  elements.cycleMetric.textContent = state.lastCycleDetected ? "Yes" : "No";
+  elements.cycleMetric.textContent = state.lastCycleDetected ? 'Yes' : 'No';
 
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const totalSteps = operationRunner ? operationRunner.pendingLength : 0;
@@ -502,7 +486,7 @@ function finalizePendingOperation(meta) {
   state.lastOrderLabels = meta.orderLabels;
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.appendLog(meta.summary, meta.success ? 'ok' : '');
 
   renderSnapshot(state.lastSnapshot, null);
   helpers.clearCodeHighlights();
@@ -544,13 +528,13 @@ function loadGraphFromInputs() {
   state.lastSnapshot = state.tracer.createInitialSnapshot();
 
   renderSnapshot(state.lastSnapshot, null);
-  helpers.focusCodePanel("topo");
+  helpers.focusCodePanel('topo');
   helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.edges.length} directed edges.`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
 }
 
 function shuffle(values) {
@@ -608,27 +592,27 @@ function generateRandomGraph() {
 }
 
 function loadSampleGraph() {
-  elements.nodesInput.value = SAMPLE_DAG.nodes.join(", ");
+  elements.nodesInput.value = SAMPLE_DAG.nodes.join(', ');
   elements.edgesInput.value = SAMPLE_DAG.edgesText;
   loadGraphFromInputs();
 }
 
 function loadRandomGraph() {
   const random = generateRandomGraph();
-  elements.nodesInput.value = random.nodes.join(", ");
-  elements.edgesInput.value = random.edgeLines.join("\n");
+  elements.nodesInput.value = random.nodes.join(', ');
+  elements.edgesInput.value = random.edgeLines.join('\n');
   loadGraphFromInputs();
 }
 
 function prepareOperation() {
   if (!state.tracer || !state.graph) {
-    helpers.updateStatus("Load a graph first.");
+    helpers.updateStatus('Load a graph first.');
     return null;
   }
 
   const trace = state.tracer.generateRun();
   return {
-    opType: "topo",
+    opType: 'topo',
     events: trace.events,
     cycleDetected: trace.cycleDetected,
     processedCount: trace.processedCount,
@@ -666,17 +650,19 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} run with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} run with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadGraphBtn.addEventListener("click", loadGraphFromInputs);
-  elements.sampleGraphBtn.addEventListener("click", loadSampleGraph);
-  elements.randomGraphBtn.addEventListener("click", loadRandomGraph);
+  elements.loadGraphBtn.addEventListener('click', loadGraphFromInputs);
+  elements.sampleGraphBtn.addEventListener('click', loadSampleGraph);
+  elements.randomGraphBtn.addEventListener('click', loadRandomGraph);
 
   setupRunnerControls({
     elements,
@@ -696,7 +682,7 @@ function init() {
     },
   });
 
-  helpers.focusCodePanel("topo");
+  helpers.focusCodePanel('topo');
   loadSampleGraph();
 }
 

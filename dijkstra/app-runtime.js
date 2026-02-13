@@ -1,15 +1,12 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
 import {
   createLabelToIndex,
   edgeKeyForMode,
   parseNodeLabelsInput,
   parseWeightedEdgesInput,
-} from "../shared/graph-input.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import {
-  computeCircularNodePositions,
-  createSvgElement,
-} from "../shared/graph-core.js";
+} from '../shared/graph-input.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { computeCircularNodePositions, createSvgElement } from '../shared/graph-core.js';
 import {
   createDirectedPairSet,
   ensureArrowMarker,
@@ -17,11 +14,11 @@ import {
   prepareGraphCanvas,
   renderGraphEdges,
   renderGraphNodes,
-} from "../shared/graph-renderer.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+} from '../shared/graph-renderer.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 const SAMPLE_GRAPH = {
-  nodes: ["A", "B", "C", "D", "E", "F"],
+  nodes: ['A', 'B', 'C', 'D', 'E', 'F'],
   edgesText: `A B 4
 A C 2
 B C 1
@@ -34,7 +31,7 @@ E F 3`,
 };
 
 function formatDistance(value) {
-  return Number.isFinite(value) ? String(value) : "inf";
+  return Number.isFinite(value) ? String(value) : 'inf';
 }
 
 function buildGraph(nodes, edges, mode) {
@@ -47,7 +44,7 @@ function buildGraph(nodes, edges, mode) {
       edgeId: edge.id,
     });
 
-    if (mode === "undirected") {
+    if (mode === 'undirected') {
       adjacency[edge.to].push({
         to: edge.from,
         weight: edge.weight,
@@ -103,7 +100,7 @@ class DijkstraTracer {
 
   #emit(events, message, line, state, extras = {}) {
     events.push({
-      opType: "dijkstra",
+      opType: 'dijkstra',
       message,
       line,
       snapshot: this.#snapshot(
@@ -169,12 +166,7 @@ class DijkstraTracer {
 
     while (state.frontier.length > 0) {
       state.frontier.sort((a, b) => a.distance - b.distance || a.node - b.node);
-      this.#emit(
-        events,
-        `Priority queue has ${state.frontier.length} candidate(s).`,
-        2,
-        state,
-      );
+      this.#emit(events, `Priority queue has ${state.frontier.length} candidate(s).`, 2, state);
 
       const next = state.frontier.shift();
       const u = next.node;
@@ -204,13 +196,9 @@ class DijkstraTracer {
 
       if (targetIndex !== null && u === targetIndex) {
         stoppedEarly = true;
-        this.#emit(
-          events,
-          `Target ${labels[targetIndex]} is settled. Stop early.`,
-          9,
-          state,
-          { current: u },
-        );
+        this.#emit(events, `Target ${labels[targetIndex]} is settled. Stop early.`, 9, state, {
+          current: u,
+        });
         break;
       }
 
@@ -226,13 +214,10 @@ class DijkstraTracer {
         );
 
         if (state.visited[v]) {
-          this.#emit(
-            events,
-            `${labels[v]} is already settled. Skip relaxation.`,
-            6,
-            state,
-            { current: u, activeEdgeId: edge.edgeId },
-          );
+          this.#emit(events, `${labels[v]} is already settled. Skip relaxation.`, 6, state, {
+            current: u,
+            activeEdgeId: edge.edgeId,
+          });
           continue;
         }
 
@@ -280,7 +265,7 @@ class DijkstraTracer {
       );
     }
 
-    this.#emit(events, "Dijkstra run complete.", 9, state, { done: true });
+    this.#emit(events, 'Dijkstra run complete.', 9, state, { done: true });
 
     const settledCount = state.visited.filter(Boolean).length;
     let summary = `Run complete from ${labels[sourceIndex]}. Settled ${settledCount}/${size} nodes.`;
@@ -298,7 +283,7 @@ class DijkstraTracer {
         success = false;
       } else {
         pathLabels = pathIndices.map((index) => labels[index]);
-        summary = `Shortest path ${labels[sourceIndex]} -> ${labels[targetIndex]}: distance ${targetDistance}, path ${pathLabels.join(" -> ")}.`;
+        summary = `Shortest path ${labels[sourceIndex]} -> ${labels[targetIndex]}: distance ${targetDistance}, path ${pathLabels.join(' -> ')}.`;
       }
     }
 
@@ -313,32 +298,32 @@ class DijkstraTracer {
 }
 
 const elements = {
-  nodesInput: document.getElementById("nodesInput"),
-  edgesInput: document.getElementById("edgesInput"),
-  loadGraphBtn: document.getElementById("loadGraphBtn"),
-  sampleGraphBtn: document.getElementById("sampleGraphBtn"),
-  randomGraphBtn: document.getElementById("randomGraphBtn"),
-  graphMode: document.getElementById("graphMode"),
-  graphViewPanel: document.getElementById("graphViewPanel"),
-  sourceSelect: document.getElementById("sourceSelect"),
-  targetSelect: document.getElementById("targetSelect"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  settledCount: document.getElementById("settledCount"),
-  distanceResult: document.getElementById("distanceResult"),
-  pathResult: document.getElementById("pathResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  graphCanvas: document.getElementById("graphCanvas"),
-  nodeCards: document.getElementById("nodeCards"),
-  frontierStrip: document.getElementById("frontierStrip"),
-  edgeRows: document.getElementById("edgeRows"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  nodesInput: document.getElementById('nodesInput'),
+  edgesInput: document.getElementById('edgesInput'),
+  loadGraphBtn: document.getElementById('loadGraphBtn'),
+  sampleGraphBtn: document.getElementById('sampleGraphBtn'),
+  randomGraphBtn: document.getElementById('randomGraphBtn'),
+  graphMode: document.getElementById('graphMode'),
+  graphViewPanel: document.getElementById('graphViewPanel'),
+  sourceSelect: document.getElementById('sourceSelect'),
+  targetSelect: document.getElementById('targetSelect'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  settledCount: document.getElementById('settledCount'),
+  distanceResult: document.getElementById('distanceResult'),
+  pathResult: document.getElementById('pathResult'),
+  stepCounter: document.getElementById('stepCounter'),
+  graphCanvas: document.getElementById('graphCanvas'),
+  nodeCards: document.getElementById('nodeCards'),
+  frontierStrip: document.getElementById('frontierStrip'),
+  edgeRows: document.getElementById('edgeRows'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -357,7 +342,7 @@ const helpers = createRuntimeHelpers({
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
-  elements.graphViewPanel.classList.toggle("playing", enabled);
+  elements.graphViewPanel.classList.toggle('playing', enabled);
 }
 
 function cloneSnapshot(snapshot) {
@@ -389,7 +374,7 @@ function getSelectedSourceIndex() {
 
 function getSelectedTargetIndex() {
   const value = elements.targetSelect.value;
-  if (value === "") {
+  if (value === '') {
     return null;
   }
   const index = Number(value);
@@ -397,9 +382,9 @@ function getSelectedTargetIndex() {
 }
 
 function applyModeUi(mode) {
-  const isDirected = mode === "directed";
-  elements.graphViewPanel.classList.toggle("mode-directed", isDirected);
-  elements.graphViewPanel.classList.toggle("mode-undirected", !isDirected);
+  const isDirected = mode === 'directed';
+  elements.graphViewPanel.classList.toggle('mode-directed', isDirected);
+  elements.graphViewPanel.classList.toggle('mode-undirected', !isDirected);
 }
 
 function getPathEdgeIds(snapshot) {
@@ -419,7 +404,7 @@ function getPathEdgeIds(snapshot) {
     guard += 1;
     const parent = snapshot.previous[cursor];
     const edge = state.graph.edges.find((candidate) => {
-      if (state.mode === "directed") {
+      if (state.mode === 'directed') {
         return candidate.from === parent && candidate.to === cursor;
       }
       return (
@@ -437,16 +422,15 @@ function getPathEdgeIds(snapshot) {
   return pathEdgeIds;
 }
 
-
 function renderGraphCanvas(snapshot, activeEdgeId = null) {
-  elements.graphCanvas.classList.toggle("has-active-edge", activeEdgeId !== null);
-  elements.graphCanvas.classList.toggle("has-current-node", snapshot?.current !== null);
+  elements.graphCanvas.classList.toggle('has-active-edge', activeEdgeId !== null);
+  elements.graphCanvas.classList.toggle('has-current-node', snapshot?.current !== null);
 
   const prepared = prepareGraphCanvas({
     svgElement: elements.graphCanvas,
     fallbackSize: { width: 980, height: 560 },
     hasGraph: Boolean(state.graph),
-    emptyMessage: "Load a graph to visualize it.",
+    emptyMessage: 'Load a graph to visualize it.',
   });
   if (!prepared.ready) {
     return;
@@ -461,26 +445,26 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     minRadiusY: 86,
   });
   const pathEdgeIds = getPathEdgeIds(snapshot);
-  const drawDirected = state.mode === "directed";
+  const drawDirected = state.mode === 'directed';
 
   if (drawDirected) {
     ensureArrowMarker({
       svgElement: elements.graphCanvas,
-      id: "graph-arrow",
+      id: 'graph-arrow',
       markerWidth: 9,
       markerHeight: 9,
       refX: 8,
       refY: 4.5,
-      fill: "rgba(57, 89, 121, 0.9)",
+      fill: 'rgba(57, 89, 121, 0.9)',
     });
     ensureArrowMarker({
       svgElement: elements.graphCanvas,
-      id: "graph-arrow-active",
+      id: 'graph-arrow-active',
       markerWidth: 7,
       markerHeight: 7,
       refX: 6.5,
       refY: 3.5,
-      fill: "rgba(245, 148, 12, 1)",
+      fill: 'rgba(245, 148, 12, 1)',
     });
   }
 
@@ -491,19 +475,19 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     positions,
     nodeRadius,
     directed: drawDirected,
-    markerId: "graph-arrow",
-    activeMarkerId: "graph-arrow-active",
+    markerId: 'graph-arrow',
+    activeMarkerId: 'graph-arrow-active',
     activeEdgeId,
     curveOffsetForEdge: (edge) =>
       drawDirected ? getReverseCurveOffset(edge, directedPairs, 22) : 0,
     labelOffset: 12,
-    edgeClassFn: (edge) => (pathEdgeIds.has(edge.id) ? ["path"] : []),
+    edgeClassFn: (edge) => (pathEdgeIds.has(edge.id) ? ['path'] : []),
     edgeLabelTextFn: (edge) => String(edge.weight),
     edgeLabelWidthFn: (text) => 10 + text.length * 7,
     edgeLabelBgClassFn: (_edge, isActive) =>
-      isActive ? ["graph-edge-label-bg", "active"] : "graph-edge-label-bg",
+      isActive ? ['graph-edge-label-bg', 'active'] : 'graph-edge-label-bg',
     edgeLabelClassFn: (_edge, isActive) =>
-      isActive ? ["graph-edge-label", "active"] : "graph-edge-label",
+      isActive ? ['graph-edge-label', 'active'] : 'graph-edge-label',
   });
 
   const frontierSet = new Set(snapshot?.frontier.map((item) => item.node) ?? []);
@@ -513,16 +497,16 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     nodeCount: state.graph.nodes.length,
     positions,
     nodeClassFn: (index) => [
-      frontierSet.has(index) ? "frontier" : "",
-      snapshot?.visited[index] ? "visited" : "",
-      snapshot?.current === index ? "current" : "",
-      snapshot?.targetIndex === index ? "target" : "",
-      sourceIndex === index ? "source" : "",
+      frontierSet.has(index) ? 'frontier' : '',
+      snapshot?.visited[index] ? 'visited' : '',
+      snapshot?.current === index ? 'current' : '',
+      snapshot?.targetIndex === index ? 'target' : '',
+      sourceIndex === index ? 'source' : '',
     ],
     renderNodeContent: ({ group, index, position }) => {
       if (snapshot?.current === index) {
-        const halo = createSvgElement("circle", {
-          class: "graph-current-halo",
+        const halo = createSvgElement('circle', {
+          class: 'graph-current-halo',
           cx: position.x,
           cy: position.y,
           r: nodeRadius + 8,
@@ -530,22 +514,22 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
         group.appendChild(halo);
       }
 
-      const circle = createSvgElement("circle", {
+      const circle = createSvgElement('circle', {
         cx: position.x,
         cy: position.y,
         r: nodeRadius,
       });
       group.appendChild(circle);
 
-      const label = createSvgElement("text", {
+      const label = createSvgElement('text', {
         x: position.x,
         y: position.y,
       });
       label.textContent = state.graph.nodes[index];
       group.appendChild(label);
 
-      const distLabel = createSvgElement("text", {
-        class: "graph-dist",
+      const distLabel = createSvgElement('text', {
+        class: 'graph-dist',
         x: position.x,
         y: position.y + 36,
       });
@@ -556,23 +540,21 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
 }
 
 function renderFrontier(snapshot) {
-  elements.frontierStrip.innerHTML = "";
+  elements.frontierStrip.innerHTML = '';
   if (!snapshot || snapshot.frontier.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "frontier-empty";
-    empty.textContent = "queue is empty";
+    const empty = document.createElement('span');
+    empty.className = 'frontier-empty';
+    empty.textContent = 'queue is empty';
     elements.frontierStrip.appendChild(empty);
     return;
   }
 
-  const items = [...snapshot.frontier].sort(
-    (a, b) => a.distance - b.distance || a.node - b.node,
-  );
+  const items = [...snapshot.frontier].sort((a, b) => a.distance - b.distance || a.node - b.node);
   for (const item of items) {
-    const pill = document.createElement("span");
-    pill.className = "frontier-pill";
+    const pill = document.createElement('span');
+    pill.className = 'frontier-pill';
     if (snapshot.visited[item.node]) {
-      pill.classList.add("stale");
+      pill.classList.add('stale');
     }
     const label = state.graph.nodes[item.node];
     pill.textContent = `${label}(${formatDistance(item.distance)})`;
@@ -581,31 +563,31 @@ function renderFrontier(snapshot) {
 }
 
 function renderNodes(snapshot) {
-  elements.nodeCards.innerHTML = "";
+  elements.nodeCards.innerHTML = '';
   if (!state.graph || !snapshot) {
     return;
   }
 
   const frontierSet = new Set(snapshot.frontier.map((item) => item.node));
   for (let i = 0; i < state.graph.nodes.length; i += 1) {
-    const card = document.createElement("article");
-    card.className = "node-card";
+    const card = document.createElement('article');
+    card.className = 'node-card';
 
     if (snapshot.visited[i]) {
-      card.classList.add("visited");
+      card.classList.add('visited');
     }
     if (frontierSet.has(i)) {
-      card.classList.add("frontier");
+      card.classList.add('frontier');
     }
     if (snapshot.current === i) {
-      card.classList.add("current");
+      card.classList.add('current');
     }
     if (snapshot.targetIndex === i) {
-      card.classList.add("target");
+      card.classList.add('target');
     }
 
-    const status = snapshot.visited[i] ? "settled" : frontierSet.has(i) ? "queued" : "unseen";
-    const previous = snapshot.previous[i] === null ? "-" : state.graph.nodes[snapshot.previous[i]];
+    const status = snapshot.visited[i] ? 'settled' : frontierSet.has(i) ? 'queued' : 'unseen';
+    const previous = snapshot.previous[i] === null ? '-' : state.graph.nodes[snapshot.previous[i]];
     const distance = formatDistance(snapshot.distances[i]);
 
     card.innerHTML = `
@@ -622,20 +604,20 @@ function renderNodes(snapshot) {
 }
 
 function renderEdges(activeEdgeId = null) {
-  elements.edgeRows.innerHTML = "";
+  elements.edgeRows.innerHTML = '';
   if (!state.graph) {
     return;
   }
 
   for (const edge of state.graph.edges) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     if (activeEdgeId !== null && edge.id === activeEdgeId) {
-      row.classList.add("active-edge");
+      row.classList.add('active-edge');
     }
 
     const left = state.graph.nodes[edge.from];
     const right = state.graph.nodes[edge.to];
-    const arrow = state.mode === "directed" ? "->" : "<->";
+    const arrow = state.mode === 'directed' ? '->' : '<->';
 
     row.innerHTML = `
       <td>${edge.id}</td>
@@ -671,14 +653,14 @@ function updateMetrics() {
   elements.settledCount.textContent = `${settled} / ${totalNodes}`;
 
   if (state.lastDistance === null) {
-    elements.distanceResult.textContent = "-";
+    elements.distanceResult.textContent = '-';
   } else if (Number.isFinite(state.lastDistance)) {
     elements.distanceResult.textContent = String(state.lastDistance);
   } else {
-    elements.distanceResult.textContent = "unreachable";
+    elements.distanceResult.textContent = 'unreachable';
   }
 
-  elements.pathResult.textContent = state.lastPathLabels ? state.lastPathLabels.join(" -> ") : "-";
+  elements.pathResult.textContent = state.lastPathLabels ? state.lastPathLabels.join(' -> ') : '-';
 
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const totalSteps = operationRunner ? operationRunner.pendingLength : 0;
@@ -699,7 +681,7 @@ function finalizePendingOperation(meta) {
   state.lastPathLabels = meta.targetSpecified ? meta.pathLabels : null;
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.appendLog(meta.summary, meta.success ? 'ok' : '');
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(null);
@@ -711,38 +693,39 @@ function populateSourceAndTargetSelects(nodes) {
   const previousSource = elements.sourceSelect.value;
   const previousTarget = elements.targetSelect.value;
 
-  elements.sourceSelect.innerHTML = "";
-  elements.targetSelect.innerHTML = "";
+  elements.sourceSelect.innerHTML = '';
+  elements.targetSelect.innerHTML = '';
 
   nodes.forEach((label, index) => {
-    const sourceOption = document.createElement("option");
+    const sourceOption = document.createElement('option');
     sourceOption.value = String(index);
     sourceOption.textContent = label;
     elements.sourceSelect.appendChild(sourceOption);
   });
 
-  const noneOption = document.createElement("option");
-  noneOption.value = "";
-  noneOption.textContent = "None (settle all)";
+  const noneOption = document.createElement('option');
+  noneOption.value = '';
+  noneOption.textContent = 'None (settle all)';
   elements.targetSelect.appendChild(noneOption);
 
   nodes.forEach((label, index) => {
-    const targetOption = document.createElement("option");
+    const targetOption = document.createElement('option');
     targetOption.value = String(index);
     targetOption.textContent = label;
     elements.targetSelect.appendChild(targetOption);
   });
 
   const hasSource = nodes.some((_, index) => String(index) === previousSource);
-  elements.sourceSelect.value = hasSource ? previousSource : "0";
+  elements.sourceSelect.value = hasSource ? previousSource : '0';
 
-  const hasTarget = previousTarget === "" || nodes.some((_, index) => String(index) === previousTarget);
-  if (hasTarget && previousTarget !== "") {
+  const hasTarget =
+    previousTarget === '' || nodes.some((_, index) => String(index) === previousTarget);
+  if (hasTarget && previousTarget !== '') {
     elements.targetSelect.value = previousTarget;
   } else if (nodes.length > 1) {
     elements.targetSelect.value = String(nodes.length - 1);
   } else {
-    elements.targetSelect.value = "";
+    elements.targetSelect.value = '';
   }
 }
 
@@ -792,13 +775,13 @@ function loadGraphFromInputs() {
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(null);
-  helpers.focusCodePanel("dijkstra");
+  helpers.focusCodePanel('dijkstra');
   helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.edges.length} edges in ${state.mode} mode.`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
   return true;
 }
 
@@ -864,15 +847,15 @@ function generateRandomGraph(mode) {
 }
 
 function loadSampleGraph() {
-  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(", ");
+  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(', ');
   elements.edgesInput.value = SAMPLE_GRAPH.edgesText;
   loadGraphFromInputs();
 }
 
 function loadRandomGraph() {
   const random = generateRandomGraph(state.mode);
-  elements.nodesInput.value = random.nodes.join(", ");
-  elements.edgesInput.value = random.edgeLines.join("\n");
+  elements.nodesInput.value = random.nodes.join(', ');
+  elements.edgesInput.value = random.edgeLines.join('\n');
   loadGraphFromInputs();
 }
 
@@ -887,13 +870,13 @@ function syncTargetInSnapshot() {
 
 function prepareOperation() {
   if (!state.tracer || !state.graph) {
-    helpers.updateStatus("Load a graph first.");
+    helpers.updateStatus('Load a graph first.');
     return null;
   }
 
   const sourceIndex = getSelectedSourceIndex();
   if (sourceIndex === null || sourceIndex < 0 || sourceIndex >= state.graph.nodes.length) {
-    const message = "Choose a valid source node.";
+    const message = 'Choose a valid source node.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
@@ -901,7 +884,7 @@ function prepareOperation() {
 
   const targetIndex = getSelectedTargetIndex();
   if (targetIndex !== null && (targetIndex < 0 || targetIndex >= state.graph.nodes.length)) {
-    const message = "Choose a valid target node.";
+    const message = 'Choose a valid target node.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
@@ -909,7 +892,7 @@ function prepareOperation() {
 
   const trace = state.tracer.generateRun(sourceIndex, targetIndex);
   return {
-    opType: "dijkstra",
+    opType: 'dijkstra',
     events: trace.events,
     targetSpecified: targetIndex !== null,
     targetDistance: trace.targetDistance,
@@ -947,24 +930,28 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadGraphBtn.addEventListener("click", loadGraphFromInputs);
-  elements.sampleGraphBtn.addEventListener("click", loadSampleGraph);
-  elements.randomGraphBtn.addEventListener("click", loadRandomGraph);
+  elements.loadGraphBtn.addEventListener('click', loadGraphFromInputs);
+  elements.sampleGraphBtn.addEventListener('click', loadSampleGraph);
+  elements.randomGraphBtn.addEventListener('click', loadRandomGraph);
 
-  elements.graphMode.addEventListener("change", () => {
+  elements.graphMode.addEventListener('change', () => {
     applyModeAndReload(elements.graphMode.value);
   });
-  elements.targetSelect.addEventListener("change", syncTargetInSnapshot);
-  elements.sourceSelect.addEventListener("change", () => {
-    helpers.updateStatus(`Source set to ${elements.sourceSelect.options[elements.sourceSelect.selectedIndex]?.text ?? "-"}.`);
+  elements.targetSelect.addEventListener('change', syncTargetInSnapshot);
+  elements.sourceSelect.addEventListener('change', () => {
+    helpers.updateStatus(
+      `Source set to ${elements.sourceSelect.options[elements.sourceSelect.selectedIndex]?.text ?? '-'}.`,
+    );
   });
 
   setupRunnerControls({
@@ -982,12 +969,12 @@ function init() {
       l: () => loadGraphFromInputs(),
       m: () => loadSampleGraph(),
       r: () => loadRandomGraph(),
-      u: () => applyModeAndReload("undirected"),
-      d: () => applyModeAndReload("directed"),
+      u: () => applyModeAndReload('undirected'),
+      d: () => applyModeAndReload('directed'),
     },
   });
 
-  helpers.focusCodePanel("dijkstra");
+  helpers.focusCodePanel('dijkstra');
   applyModeUi(state.mode);
   loadSampleGraph();
 }

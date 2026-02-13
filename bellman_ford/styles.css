@@ -17,8 +17,7 @@ bellman-ford-tutorial-app {
   --font-sans: "Chakra Petch", "Trebuchet MS", sans-serif;
   --font-mono: "IBM Plex Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 12% 12%, #ffd6b1 0%, transparent 34%),
+  --page-bg: radial-gradient(circle at 12% 12%, #ffd6b1 0%, transparent 34%),
     radial-gradient(circle at 85% 88%, #ecd8bf 0%, transparent 33%),
     linear-gradient(165deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1240px;
@@ -180,10 +179,8 @@ textarea {
   overflow: hidden;
   min-height: 340px;
   margin-bottom: 10px;
-  background:
-    radial-gradient(circle at 14% 14%, rgba(250, 206, 161, 0.25) 0%, transparent 35%),
-    radial-gradient(circle at 84% 86%, rgba(232, 200, 175, 0.26) 0%, transparent 35%),
-    #fffdf9;
+  background: radial-gradient(circle at 14% 14%, rgba(250, 206, 161, 0.25) 0%, transparent 35%),
+    radial-gradient(circle at 84% 86%, rgba(232, 200, 175, 0.26) 0%, transparent 35%), #fffdf9;
 }
 
 .graph-canvas {

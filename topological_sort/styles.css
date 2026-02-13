@@ -17,8 +17,7 @@ topological-sort-tutorial-app {
   --font-sans: "Red Hat Display", "Trebuchet MS", sans-serif;
   --font-mono: "Source Code Pro", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 12% 12%, #cbf0ee 0%, transparent 34%),
+  --page-bg: radial-gradient(circle at 12% 12%, #cbf0ee 0%, transparent 34%),
     radial-gradient(circle at 84% 86%, #d3e8f5 0%, transparent 35%),
     linear-gradient(168deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1220px;
@@ -117,8 +116,7 @@ textarea {
 }
 
 .controls {
-  background:
-    radial-gradient(circle at 88% 10%, rgba(153, 210, 227, 0.18), transparent 34%),
+  background: radial-gradient(circle at 88% 10%, rgba(153, 210, 227, 0.18), transparent 34%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 252, 254, 0.94));
 }
 
@@ -191,10 +189,8 @@ textarea {
   overflow: hidden;
   min-height: 330px;
   margin-bottom: 10px;
-  background:
-    radial-gradient(circle at 14% 14%, rgba(165, 222, 220, 0.24) 0%, transparent 35%),
-    radial-gradient(circle at 84% 86%, rgba(175, 207, 236, 0.24) 0%, transparent 35%),
-    #f7fdff;
+  background: radial-gradient(circle at 14% 14%, rgba(165, 222, 220, 0.24) 0%, transparent 35%),
+    radial-gradient(circle at 84% 86%, rgba(175, 207, 236, 0.24) 0%, transparent 35%), #f7fdff;
 }
 
 .graph-canvas {

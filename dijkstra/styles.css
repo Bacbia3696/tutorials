@@ -16,8 +16,7 @@ dijkstra-tutorial-app {
   --font-sans: "Sora", "Trebuchet MS", sans-serif;
   --font-mono: "Fira Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 16% 10%, #d4ebff 0%, transparent 34%),
+  --page-bg: radial-gradient(circle at 16% 10%, #d4ebff 0%, transparent 34%),
     radial-gradient(circle at 86% 90%, #f8e3ae 0%, transparent 32%),
     linear-gradient(170deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1200px;
@@ -195,10 +194,8 @@ textarea {
   overflow: hidden;
   min-height: 430px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  background:
-    radial-gradient(circle at 14% 14%, rgba(160, 204, 245, 0.2) 0%, transparent 34%),
-    radial-gradient(circle at 84% 86%, rgba(245, 219, 156, 0.24) 0%, transparent 38%),
-    #f7fbff;
+  background: radial-gradient(circle at 14% 14%, rgba(160, 204, 245, 0.2) 0%, transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(245, 219, 156, 0.24) 0%, transparent 38%), #f7fbff;
 }
 
 .graph-canvas {
@@ -417,10 +414,8 @@ textarea {
 }
 
 .graph-view.mode-directed .graph-canvas-wrap {
-  background:
-    radial-gradient(circle at 14% 14%, rgba(160, 204, 245, 0.25) 0%, transparent 34%),
-    radial-gradient(circle at 84% 86%, rgba(245, 219, 156, 0.2) 0%, transparent 38%),
-    #f7fbff;
+  background: radial-gradient(circle at 14% 14%, rgba(160, 204, 245, 0.25) 0%, transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(245, 219, 156, 0.2) 0%, transparent 38%), #f7fbff;
 }
 
 .graph-view.mode-directed .graph-edge {
@@ -432,10 +427,8 @@ textarea {
 }
 
 .graph-view.mode-undirected .graph-canvas-wrap {
-  background:
-    radial-gradient(circle at 14% 14%, rgba(164, 227, 190, 0.2) 0%, transparent 34%),
-    radial-gradient(circle at 84% 86%, rgba(239, 242, 181, 0.25) 0%, transparent 38%),
-    #f7fdf9;
+  background: radial-gradient(circle at 14% 14%, rgba(164, 227, 190, 0.2) 0%, transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(239, 242, 181, 0.25) 0%, transparent 38%), #f7fdf9;
 }
 
 .graph-view.mode-undirected .graph-edge {

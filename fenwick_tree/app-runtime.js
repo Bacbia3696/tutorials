@@ -1,8 +1,8 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import { createSvgElement } from "../shared/graph-core.js";
-import { parseArrayInput, randomIntegerArray } from "../shared/array-input.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { createSvgElement } from '../shared/graph-core.js';
+import { parseArrayInput, randomIntegerArray } from '../shared/array-input.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 class FenwickTracer {
   constructor(values) {
@@ -27,7 +27,7 @@ class FenwickTracer {
 
     const emit = (message, line, activeIndex = null, extras = {}) => {
       events.push({
-        opType: "update",
+        opType: 'update',
         message,
         line,
         activeIndex,
@@ -62,7 +62,7 @@ class FenwickTracer {
 
     const emit = (message, line, activeIndex = null, extras = {}) => {
       events.push({
-        opType: "prefix",
+        opType: 'prefix',
         message,
         line,
         activeIndex,
@@ -97,7 +97,7 @@ class FenwickTracer {
 
     const emit = (message, line, activeIndex = null, extras = {}) => {
       events.push({
-        opType: "range",
+        opType: 'range',
         message,
         line,
         activeIndex,
@@ -144,35 +144,35 @@ class FenwickTracer {
 }
 
 const elements = {
-  arrayInput: document.getElementById("arrayInput"),
-  loadArrayBtn: document.getElementById("loadArrayBtn"),
-  randomArrayBtn: document.getElementById("randomArrayBtn"),
-  opType: document.getElementById("opType"),
-  singleIndexWrap: document.getElementById("singleIndexWrap"),
-  singleIndex: document.getElementById("singleIndex"),
-  leftWrap: document.getElementById("leftWrap"),
-  leftIndex: document.getElementById("leftIndex"),
-  rightWrap: document.getElementById("rightWrap"),
-  rightIndex: document.getElementById("rightIndex"),
-  deltaWrap: document.getElementById("deltaWrap"),
-  deltaValue: document.getElementById("deltaValue"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  arrayTotal: document.getElementById("arrayTotal"),
-  queryResult: document.getElementById("queryResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  arrayStrip: document.getElementById("arrayStrip"),
-  coverageMap: document.getElementById("coverageMap"),
-  jumpCanvas: document.getElementById("jumpCanvas"),
-  jumpCaption: document.getElementById("jumpCaption"),
-  bitRows: document.getElementById("bitRows"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  arrayInput: document.getElementById('arrayInput'),
+  loadArrayBtn: document.getElementById('loadArrayBtn'),
+  randomArrayBtn: document.getElementById('randomArrayBtn'),
+  opType: document.getElementById('opType'),
+  singleIndexWrap: document.getElementById('singleIndexWrap'),
+  singleIndex: document.getElementById('singleIndex'),
+  leftWrap: document.getElementById('leftWrap'),
+  leftIndex: document.getElementById('leftIndex'),
+  rightWrap: document.getElementById('rightWrap'),
+  rightIndex: document.getElementById('rightIndex'),
+  deltaWrap: document.getElementById('deltaWrap'),
+  deltaValue: document.getElementById('deltaValue'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  arrayTotal: document.getElementById('arrayTotal'),
+  queryResult: document.getElementById('queryResult'),
+  stepCounter: document.getElementById('stepCounter'),
+  arrayStrip: document.getElementById('arrayStrip'),
+  coverageMap: document.getElementById('coverageMap'),
+  jumpCanvas: document.getElementById('jumpCanvas'),
+  jumpCaption: document.getElementById('jumpCaption'),
+  bitRows: document.getElementById('bitRows'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -187,22 +187,21 @@ const helpers = createRuntimeHelpers({
 });
 let operationRunner = null;
 
-
 function renderArray(activeIndex = null) {
-  elements.arrayStrip.innerHTML = "";
+  elements.arrayStrip.innerHTML = '';
   const hasActive = Number.isInteger(activeIndex) && activeIndex > 0 && state.fenwick;
   const low = hasActive ? activeIndex & -activeIndex : 0;
   const left = hasActive ? activeIndex - low + 1 : 0;
 
   state.values.forEach((value, idx) => {
     const oneBased = idx + 1;
-    const cell = document.createElement("div");
-    cell.className = "array-cell";
+    const cell = document.createElement('div');
+    cell.className = 'array-cell';
     if (hasActive && oneBased >= left && oneBased <= activeIndex) {
-      cell.classList.add("covered");
+      cell.classList.add('covered');
     }
     if (hasActive && oneBased === activeIndex) {
-      cell.classList.add("pivot");
+      cell.classList.add('pivot');
     }
     cell.innerHTML = `<span class="idx">i=${idx + 1}</span><span class="val">${value}</span>`;
     elements.arrayStrip.appendChild(cell);
@@ -210,13 +209,11 @@ function renderArray(activeIndex = null) {
 }
 
 function toBinary(value) {
-  return value.toString(2).padStart(4, "0");
+  return value.toString(2).padStart(4, '0');
 }
 
-
-
 function parsePrefixIndexFromLabel(label) {
-  if (typeof label !== "string") {
+  if (typeof label !== 'string') {
     return null;
   }
   const match = label.match(/prefix\((\d+)\)/);
@@ -233,7 +230,7 @@ function getPreviewStartIndex(opType, label = null) {
     return fromLabel;
   }
 
-  if (opType === "update" || opType === "prefix") {
+  if (opType === 'update' || opType === 'prefix') {
     const value = Number(elements.singleIndex.value);
     return Number.isInteger(value) ? value : null;
   }
@@ -255,7 +252,7 @@ function buildJumpSequence(startIndex, opType) {
   const sequence = [];
   const guardLimit = n + 3;
 
-  if (opType === "update") {
+  if (opType === 'update') {
     let i = startIndex;
     let guard = 0;
     while (i >= 1 && i <= n && guard < guardLimit) {
@@ -278,20 +275,20 @@ function buildJumpSequence(startIndex, opType) {
 }
 
 function ensureJumpArrowMarker(svgElement) {
-  const defs = createSvgElement("defs");
-  const marker = createSvgElement("marker", {
-    id: "jump-arrow",
+  const defs = createSvgElement('defs');
+  const marker = createSvgElement('marker', {
+    id: 'jump-arrow',
     markerWidth: 8,
     markerHeight: 8,
     refX: 7.2,
     refY: 4,
-    orient: "auto",
-    markerUnits: "strokeWidth",
+    orient: 'auto',
+    markerUnits: 'strokeWidth',
   });
   marker.appendChild(
-    createSvgElement("path", {
-      d: "M 0 0 L 8 4 L 0 8 z",
-      fill: "rgba(31, 71, 61, 0.66)",
+    createSvgElement('path', {
+      d: 'M 0 0 L 8 4 L 0 8 z',
+      fill: 'rgba(31, 71, 61, 0.66)',
     }),
   );
   defs.appendChild(marker);
@@ -300,48 +297,46 @@ function ensureJumpArrowMarker(svgElement) {
 
 function renderJumpTimeline(activeIndex = null, opType = elements.opType.value, label = null) {
   const svg = elements.jumpCanvas;
-  svg.innerHTML = "";
-  const jumpWrap = elements.jumpCanvas.closest(".jump-map-wrap");
+  svg.innerHTML = '';
+  const jumpWrap = elements.jumpCanvas.closest('.jump-map-wrap');
   if (jumpWrap) {
     jumpWrap.dataset.op = opType;
   }
 
   if (!state.fenwick) {
-    const text = createSvgElement("text", {
-      class: "jump-empty",
+    const text = createSvgElement('text', {
+      class: 'jump-empty',
       x: 270,
       y: 75,
-      "text-anchor": "middle",
-      "dominant-baseline": "middle",
+      'text-anchor': 'middle',
+      'dominant-baseline': 'middle',
     });
-    text.textContent = "Load an array to preview jump routes.";
+    text.textContent = 'Load an array to preview jump routes.';
     svg.appendChild(text);
-    elements.jumpCaption.textContent = "Load an array to preview jump routes.";
+    elements.jumpCaption.textContent = 'Load an array to preview jump routes.';
     return;
   }
 
-  const start = Number.isInteger(activeIndex)
-    ? activeIndex
-    : getPreviewStartIndex(opType, label);
+  const start = Number.isInteger(activeIndex) ? activeIndex : getPreviewStartIndex(opType, label);
   const sequence = buildJumpSequence(start, opType);
   if (sequence.length === 0) {
-    const text = createSvgElement("text", {
-      class: "jump-empty",
+    const text = createSvgElement('text', {
+      class: 'jump-empty',
       x: 270,
       y: 75,
-      "text-anchor": "middle",
-      "dominant-baseline": "middle",
+      'text-anchor': 'middle',
+      'dominant-baseline': 'middle',
     });
-    text.textContent = "Choose valid indices to see jump path.";
+    text.textContent = 'Choose valid indices to see jump path.';
     svg.appendChild(text);
-    elements.jumpCaption.textContent = "Choose valid indices to see jump path.";
+    elements.jumpCaption.textContent = 'Choose valid indices to see jump path.';
     return;
   }
 
   const isPreview = !Number.isInteger(activeIndex);
   const width = Math.max(540, 90 + Math.max(0, sequence.length - 1) * 120);
   const height = 150;
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
   ensureJumpArrowMarker(svg);
 
@@ -355,53 +350,53 @@ function renderJumpTimeline(activeIndex = null, opType = elements.opType.value, 
 
     if (idx < sequence.length - 1) {
       const nextX = leftPad + (idx + 1) * gap;
-      const edge = createSvgElement("line", {
-        class: "jump-edge",
+      const edge = createSvgElement('line', {
+        class: 'jump-edge',
         x1: x + 16,
         y1: y,
         x2: nextX - 16,
         y2: y,
-        "marker-end": "url(#jump-arrow)",
+        'marker-end': 'url(#jump-arrow)',
       });
       if (idx === 0 && Number.isInteger(activeIndex)) {
-        edge.classList.add("active");
+        edge.classList.add('active');
       }
       svg.appendChild(edge);
 
       if (value > 0) {
         const delta = value & -value;
-        const step = opType === "update" ? `+${delta}` : `-${delta}`;
-        const text = createSvgElement("text", {
-          class: "jump-edge-label",
+        const step = opType === 'update' ? `+${delta}` : `-${delta}`;
+        const text = createSvgElement('text', {
+          class: 'jump-edge-label',
           x: (x + nextX) / 2,
           y: y - 14,
-          "text-anchor": "middle",
-          "dominant-baseline": "middle",
+          'text-anchor': 'middle',
+          'dominant-baseline': 'middle',
         });
         text.textContent = step;
         svg.appendChild(text);
       }
     }
 
-    const group = createSvgElement("g", { class: "jump-node" });
+    const group = createSvgElement('g', { class: 'jump-node' });
     if (idx === 0 && Number.isInteger(activeIndex)) {
-      group.classList.add("active");
+      group.classList.add('active');
     } else if (idx === 0 && isPreview) {
-      group.classList.add("preview");
+      group.classList.add('preview');
     }
     if (value === 0) {
-      group.classList.add("terminal");
+      group.classList.add('terminal');
     }
 
     group.appendChild(
-      createSvgElement("circle", {
+      createSvgElement('circle', {
         cx: x,
         cy: y,
         r: 16,
       }),
     );
 
-    const labelNode = createSvgElement("text", {
+    const labelNode = createSvgElement('text', {
       x,
       y,
     });
@@ -409,19 +404,19 @@ function renderJumpTimeline(activeIndex = null, opType = elements.opType.value, 
     group.appendChild(labelNode);
 
     const lb = value > 0 ? value & -value : 0;
-    const lowbit = createSvgElement("text", {
+    const lowbit = createSvgElement('text', {
       x,
       y: y + 24,
-      class: "jump-edge-label",
+      class: 'jump-edge-label',
     });
-    lowbit.textContent = value > 0 ? `lb=${lb}` : "done";
+    lowbit.textContent = value > 0 ? `lb=${lb}` : 'done';
     group.appendChild(lowbit);
 
     svg.appendChild(group);
   }
 
-  const route = sequence.join(" -> ");
-  const modeText = opType === "update" ? "update jumps" : "query jumps";
+  const route = sequence.join(' -> ');
+  const modeText = opType === 'update' ? 'update jumps' : 'query jumps';
   elements.jumpCaption.textContent = isPreview
     ? `Preview ${modeText}: ${route}`
     : `Active ${modeText}: ${route}`;
@@ -429,52 +424,52 @@ function renderJumpTimeline(activeIndex = null, opType = elements.opType.value, 
 
 function renderCoverage(bitValues, activeIndex = null, opType = elements.opType.value) {
   if (!state.fenwick) {
-    elements.coverageMap.innerHTML = "";
+    elements.coverageMap.innerHTML = '';
     return;
   }
 
   elements.coverageMap.dataset.op = opType;
-  elements.coverageMap.innerHTML = "";
-  const head = document.createElement("div");
-  head.className = "coverage-head";
-  head.innerHTML = "<span>BIT i</span><span>Range</span><span>Coverage</span><span>bit[i]</span>";
+  elements.coverageMap.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'coverage-head';
+  head.innerHTML = '<span>BIT i</span><span>Range</span><span>Coverage</span><span>bit[i]</span>';
   elements.coverageMap.appendChild(head);
 
   const n = state.fenwick.n;
   for (let i = 1; i <= n; i += 1) {
     const low = i & -i;
     const left = i - low + 1;
-    const row = document.createElement("div");
-    row.className = "coverage-row";
+    const row = document.createElement('div');
+    row.className = 'coverage-row';
     if (i === activeIndex) {
-      row.classList.add("active");
+      row.classList.add('active');
     }
 
-    const label = document.createElement("span");
-    label.className = "coverage-label";
+    const label = document.createElement('span');
+    label.className = 'coverage-label';
     label.textContent = `i=${i}`;
 
-    const range = document.createElement("span");
-    range.className = "coverage-range";
+    const range = document.createElement('span');
+    range.className = 'coverage-range';
     range.textContent = `[${left}, ${i}]`;
 
-    const track = document.createElement("div");
-    track.className = "coverage-track";
+    const track = document.createElement('div');
+    track.className = 'coverage-track';
     track.style.gridTemplateColumns = `repeat(${n}, minmax(0, 1fr))`;
     for (let idx = 1; idx <= n; idx += 1) {
-      const cell = document.createElement("div");
-      cell.className = "coverage-cell";
+      const cell = document.createElement('div');
+      cell.className = 'coverage-cell';
       if (idx >= left && idx <= i) {
-        cell.classList.add("covered");
+        cell.classList.add('covered');
       }
       if (i === activeIndex && idx >= left && idx <= i) {
-        cell.classList.add("active");
+        cell.classList.add('active');
       }
       track.appendChild(cell);
     }
 
-    const value = document.createElement("span");
-    value.className = "coverage-value";
+    const value = document.createElement('span');
+    value.className = 'coverage-value';
     value.textContent = String(bitValues[i] ?? 0);
 
     row.appendChild(label);
@@ -487,17 +482,17 @@ function renderCoverage(bitValues, activeIndex = null, opType = elements.opType.
 
 function renderBit(bitValues, activeIndex = null) {
   if (!state.fenwick) {
-    elements.bitRows.innerHTML = "";
+    elements.bitRows.innerHTML = '';
     return;
   }
 
-  elements.bitRows.innerHTML = "";
+  elements.bitRows.innerHTML = '';
   for (let i = 1; i <= state.fenwick.n; i += 1) {
     const low = i & -i;
     const left = i - low + 1;
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     if (i === activeIndex) {
-      row.classList.add("active");
+      row.classList.add('active');
     }
 
     row.innerHTML = `
@@ -513,9 +508,9 @@ function renderBit(bitValues, activeIndex = null) {
 
 function updateMetrics() {
   const total = state.values.reduce((acc, value) => acc + value, 0);
-  elements.arrayTotal.textContent = Number.isFinite(total) ? total : "-";
+  elements.arrayTotal.textContent = Number.isFinite(total) ? total : '-';
   elements.queryResult.textContent =
-    state.lastQueryResult === null ? "-" : String(state.lastQueryResult);
+    state.lastQueryResult === null ? '-' : String(state.lastQueryResult);
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const totalSteps = operationRunner ? operationRunner.pendingLength : 0;
   elements.stepCounter.textContent = `${step} / ${totalSteps}`;
@@ -535,7 +530,7 @@ function setIndexBounds() {
       field.value = String(max);
     }
     if (current < 1) {
-      field.value = "1";
+      field.value = '1';
     }
   }
 }
@@ -544,21 +539,19 @@ function finalizePendingOperation(meta) {
   if (meta.nextValues) {
     state.values = meta.nextValues;
   }
-  if (typeof meta.result === "number") {
+  if (typeof meta.result === 'number') {
     state.lastQueryResult = meta.result;
   }
 
   const mismatch =
-    typeof meta.result === "number" &&
-    typeof meta.naive === "number" &&
-    meta.result !== meta.naive;
+    typeof meta.result === 'number' && typeof meta.naive === 'number' && meta.result !== meta.naive;
 
   const summary = mismatch
     ? `${meta.summary} (warning: naive check is ${meta.naive})`
     : meta.summary;
 
   helpers.updateStatus(summary);
-  helpers.appendLog(summary, mismatch ? "" : "ok");
+  helpers.appendLog(summary, mismatch ? '' : 'ok');
 
   renderArray(null);
   renderCoverage(state.fenwick.bit, null, meta.opType ?? elements.opType.value);
@@ -588,31 +581,31 @@ function validateOneBasedIndex(value, size, label) {
 }
 
 function validateRange(left, right, size) {
-  const leftError = validateOneBasedIndex(left, size, "Left index");
+  const leftError = validateOneBasedIndex(left, size, 'Left index');
   if (leftError) {
     return leftError;
   }
-  const rightError = validateOneBasedIndex(right, size, "Right index");
+  const rightError = validateOneBasedIndex(right, size, 'Right index');
   if (rightError) {
     return rightError;
   }
   if (left > right) {
-    return "Require l <= r.";
+    return 'Require l <= r.';
   }
   return null;
 }
 
 function prepareOperation() {
   if (!state.fenwick) {
-    helpers.updateStatus("Load an array first.");
+    helpers.updateStatus('Load an array first.');
     return null;
   }
 
   const opType = elements.opType.value;
 
-  if (opType === "update") {
+  if (opType === 'update') {
     const index = Number(elements.singleIndex.value);
-    const indexError = validateOneBasedIndex(index, state.fenwick.n, "Index i");
+    const indexError = validateOneBasedIndex(index, state.fenwick.n, 'Index i');
     if (indexError) {
       helpers.updateStatus(indexError);
       helpers.appendLog(indexError);
@@ -621,7 +614,7 @@ function prepareOperation() {
 
     const delta = Number(elements.deltaValue.value);
     if (!Number.isInteger(delta)) {
-      const message = "Delta must be an integer.";
+      const message = 'Delta must be an integer.';
       helpers.updateStatus(message);
       helpers.appendLog(message);
       return null;
@@ -639,9 +632,9 @@ function prepareOperation() {
     };
   }
 
-  if (opType === "prefix") {
+  if (opType === 'prefix') {
     const index = Number(elements.singleIndex.value);
-    const indexError = validateOneBasedIndex(index, state.fenwick.n, "Index i");
+    const indexError = validateOneBasedIndex(index, state.fenwick.n, 'Index i');
     if (indexError) {
       helpers.updateStatus(indexError);
       helpers.appendLog(indexError);
@@ -701,13 +694,13 @@ function loadArray(values) {
 
   const message = `Loaded ${values.length} values. Fenwick tree built.`;
   helpers.updateStatus(message);
-  helpers.appendLog(`${message} Values: [${values.join(", ")}]`, "ok");
+  helpers.appendLog(`${message} Values: [${values.join(', ')}]`, 'ok');
 }
 
 function handleArrayLoadInput() {
   const parsed = parseArrayInput(elements.arrayInput.value, {
     maxValues: 20,
-    maxValuesMessage: "Please use at most 20 values for readability.",
+    maxValuesMessage: 'Please use at most 20 values for readability.',
   });
   if (parsed.error) {
     helpers.updateStatus(parsed.error);
@@ -719,7 +712,7 @@ function handleArrayLoadInput() {
 
 function handleRandomArray() {
   const values = randomIntegerArray({ minLength: 7, maxLength: 12, maxValue: 12 });
-  elements.arrayInput.value = values.join(", ");
+  elements.arrayInput.value = values.join(', ');
   loadArray(values);
 }
 
@@ -728,10 +721,10 @@ function handleOperationTypeChange() {
   helpers.focusCodePanel(opType);
   helpers.clearCodeHighlights();
 
-  elements.singleIndexWrap.style.display = opType === "range" ? "none" : "flex";
-  elements.leftWrap.style.display = opType === "range" ? "flex" : "none";
-  elements.rightWrap.style.display = opType === "range" ? "flex" : "none";
-  elements.deltaWrap.style.display = opType === "update" ? "flex" : "none";
+  elements.singleIndexWrap.style.display = opType === 'range' ? 'none' : 'flex';
+  elements.leftWrap.style.display = opType === 'range' ? 'flex' : 'none';
+  elements.rightWrap.style.display = opType === 'range' ? 'flex' : 'none';
+  elements.deltaWrap.style.display = opType === 'update' ? 'flex' : 'none';
   renderJumpTimeline(null, opType, null);
 }
 
@@ -753,19 +746,27 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} operation with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} operation with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadArrayBtn.addEventListener("click", handleArrayLoadInput);
-  elements.randomArrayBtn.addEventListener("click", handleRandomArray);
-  elements.opType.addEventListener("change", handleOperationTypeChange);
-  elements.singleIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
-  elements.leftIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
-  elements.rightIndex.addEventListener("input", () => renderJumpTimeline(null, elements.opType.value, null));
+  elements.loadArrayBtn.addEventListener('click', handleArrayLoadInput);
+  elements.randomArrayBtn.addEventListener('click', handleRandomArray);
+  elements.opType.addEventListener('change', handleOperationTypeChange);
+  elements.singleIndex.addEventListener('input', () =>
+    renderJumpTimeline(null, elements.opType.value, null),
+  );
+  elements.leftIndex.addEventListener('input', () =>
+    renderJumpTimeline(null, elements.opType.value, null),
+  );
+  elements.rightIndex.addEventListener('input', () =>
+    renderJumpTimeline(null, elements.opType.value, null),
+  );
 
   setupRunnerControls({
     elements,
@@ -781,9 +782,9 @@ function init() {
     extraShortcuts: {
       l: () => handleArrayLoadInput(),
       r: () => handleRandomArray(),
-      1: () => setOperationType("update"),
-      2: () => setOperationType("prefix"),
-      3: () => setOperationType("range"),
+      1: () => setOperationType('update'),
+      2: () => setOperationType('prefix'),
+      3: () => setOperationType('range'),
     },
   });
 

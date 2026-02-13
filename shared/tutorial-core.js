@@ -11,31 +11,31 @@ export function isTypingTarget(target) {
 
 export function createLogger(logOutputElement) {
   return {
-    append(message, tone = "") {
-      const entry = document.createElement("div");
+    append(message, tone = '') {
+      const entry = document.createElement('div');
       entry.className = `log-entry ${tone}`.trim();
       entry.textContent = message;
       logOutputElement.appendChild(entry);
       logOutputElement.scrollTop = logOutputElement.scrollHeight;
     },
     clear() {
-      logOutputElement.innerHTML = "";
+      logOutputElement.innerHTML = '';
     },
   };
 }
 
-export function createCodeHighlighter(panelSelector = ".code-panel") {
+export function createCodeHighlighter(panelSelector = '.code-panel') {
   const getPanels = () => document.querySelectorAll(panelSelector);
 
   return {
     focus(opType) {
       getPanels().forEach((panel) => {
-        panel.classList.toggle("dimmed", panel.dataset.op !== opType);
+        panel.classList.toggle('dimmed', panel.dataset.op !== opType);
       });
     },
     clear() {
       document.querySelectorAll(`${panelSelector} li.active`).forEach((line) => {
-        line.classList.remove("active");
+        line.classList.remove('active');
       });
     },
     highlight(opType, line) {
@@ -50,7 +50,7 @@ export function createCodeHighlighter(panelSelector = ".code-panel") {
         `${panelSelector}[data-op="${opType}"] li[data-line="${line}"]`,
       );
       if (target) {
-        target.classList.add("active");
+        target.classList.add('active');
       }
     },
   };
@@ -82,8 +82,8 @@ export function bindShortcutHandler({
     action(event);
   };
 
-  target.addEventListener("keydown", handler);
-  return () => target.removeEventListener("keydown", handler);
+  target.addEventListener('keydown', handler);
+  return () => target.removeEventListener('keydown', handler);
 }
 
 export function createOperationRunner({

@@ -1,4 +1,4 @@
-import { createSvgElement, getSvgCanvasSize, computeEdgeGeometry } from "./graph-core.js";
+import { createSvgElement, getSvgCanvasSize, computeEdgeGeometry } from './graph-core.js';
 
 function toClassList(value) {
   if (!value) {
@@ -20,20 +20,20 @@ export function prepareGraphCanvas({
   svgElement,
   fallbackSize = { width: 900, height: 520 },
   hasGraph,
-  emptyMessage = "Load a graph to visualize it.",
-  emptyClass = "graph-empty-label",
+  emptyMessage = 'Load a graph to visualize it.',
+  emptyClass = 'graph-empty-label',
 }) {
-  svgElement.innerHTML = "";
+  svgElement.innerHTML = '';
   const { width, height } = getSvgCanvasSize(svgElement, fallbackSize);
-  svgElement.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
   if (!hasGraph) {
-    const text = createSvgElement("text", {
+    const text = createSvgElement('text', {
       class: emptyClass,
       x: width / 2,
       y: height / 2,
-      "text-anchor": "middle",
-      "dominant-baseline": "middle",
+      'text-anchor': 'middle',
+      'dominant-baseline': 'middle',
     });
     text.textContent = emptyMessage;
     svgElement.appendChild(text);
@@ -45,24 +45,24 @@ export function prepareGraphCanvas({
 
 export function ensureArrowMarker({
   svgElement,
-  id = "graph-arrow",
+  id = 'graph-arrow',
   markerWidth = 9,
   markerHeight = 9,
   refX = 8,
   refY = 4.5,
-  fill = "rgba(57, 89, 121, 0.9)",
+  fill = 'rgba(57, 89, 121, 0.9)',
 }) {
-  const defs = createSvgElement("defs");
-  const marker = createSvgElement("marker", {
+  const defs = createSvgElement('defs');
+  const marker = createSvgElement('marker', {
     id,
     markerWidth,
     markerHeight,
     refX,
     refY,
-    orient: "auto",
-    markerUnits: "strokeWidth",
+    orient: 'auto',
+    markerUnits: 'strokeWidth',
   });
-  const arrowPath = createSvgElement("path", {
+  const arrowPath = createSvgElement('path', {
     d: `M 0 0 L ${markerWidth} ${markerHeight / 2} L 0 ${markerHeight} z`,
     fill,
   });
@@ -88,19 +88,21 @@ export function renderGraphEdges({
   positions,
   nodeRadius = 20,
   directed = false,
-  markerId = "graph-arrow",
+  markerId = 'graph-arrow',
   activeMarkerId = null,
   activeEdgeId = null,
   curveOffsetForEdge = () => 0,
   labelOffset = 10,
   edgeClassFn = () => [],
-  edgeLabelTextFn = () => "",
+  edgeLabelTextFn = () => '',
   edgeLabelWidthFn = (text) => 10 + text.length * 7,
-  edgeLabelBgClassFn = (_edge, isActive) => (isActive ? ["graph-edge-label-bg", "active"] : "graph-edge-label-bg"),
-  edgeLabelClassFn = (_edge, isActive) => (isActive ? ["graph-edge-label", "active"] : "graph-edge-label"),
+  edgeLabelBgClassFn = (_edge, isActive) =>
+    isActive ? ['graph-edge-label-bg', 'active'] : 'graph-edge-label-bg',
+  edgeLabelClassFn = (_edge, isActive) =>
+    isActive ? ['graph-edge-label', 'active'] : 'graph-edge-label',
   edgeLabelVerticalOffset = 0.5,
 }) {
-  const edgesLayer = createSvgElement("g");
+  const edgesLayer = createSvgElement('g');
 
   for (const edge of edges) {
     const isActive = activeEdgeId !== null && edge.id === activeEdgeId;
@@ -113,20 +115,20 @@ export function renderGraphEdges({
       labelOffset,
     });
 
-    const path = createSvgElement("path", { d: geometry.pathD });
-    addClasses(path, ["graph-edge", ...toClassList(edgeClassFn(edge, isActive))]);
+    const path = createSvgElement('path', { d: geometry.pathD });
+    addClasses(path, ['graph-edge', ...toClassList(edgeClassFn(edge, isActive))]);
     if (isActive) {
-      path.classList.add("active");
+      path.classList.add('active');
     }
     if (directed) {
       const markerToUse = isActive && activeMarkerId ? activeMarkerId : markerId;
-      path.setAttribute("marker-end", `url(#${markerToUse})`);
+      path.setAttribute('marker-end', `url(#${markerToUse})`);
     }
     edgesLayer.appendChild(path);
 
     const labelText = String(edgeLabelTextFn(edge, isActive));
     const labelWidth = edgeLabelWidthFn(labelText, edge, isActive);
-    const labelBg = createSvgElement("rect", {
+    const labelBg = createSvgElement('rect', {
       x: geometry.labelX - labelWidth / 2,
       y: geometry.labelY - 8,
       width: labelWidth,
@@ -136,11 +138,11 @@ export function renderGraphEdges({
     addClasses(labelBg, edgeLabelBgClassFn(edge, isActive));
     edgesLayer.appendChild(labelBg);
 
-    const label = createSvgElement("text", {
+    const label = createSvgElement('text', {
       x: geometry.labelX,
       y: geometry.labelY + edgeLabelVerticalOffset,
-      "text-anchor": "middle",
-      "dominant-baseline": "middle",
+      'text-anchor': 'middle',
+      'dominant-baseline': 'middle',
     });
     addClasses(label, edgeLabelClassFn(edge, isActive));
     label.textContent = labelText;
@@ -157,10 +159,10 @@ export function renderGraphNodes({
   nodeClassFn = () => [],
   renderNodeContent,
 }) {
-  const nodeLayer = createSvgElement("g");
+  const nodeLayer = createSvgElement('g');
 
   for (let index = 0; index < nodeCount; index += 1) {
-    const group = createSvgElement("g", { class: "graph-node" });
+    const group = createSvgElement('g', { class: 'graph-node' });
     addClasses(group, nodeClassFn(index));
 
     renderNodeContent({

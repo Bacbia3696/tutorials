@@ -1,19 +1,19 @@
-import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 async function importBrowserModule(absolutePath) {
-  const source = await fs.readFile(absolutePath, "utf8");
+  const source = await fs.readFile(absolutePath, 'utf8');
   return import(`data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`);
 }
 
 const thisFile = fileURLToPath(import.meta.url);
 const testsDir = path.dirname(thisFile);
-const sharedDir = path.resolve(testsDir, "..");
+const sharedDir = path.resolve(testsDir, '..');
 
-const graphInput = await importBrowserModule(path.join(sharedDir, "graph-input.js"));
-const tutorialCore = await importBrowserModule(path.join(sharedDir, "tutorial-core.js"));
+const graphInput = await importBrowserModule(path.join(sharedDir, 'graph-input.js'));
+const tutorialCore = await importBrowserModule(path.join(sharedDir, 'tutorial-core.js'));
 
 const {
   createLabelToIndex,
@@ -33,21 +33,18 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-test("parseNodeLabelsInput normalizes labels and validates size", () => {
-  assert.deepEqual(parseNodeLabelsInput("a, b c", { maxNodes: 5 }), {
-    nodes: ["A", "B", "C"],
+test('parseNodeLabelsInput normalizes labels and validates size', () => {
+  assert.deepEqual(parseNodeLabelsInput('a, b c', { maxNodes: 5 }), {
+    nodes: ['A', 'B', 'C'],
   });
-  assert.equal(
-    parseNodeLabelsInput("a, a", { maxNodes: 5 }).error,
-    "Duplicate node label 'A'.",
-  );
+  assert.equal(parseNodeLabelsInput('a, a', { maxNodes: 5 }).error, "Duplicate node label 'A'.");
 });
 
-test("parseWeightedEdgesInput enforces dijkstra-style constraints", () => {
-  const labelToIndex = createLabelToIndex(["A", "B", "C"]);
-  const parsed = parseWeightedEdgesInput("A B 3\nB C 4", {
+test('parseWeightedEdgesInput enforces dijkstra-style constraints', () => {
+  const labelToIndex = createLabelToIndex(['A', 'B', 'C']);
+  const parsed = parseWeightedEdgesInput('A B 3\nB C 4', {
     labelToIndex,
-    mode: "undirected",
+    mode: 'undirected',
     requirePositiveInteger: true,
   });
   assert.ok(!parsed.error);
@@ -56,24 +53,24 @@ test("parseWeightedEdgesInput enforces dijkstra-style constraints", () => {
     { id: 2, from: 1, to: 2, weight: 4 },
   ]);
 
-  const duplicate = parseWeightedEdgesInput("A B 3\nB A 7", {
+  const duplicate = parseWeightedEdgesInput('A B 3\nB A 7', {
     labelToIndex,
-    mode: "undirected",
+    mode: 'undirected',
     requirePositiveInteger: true,
   });
   assert.equal(duplicate.error, "Edge line 2: duplicate edge 'B A'.");
 });
 
-test("parseDirectedEdgesInput parses DAG edge lines", () => {
-  const labelToIndex = createLabelToIndex(["A", "B", "C"]);
-  const parsed = parseDirectedEdgesInput("A B\nB C", { labelToIndex });
+test('parseDirectedEdgesInput parses DAG edge lines', () => {
+  const labelToIndex = createLabelToIndex(['A', 'B', 'C']);
+  const parsed = parseDirectedEdgesInput('A B\nB C', { labelToIndex });
   assert.ok(!parsed.error);
   assert.deepEqual(parsed.edges, [
     { id: 1, from: 0, to: 1 },
     { id: 2, from: 1, to: 2 },
   ]);
 
-  const withSelfLoop = parseDirectedEdgesInput("A A", {
+  const withSelfLoop = parseDirectedEdgesInput('A A', {
     labelToIndex,
     allowSelfLoops: true,
   });
@@ -81,20 +78,20 @@ test("parseDirectedEdgesInput parses DAG edge lines", () => {
   assert.deepEqual(withSelfLoop.edges, [{ id: 1, from: 0, to: 0 }]);
 });
 
-test("edgeKeyForMode handles directed and undirected uniqueness", () => {
-  assert.equal(edgeKeyForMode("directed", 1, 2), "1->2");
-  assert.equal(edgeKeyForMode("undirected", 1, 2), "1--2");
-  assert.equal(edgeKeyForMode("undirected", 2, 1), "1--2");
+test('edgeKeyForMode handles directed and undirected uniqueness', () => {
+  assert.equal(edgeKeyForMode('directed', 1, 2), '1->2');
+  assert.equal(edgeKeyForMode('undirected', 1, 2), '1--2');
+  assert.equal(edgeKeyForMode('undirected', 2, 1), '1--2');
 });
 
-test("createOperationRunner step and finishCurrent are deterministic", () => {
+test('createOperationRunner step and finishCurrent are deterministic', () => {
   const applied = [];
   let finalizeCount = 0;
 
   const runner = createOperationRunner({
     getSpeedMs: () => 0,
     prepareOperation: () => ({
-      opType: "demo",
+      opType: 'demo',
       events: [1, 2, 3],
     }),
     applyEvent: (event) => applied.push(event),
@@ -111,14 +108,14 @@ test("createOperationRunner step and finishCurrent are deterministic", () => {
   assert.equal(runner.hasPending, false);
 });
 
-test("createOperationRunner runAnimated applies all events and finalizes once", async () => {
+test('createOperationRunner runAnimated applies all events and finalizes once', async () => {
   const applied = [];
   let finalizeCount = 0;
 
   const runner = createOperationRunner({
     getSpeedMs: () => 0,
     prepareOperation: () => ({
-      opType: "demo",
+      opType: 'demo',
       events: [10, 20],
     }),
     applyEvent: (event) => applied.push(event),

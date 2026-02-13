@@ -11,8 +11,7 @@
   --font-sans: "Manrope", "Trebuchet MS", sans-serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 14% 20%, #dad3f8 0%, transparent 36%),
+  --page-bg: radial-gradient(circle at 14% 20%, #dad3f8 0%, transparent 36%),
     radial-gradient(circle at 88% 82%, #bdd0e8 0%, transparent 40%),
     linear-gradient(160deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1540px;
@@ -131,8 +130,7 @@ code,
   position: relative;
   border: 1px solid var(--edge);
   border-radius: 12px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(240, 242, 250, 0.85)),
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(240, 242, 250, 0.85)),
     repeating-linear-gradient(
       180deg,
       transparent,

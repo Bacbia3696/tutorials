@@ -1,9 +1,6 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import {
-  bindDebouncedResize,
-  setupRunnerControls,
-} from "../shared/tutorial-bootstrap.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { bindDebouncedResize, setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 // ─── DSU Data Structure with Trace Generation ───────────────────────────────
 
@@ -62,7 +59,7 @@ class DSUTracer {
 
     const emit = (message, line, activeNodes = [], extras = {}) => {
       events.push({
-        opType: "find",
+        opType: 'find',
         message,
         line,
         activeNodes,
@@ -77,7 +74,10 @@ class DSUTracer {
     let current = x;
     while (this.parent.get(current) !== current) {
       path.push(current);
-      emit(`parent[${current}] = ${this.parent.get(current)} ≠ ${current}, keep going`, 1, [current, this.parent.get(current)]);
+      emit(`parent[${current}] = ${this.parent.get(current)} ≠ ${current}, keep going`, 1, [
+        current,
+        this.parent.get(current),
+      ]);
       current = this.parent.get(current);
     }
     const root = current;
@@ -101,7 +101,7 @@ class DSUTracer {
 
     const emit = (message, line, activeNodes = [], extras = {}) => {
       events.push({
-        opType: "union",
+        opType: 'union',
         message,
         line,
         activeNodes,
@@ -118,7 +118,10 @@ class DSUTracer {
       const path = [];
       while (this.parent.get(rootA) !== rootA) {
         path.push(rootA);
-        emit(`  Find(${a}): parent[${rootA}] = ${this.parent.get(rootA)}, walk up`, 1, [rootA, this.parent.get(rootA)]);
+        emit(`  Find(${a}): parent[${rootA}] = ${this.parent.get(rootA)}, walk up`, 1, [
+          rootA,
+          this.parent.get(rootA),
+        ]);
         rootA = this.parent.get(rootA);
       }
       emit(`  Find(${a}) = ${rootA}`, 1, [rootA]);
@@ -138,7 +141,10 @@ class DSUTracer {
       const path = [];
       while (this.parent.get(rootB) !== rootB) {
         path.push(rootB);
-        emit(`  Find(${b}): parent[${rootB}] = ${this.parent.get(rootB)}, walk up`, 2, [rootB, this.parent.get(rootB)]);
+        emit(`  Find(${b}): parent[${rootB}] = ${this.parent.get(rootB)}, walk up`, 2, [
+          rootB,
+          this.parent.get(rootB),
+        ]);
         rootB = this.parent.get(rootB);
       }
       emit(`  Find(${b}) = ${rootB}`, 2, [rootB]);
@@ -153,16 +159,19 @@ class DSUTracer {
     if (rootA === rootB) {
       emit(`rootA == rootB == ${rootA}: already connected, skip`, 3, [rootA], {
         done: true,
-        result: "already connected",
+        result: 'already connected',
       });
-      return { events, result: "already connected", merged: false };
+      return { events, result: 'already connected', merged: false };
     }
 
     const rankA = this.rank.get(rootA);
     const rankB = this.rank.get(rootB);
 
     if (rankA < rankB) {
-      emit(`rank[${rootA}]=${rankA} < rank[${rootB}]=${rankB}: swap so A is always ≥`, 4, [rootA, rootB]);
+      emit(`rank[${rootA}]=${rankA} < rank[${rootB}]=${rankB}: swap so A is always ≥`, 4, [
+        rootA,
+        rootB,
+      ]);
       const tmp = rootA;
       rootA = rootB;
       rootB = tmp;
@@ -193,7 +202,7 @@ class DSUTracer {
 
     const emit = (message, line, activeNodes = [], extras = {}) => {
       events.push({
-        opType: "connected",
+        opType: 'connected',
         message,
         line,
         activeNodes,
@@ -238,7 +247,7 @@ class DSUTracer {
 
     const connected = rootA === rootB;
     emit(
-      `Find(${a})=${rootA}, Find(${b})=${rootB} → ${connected ? "connected" : "NOT connected"}`,
+      `Find(${a})=${rootA}, Find(${b})=${rootB} → ${connected ? 'connected' : 'NOT connected'}`,
       1,
       [rootA, rootB],
       { done: true, result: connected },
@@ -250,28 +259,28 @@ class DSUTracer {
 // ─── DOM Elements ───────────────────────────────────────────────────────────
 
 const elements = {
-  elementsInput: document.getElementById("elementsInput"),
-  loadBtn: document.getElementById("loadBtn"),
-  sampleBtn: document.getElementById("sampleBtn"),
-  opType: document.getElementById("opType"),
-  paramA: document.getElementById("paramA"),
-  paramB: document.getElementById("paramB"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  elementCount: document.getElementById("elementCount"),
-  componentCount: document.getElementById("componentCount"),
-  lastResult: document.getElementById("lastResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  forestContainer: document.getElementById("forestContainer"),
-  parentTableContainer: document.getElementById("parentTableContainer"),
-  componentsList: document.getElementById("componentsList"),
-  logOutput: document.getElementById("logOutput"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
+  elementsInput: document.getElementById('elementsInput'),
+  loadBtn: document.getElementById('loadBtn'),
+  sampleBtn: document.getElementById('sampleBtn'),
+  opType: document.getElementById('opType'),
+  paramA: document.getElementById('paramA'),
+  paramB: document.getElementById('paramB'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  elementCount: document.getElementById('elementCount'),
+  componentCount: document.getElementById('componentCount'),
+  lastResult: document.getElementById('lastResult'),
+  stepCounter: document.getElementById('stepCounter'),
+  forestContainer: document.getElementById('forestContainer'),
+  parentTableContainer: document.getElementById('parentTableContainer'),
+  componentsList: document.getElementById('componentsList'),
+  logOutput: document.getElementById('logOutput'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
 };
 
 const state = {
@@ -297,10 +306,10 @@ function parseElementsInput(text) {
     .filter((t) => t.length > 0);
 
   if (tokens.length === 0) {
-    return { error: "Please provide at least one element." };
+    return { error: 'Please provide at least one element.' };
   }
   if (tokens.length > 30) {
-    return { error: "Use at most 30 elements." };
+    return { error: 'Use at most 30 elements.' };
   }
 
   const nums = [];
@@ -332,58 +341,58 @@ function randomSampleElements() {
 
 function renderParentTable(snapshot, activeNodes = []) {
   const container = elements.parentTableContainer;
-  container.innerHTML = "";
+  container.innerHTML = '';
 
   if (!snapshot) {
     return;
   }
 
-  const table = document.createElement("table");
-  table.className = "parent-table";
+  const table = document.createElement('table');
+  table.className = 'parent-table';
 
   const activeSet = new Set(activeNodes);
 
   // Header
-  const thead = document.createElement("thead");
-  const headerRow = document.createElement("tr");
-  const indexHeader = document.createElement("th");
-  indexHeader.textContent = "Element";
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  const indexHeader = document.createElement('th');
+  indexHeader.textContent = 'Element';
   headerRow.appendChild(indexHeader);
   for (const e of snapshot.elements) {
-    const th = document.createElement("th");
+    const th = document.createElement('th');
     th.textContent = String(e);
     headerRow.appendChild(th);
   }
   thead.appendChild(headerRow);
   table.appendChild(thead);
 
-  const tbody = document.createElement("tbody");
+  const tbody = document.createElement('tbody');
 
   // Parent row
-  const parentRow = document.createElement("tr");
-  const parentLabel = document.createElement("th");
-  parentLabel.textContent = "parent";
+  const parentRow = document.createElement('tr');
+  const parentLabel = document.createElement('th');
+  parentLabel.textContent = 'parent';
   parentRow.appendChild(parentLabel);
   for (const e of snapshot.elements) {
-    const td = document.createElement("td");
+    const td = document.createElement('td');
     td.textContent = String(snapshot.parent[e]);
     if (activeSet.has(e)) {
-      td.className = "highlight";
+      td.className = 'highlight';
     }
     parentRow.appendChild(td);
   }
   tbody.appendChild(parentRow);
 
   // Rank row
-  const rankRow = document.createElement("tr");
-  const rankLabel = document.createElement("th");
-  rankLabel.textContent = "rank";
+  const rankRow = document.createElement('tr');
+  const rankLabel = document.createElement('th');
+  rankLabel.textContent = 'rank';
   rankRow.appendChild(rankLabel);
   for (const e of snapshot.elements) {
-    const td = document.createElement("td");
+    const td = document.createElement('td');
     td.textContent = String(snapshot.rank[e]);
     if (activeSet.has(e)) {
-      td.className = "highlight";
+      td.className = 'highlight';
     }
     rankRow.appendChild(td);
   }
@@ -397,20 +406,20 @@ function renderParentTable(snapshot, activeNodes = []) {
 
 function renderComponents(snapshot) {
   const container = elements.componentsList;
-  container.innerHTML = "";
+  container.innerHTML = '';
 
   if (!snapshot || snapshot.components.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "component-chip empty";
-    empty.textContent = "(no elements)";
+    const empty = document.createElement('div');
+    empty.className = 'component-chip empty';
+    empty.textContent = '(no elements)';
     container.appendChild(empty);
     return;
   }
 
   for (const comp of snapshot.components) {
-    const chip = document.createElement("div");
-    chip.className = "component-chip";
-    chip.innerHTML = `<span class="chip-label">root ${comp.root}:</span> {${comp.members.join(", ")}}`;
+    const chip = document.createElement('div');
+    chip.className = 'component-chip';
+    chip.innerHTML = `<span class="chip-label">root ${comp.root}:</span> {${comp.members.join(', ')}}`;
     container.appendChild(chip);
   }
 }
@@ -504,43 +513,43 @@ function renderForest(snapshot, activeNodes = []) {
   state.lastSnapshot = snapshot;
   state.lastActiveNodes = activeNodes;
   const container = elements.forestContainer;
-  container.innerHTML = "";
+  container.innerHTML = '';
 
   if (!snapshot || snapshot.elements.length === 0) {
     return;
   }
 
   const panelWidth = Math.max(container.clientWidth - 6, 400);
-  const { coords, width, height, } = layoutForest(snapshot, panelWidth);
+  const { coords, width, height } = layoutForest(snapshot, panelWidth);
   const activeSet = new Set(activeNodes);
 
-  const scroll = document.createElement("div");
-  scroll.className = "forest-scroll";
+  const scroll = document.createElement('div');
+  scroll.className = 'forest-scroll';
 
-  const diagram = document.createElement("div");
-  diagram.className = "forest-diagram";
+  const diagram = document.createElement('div');
+  diagram.className = 'forest-diagram';
   diagram.style.width = `${width}px`;
   diagram.style.height = `${height}px`;
 
   // SVG for edges
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("class", "forest-links");
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svg.setAttribute("preserveAspectRatio", "none");
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'forest-links');
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
 
   // Arrow marker
-  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-  const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-  marker.setAttribute("id", "arrow");
-  marker.setAttribute("viewBox", "0 0 10 10");
-  marker.setAttribute("refX", "9");
-  marker.setAttribute("refY", "5");
-  marker.setAttribute("markerWidth", "6");
-  marker.setAttribute("markerHeight", "6");
-  marker.setAttribute("orient", "auto-start-reverse");
-  const arrowPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  arrowPath.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
-  arrowPath.setAttribute("fill", "rgba(60, 70, 110, 0.4)");
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+  marker.setAttribute('id', 'arrow');
+  marker.setAttribute('viewBox', '0 0 10 10');
+  marker.setAttribute('refX', '9');
+  marker.setAttribute('refY', '5');
+  marker.setAttribute('markerWidth', '6');
+  marker.setAttribute('markerHeight', '6');
+  marker.setAttribute('orient', 'auto-start-reverse');
+  const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+  arrowPath.setAttribute('fill', 'rgba(60, 70, 110, 0.4)');
   marker.appendChild(arrowPath);
   defs.appendChild(marker);
   svg.appendChild(defs);
@@ -557,7 +566,7 @@ function renderForest(snapshot, activeNodes = []) {
       continue;
     }
 
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     // Draw from child upward to parent
     const nodeRadius = 24;
     const dx = to.x - from.x;
@@ -566,11 +575,11 @@ function renderForest(snapshot, activeNodes = []) {
     const ux = dist > 0 ? dx / dist : 0;
     const uy = dist > 0 ? dy / dist : -1;
 
-    line.setAttribute("x1", String(from.x + ux * nodeRadius));
-    line.setAttribute("y1", String(from.y + uy * nodeRadius));
-    line.setAttribute("x2", String(to.x - ux * nodeRadius));
-    line.setAttribute("y2", String(to.y - uy * nodeRadius));
-    line.setAttribute("class", `forest-edge${activeSet.has(e) ? " highlight" : ""}`);
+    line.setAttribute('x1', String(from.x + ux * nodeRadius));
+    line.setAttribute('y1', String(from.y + uy * nodeRadius));
+    line.setAttribute('x2', String(to.x - ux * nodeRadius));
+    line.setAttribute('y2', String(to.y - uy * nodeRadius));
+    line.setAttribute('class', `forest-edge${activeSet.has(e) ? ' highlight' : ''}`);
     svg.appendChild(line);
   }
 
@@ -584,13 +593,13 @@ function renderForest(snapshot, activeNodes = []) {
     }
     const isRoot = snapshot.parent[e] === e;
 
-    const card = document.createElement("div");
-    card.className = "dsu-node";
+    const card = document.createElement('div');
+    card.className = 'dsu-node';
     if (isRoot) {
-      card.classList.add("root-node");
+      card.classList.add('root-node');
     }
     if (activeSet.has(e)) {
-      card.classList.add("active");
+      card.classList.add('active');
     }
     card.style.left = `${pos.x}px`;
     card.style.top = `${pos.y}px`;
@@ -598,7 +607,7 @@ function renderForest(snapshot, activeNodes = []) {
     card.innerHTML = `
       <div class="node-label">${e}</div>
       <span class="node-rank">r${snapshot.rank[e]}</span>
-      ${isRoot ? '<span class="root-badge">ROOT</span>' : ""}
+      ${isRoot ? '<span class="root-badge">ROOT</span>' : ''}
     `;
     diagram.appendChild(card);
   }
@@ -623,7 +632,7 @@ function updateMetrics(snapshot) {
   }
   elements.elementCount.textContent = String(snap.elements.length);
   elements.componentCount.textContent = String(snap.componentCount);
-  elements.lastResult.textContent = state.lastResult === null ? "-" : String(state.lastResult);
+  elements.lastResult.textContent = state.lastResult === null ? '-' : String(state.lastResult);
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const total = operationRunner ? operationRunner.pendingLength : 0;
   elements.stepCounter.textContent = `${step} / ${total}`;
@@ -632,14 +641,14 @@ function updateMetrics(snapshot) {
 // ─── Operation Lifecycle ────────────────────────────────────────────────────
 
 function finalizePendingOperation(meta) {
-  if (Object.prototype.hasOwnProperty.call(meta, "result")) {
+  if (Object.prototype.hasOwnProperty.call(meta, 'result')) {
     state.lastResult = meta.result;
   } else {
     state.lastResult = meta.summary;
   }
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, "ok");
+  helpers.appendLog(meta.summary, 'ok');
 
   const snapshot = state.dsu.snapshot();
   renderForest(snapshot, []);
@@ -659,7 +668,7 @@ function applyEvent(event) {
 
 function prepareOperation() {
   if (!state.dsu) {
-    helpers.updateStatus("Initialize elements first.");
+    helpers.updateStatus('Initialize elements first.');
     return null;
   }
 
@@ -669,7 +678,7 @@ function prepareOperation() {
 
   const validSet = new Set(state.dsu.elements);
 
-  if (opType === "find") {
+  if (opType === 'find') {
     if (!validSet.has(a)) {
       const msg = `Element ${a} does not exist.`;
       helpers.updateStatus(msg);
@@ -685,7 +694,7 @@ function prepareOperation() {
     };
   }
 
-  if (opType === "union") {
+  if (opType === 'union') {
     if (!validSet.has(a) || !validSet.has(b)) {
       const msg = `Both elements must exist. Got a=${a}, b=${b}.`;
       helpers.updateStatus(msg);
@@ -735,9 +744,9 @@ function loadElements(elems) {
   helpers.focusCodePanel(elements.opType.value);
   helpers.clearCodeHighlights();
 
-  const message = `Initialized ${snapshot.elements.length} elements: {${snapshot.elements.join(", ")}}`;
+  const message = `Initialized ${snapshot.elements.length} elements: {${snapshot.elements.join(', ')}}`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
 }
 
 function handleLoad() {
@@ -752,7 +761,7 @@ function handleLoad() {
 
 function handleSample() {
   const elems = randomSampleElements();
-  elements.elementsInput.value = elems.join(", ");
+  elements.elementsInput.value = elems.join(', ');
   loadElements(elems);
 }
 
@@ -777,17 +786,19 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
-      helpers.updateStatus("No pending operation.");
+      helpers.updateStatus('No pending operation.');
     },
   });
 
-  elements.loadBtn.addEventListener("click", handleLoad);
-  elements.sampleBtn.addEventListener("click", handleSample);
+  elements.loadBtn.addEventListener('click', handleLoad);
+  elements.sampleBtn.addEventListener('click', handleSample);
 
-  elements.opType.addEventListener("change", () => {
+  elements.opType.addEventListener('change', () => {
     helpers.focusCodePanel(elements.opType.value);
     helpers.clearCodeHighlights();
   });
@@ -806,9 +817,9 @@ function init() {
     extraShortcuts: {
       l: () => handleLoad(),
       r: () => handleSample(),
-      1: () => setOperationType("union"),
-      2: () => setOperationType("find"),
-      3: () => setOperationType("connected"),
+      1: () => setOperationType('union'),
+      2: () => setOperationType('find'),
+      3: () => setOperationType('connected'),
     },
   });
 

@@ -1,7 +1,9 @@
 const DEFAULT_NODE_LABEL_PATTERN = /^[A-Z][A-Z0-9_]*$/;
 
 export function normalizeGraphLabel(raw) {
-  return String(raw ?? "").trim().toUpperCase();
+  return String(raw ?? '')
+    .trim()
+    .toUpperCase();
 }
 
 export function createLabelToIndex(nodes) {
@@ -13,17 +15,17 @@ export function createLabelToIndex(nodes) {
 }
 
 export function edgeKeyForMode(mode, fromIndex, toIndex) {
-  if (mode === "directed") {
+  if (mode === 'directed') {
     return `${fromIndex}->${toIndex}`;
   }
   return fromIndex < toIndex ? `${fromIndex}--${toIndex}` : `${toIndex}--${fromIndex}`;
 }
 
 function parseEdgeLines(text) {
-  return String(text ?? "")
+  return String(text ?? '')
     .split(/\n+/)
     .map((line) => line.trim())
-    .filter((line) => line.length > 0 && !line.startsWith("#"));
+    .filter((line) => line.length > 0 && !line.startsWith('#'));
 }
 
 export function parseNodeLabelsInput(
@@ -39,7 +41,7 @@ export function parseNodeLabelsInput(
     duplicateLabelMessage = (label) => `Duplicate node label '${label}'.`,
   } = {},
 ) {
-  const tokens = String(text ?? "")
+  const tokens = String(text ?? '')
     .trim()
     .split(/[\s,]+/)
     .map((token) => normalizeGraphLabel(token))
@@ -72,19 +74,15 @@ export function parseWeightedEdgesInput(
   text,
   {
     labelToIndex,
-    mode = "directed",
-    lineFormatMessage = (lineNumber) =>
-      `Edge line ${lineNumber} is invalid. Use: FROM TO WEIGHT`,
-    unknownNodeMessage = (lineNumber, label) =>
-      `Edge line ${lineNumber}: unknown node '${label}'.`,
-    invalidWeightMessage = (lineNumber) =>
-      `Edge line ${lineNumber}: weight must be an integer.`,
+    mode = 'directed',
+    lineFormatMessage = (lineNumber) => `Edge line ${lineNumber} is invalid. Use: FROM TO WEIGHT`,
+    unknownNodeMessage = (lineNumber, label) => `Edge line ${lineNumber}: unknown node '${label}'.`,
+    invalidWeightMessage = (lineNumber) => `Edge line ${lineNumber}: weight must be an integer.`,
     requirePositiveInteger = false,
     positiveWeightMessage = (lineNumber) =>
       `Edge line ${lineNumber}: weight must be a positive integer.`,
     allowNegativeWeightInUndirected = true,
-    undirectedNegativeWeightMessage =
-      "Undirected mode disallows negative weights (it immediately creates a negative cycle). Use directed mode.",
+    undirectedNegativeWeightMessage = 'Undirected mode disallows negative weights (it immediately creates a negative cycle). Use directed mode.',
     selfLoopMessage = (lineNumber) => `Edge line ${lineNumber}: self-loop is not allowed.`,
     duplicateEdgeMessage = (lineNumber, fromLabel, toLabel) =>
       `Edge line ${lineNumber}: duplicate edge '${fromLabel} ${toLabel}'.`,
@@ -93,10 +91,10 @@ export function parseWeightedEdgesInput(
 ) {
   const lines = parseEdgeLines(text);
   if (lines.length === 0) {
-    return { error: "Please provide at least one edge line." };
+    return { error: 'Please provide at least one edge line.' };
   }
   if (!(labelToIndex instanceof Map)) {
-    return { error: "Internal error: labelToIndex map is required." };
+    return { error: 'Internal error: labelToIndex map is required.' };
   }
 
   const edges = [];
@@ -125,7 +123,7 @@ export function parseWeightedEdgesInput(
     if (requirePositiveInteger && weight <= 0) {
       return { error: positiveWeightMessage(lineNumber) };
     }
-    if (!allowNegativeWeightInUndirected && mode === "undirected" && weight < 0) {
+    if (!allowNegativeWeightInUndirected && mode === 'undirected' && weight < 0) {
       return { error: undirectedNegativeWeightMessage };
     }
 
@@ -157,8 +155,7 @@ export function parseDirectedEdgesInput(
   {
     labelToIndex,
     lineFormatMessage = (lineNumber) => `Edge line ${lineNumber} is invalid. Use: FROM TO`,
-    unknownNodeMessage = (lineNumber, label) =>
-      `Edge line ${lineNumber}: unknown node '${label}'.`,
+    unknownNodeMessage = (lineNumber, label) => `Edge line ${lineNumber}: unknown node '${label}'.`,
     duplicateEdgeMessage = (lineNumber, fromLabel, toLabel) =>
       `Edge line ${lineNumber}: duplicate edge '${fromLabel} ${toLabel}'.`,
     selfLoopMessage = (lineNumber) => `Edge line ${lineNumber}: self-loop is not allowed.`,
@@ -167,10 +164,10 @@ export function parseDirectedEdgesInput(
 ) {
   const lines = parseEdgeLines(text);
   if (lines.length === 0) {
-    return { error: "Please provide at least one edge line." };
+    return { error: 'Please provide at least one edge line.' };
   }
   if (!(labelToIndex instanceof Map)) {
-    return { error: "Internal error: labelToIndex map is required." };
+    return { error: 'Internal error: labelToIndex map is required.' };
   }
 
   const edges = [];

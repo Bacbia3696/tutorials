@@ -1,8 +1,12 @@
-import { html } from "../shared/lit.js";
-import { defineTutorialApp } from "../shared/tutorial-app.js";
+import { html } from '../shared/lit.js';
+import { renderRunnerControls } from '../shared/components/runner-controls.js';
+import { renderTraceLogPanel } from '../shared/components/trace-log-panel.js';
+import { renderStatusPanel } from '../shared/components/status-panel.js';
+import { renderCodeLensPanel } from '../shared/components/code-lens-panel.js';
+import { defineTutorialApp } from '../shared/tutorial-app.js';
 
 defineTutorialApp(import.meta.url, {
-  tutorialId: "sparse_segment_tree",
+  tutorialId: 'sparse_segment_tree',
   renderTemplate: () => html`
     <div class="bg-orb orb-a"></div>
     <div class="bg-orb orb-b"></div>
@@ -75,29 +79,17 @@ defineTutorialApp(import.meta.url, {
             </div>
           </div>
 
-          <aside class="controls-runner">
-            <h3>Playback Controls</h3>
-
-            <div class="runner-grid">
-              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-              <button id="stepBtn" class="btn">Step</button>
-              <button id="instantBtn" class="btn">Apply Instantly</button>
-              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-            </div>
-
-            <div class="runner-speed">
-              <label for="speedRange">Animation Speed</label>
-              <input id="speedRange" type="range" min="120" max="1400" step="20" value="520" />
-              <span id="speedLabel">520 ms</span>
-            </div>
-
-            <p class="key-hint">
+          ${renderRunnerControls({
+            speedMs: 520,
+            speedLabel: 'Animation Speed',
+            speedMax: 1400,
+            keyHint: html`
               Shortcuts: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant,
               <kbd>F</kbd> finish, <kbd>B</kbd> reset tree,
               <kbd>L</kbd> load initial, <kbd>R</kbd> random seed,
               <kbd>U</kbd> update mode, <kbd>Q</kbd> query mode.
-            </p>
-          </aside>
+            `,
+          })}
         </div>
       </section>
 
@@ -116,22 +108,22 @@ defineTutorialApp(import.meta.url, {
         <div id="treeContainer" class="tree-container"></div>
       </section>
 
-      <section class="status panel">
-        <div>
-          <h2>Status</h2>
-          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready. Load initial values (or reset empty), then run operations.</p>
-        </div>
-        <div class="status-metrics">
+      ${renderStatusPanel({
+        sectionClass: 'status panel',
+        metricsClass: 'status-metrics',
+        statusText: 'Ready. Load initial values (or reset empty), then run operations.',
+        metricsContent: html`
           <p><span class="metric-label">Current Sum (root):</span> <span id="rootSum">-</span></p>
           <p><span class="metric-label">Materialized Nodes:</span> <span id="nodeCount">0</span></p>
           <p><span class="metric-label">Last Query Result:</span> <span id="queryResult">-</span></p>
           <p><span class="metric-label">Step:</span> <span id="stepCounter">0 / 0</span></p>
-        </div>
-      </section>
+        `,
+      })}
 
-      <section class="code panel">
-        <h2>Algorithm Lens</h2>
-        <div class="code-grid">
+      ${renderCodeLensPanel({
+        sectionClass: 'code panel',
+        title: 'Algorithm Lens',
+        content: html`
           <div class="code-panel" data-op="update">
             <h3>Range Add Update</h3>
             <ol>
@@ -155,16 +147,12 @@ defineTutorialApp(import.meta.url, {
               <li data-line="6">If partial overlap: recurse and return combined child sums</li>
             </ol>
           </div>
-        </div>
-      </section>
+        `,
+      })}
 
-      <section class="log panel">
-        <div class="row between">
-          <h2>Trace Log</h2>
-          <button id="clearLogBtn" class="btn btn-muted">Clear Log</button>
-        </div>
-        <div id="logOutput" class="log-output" role="log" aria-live="polite" aria-relevant="additions"></div>
-      </section>
+      ${renderTraceLogPanel({
+        sectionClass: 'log panel',
+      })}
     </main>
   `,
 });

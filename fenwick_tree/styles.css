@@ -15,8 +15,7 @@ fenwick-tree-tutorial-app {
   --font-sans: "Outfit", "Trebuchet MS", sans-serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 14% 18%, #ffe3c0 0%, transparent 38%),
+  --page-bg: radial-gradient(circle at 14% 18%, #ffe3c0 0%, transparent 38%),
     radial-gradient(circle at 84% 86%, #b7e0cf 0%, transparent 40%),
     linear-gradient(160deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1160px;
@@ -177,10 +176,8 @@ fenwick-tree-tutorial-app {
   border-radius: 12px;
   padding: 10px 10px 8px;
   margin-bottom: 10px;
-  background:
-    radial-gradient(circle at 14% 14%, rgba(255, 222, 170, 0.22) 0%, transparent 36%),
-    radial-gradient(circle at 86% 88%, rgba(160, 217, 195, 0.2) 0%, transparent 40%),
-    #fbfdfc;
+  background: radial-gradient(circle at 14% 14%, rgba(255, 222, 170, 0.22) 0%, transparent 36%),
+    radial-gradient(circle at 86% 88%, rgba(160, 217, 195, 0.2) 0%, transparent 40%), #fbfdfc;
   display: grid;
   gap: 6px;
   max-height: 320px;
@@ -271,10 +268,8 @@ fenwick-tree-tutorial-app {
   border-radius: 12px;
   padding: 8px 10px;
   margin-bottom: 10px;
-  background:
-    radial-gradient(circle at 16% 18%, rgba(255, 222, 170, 0.16) 0%, transparent 36%),
-    radial-gradient(circle at 82% 82%, rgba(160, 217, 195, 0.16) 0%, transparent 40%),
-    #fcfefd;
+  background: radial-gradient(circle at 16% 18%, rgba(255, 222, 170, 0.16) 0%, transparent 36%),
+    radial-gradient(circle at 82% 82%, rgba(160, 217, 195, 0.16) 0%, transparent 40%), #fcfefd;
 }
 
 .jump-canvas {
@@ -515,7 +510,6 @@ fenwick-tree-tutorial-app {
     grid-template-columns: 42px 52px minmax(180px, 1fr) 62px;
     gap: 6px;
   }
-
 }
 
 @media (max-width: 640px) {

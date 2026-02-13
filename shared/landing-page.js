@@ -1,12 +1,12 @@
-import { tutorialGroups, tutorialList } from "./tutorial-registry.js";
+import { tutorialGroups, tutorialList } from './tutorial-registry.js';
 
 const categoryBadgeLabel = Object.freeze({
-  ds: "Data Structure",
-  graph: "Graph Algorithm",
+  ds: 'Data Structure',
+  graph: 'Graph Algorithm',
 });
 
 function updateHeroBadge() {
-  const heroBadge = document.querySelector(".hero-badge");
+  const heroBadge = document.querySelector('.hero-badge');
   if (!heroBadge) {
     return;
   }
@@ -14,35 +14,35 @@ function updateHeroBadge() {
 }
 
 function createTagElement(tagText) {
-  const tag = document.createElement("span");
+  const tag = document.createElement('span');
   tag.textContent = tagText;
   return tag;
 }
 
 function createCardElement(tutorial) {
-  const card = document.createElement("a");
-  card.className = "card";
+  const card = document.createElement('a');
+  card.className = 'card';
   card.href = tutorial.route;
   card.dataset.category = tutorial.category;
-  card.setAttribute("aria-label", `Open ${tutorial.landingTitle}`);
+  card.setAttribute('aria-label', `Open ${tutorial.landingTitle}`);
 
-  const badge = document.createElement("span");
-  badge.className = "card-badge";
-  badge.textContent = categoryBadgeLabel[tutorial.category] ?? "Tutorial";
+  const badge = document.createElement('span');
+  badge.className = 'card-badge';
+  badge.textContent = categoryBadgeLabel[tutorial.category] ?? 'Tutorial';
 
-  const arrow = document.createElement("span");
-  arrow.className = "card-arrow";
-  arrow.textContent = "↗";
+  const arrow = document.createElement('span');
+  arrow.className = 'card-arrow';
+  arrow.textContent = '↗';
 
-  const title = document.createElement("h3");
+  const title = document.createElement('h3');
   title.textContent = tutorial.landingTitle ?? tutorial.title;
 
-  const description = document.createElement("p");
-  description.className = "desc";
+  const description = document.createElement('p');
+  description.className = 'desc';
   description.textContent = tutorial.landingDescription ?? tutorial.description;
 
-  const tags = document.createElement("div");
-  tags.className = "card-tags";
+  const tags = document.createElement('div');
+  tags.className = 'card-tags';
   for (const tagText of tutorial.landingTags ?? []) {
     tags.appendChild(createTagElement(tagText));
   }
@@ -70,12 +70,12 @@ function renderCategoryGrid(gridSelector, tutorials) {
 
 function renderLandingPage() {
   updateHeroBadge();
-  renderCategoryGrid("#dsGrid", tutorialGroups.ds);
-  renderCategoryGrid("#graphGrid", tutorialGroups.graph);
+  renderCategoryGrid('#dsGrid', tutorialGroups.ds);
+  renderCategoryGrid('#graphGrid', tutorialGroups.graph);
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", renderLandingPage, { once: true });
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', renderLandingPage, { once: true });
 } else {
   renderLandingPage();
 }

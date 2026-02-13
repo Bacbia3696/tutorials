@@ -1,4 +1,4 @@
-import { getTutorialConfig } from "./tutorial-registry.js";
+import { getTutorialConfig } from './tutorial-registry.js';
 
 function ensureCacheBustToken() {
   if (window.__tutorialCacheBust) {
@@ -11,7 +11,7 @@ function ensureCacheBustToken() {
 
 function toVersionedUrl(path) {
   const url = new URL(path, window.location.href);
-  url.searchParams.set("v", ensureCacheBustToken());
+  url.searchParams.set('v', ensureCacheBustToken());
   return url.href;
 }
 
@@ -21,11 +21,11 @@ function ensurePreconnectLink(href, withCrossOrigin = false) {
     return link;
   }
 
-  link = document.createElement("link");
-  link.rel = "preconnect";
+  link = document.createElement('link');
+  link.rel = 'preconnect';
   link.href = href;
   if (withCrossOrigin) {
-    link.crossOrigin = "anonymous";
+    link.crossOrigin = 'anonymous';
   }
   document.head.appendChild(link);
   return link;
@@ -34,8 +34,8 @@ function ensurePreconnectLink(href, withCrossOrigin = false) {
 function ensureStylesheet(href, key, shouldCacheBust = true) {
   let link = document.querySelector(`link[rel="stylesheet"][data-tutorial-asset="${key}"]`);
   if (!link) {
-    link = document.createElement("link");
-    link.rel = "stylesheet";
+    link = document.createElement('link');
+    link.rel = 'stylesheet';
     link.dataset.tutorialAsset = key;
     document.head.appendChild(link);
   }
@@ -46,11 +46,11 @@ function ensureStylesheet(href, key, shouldCacheBust = true) {
 function ensureMetaDescription(content) {
   let meta = document.querySelector('meta[name="description"]');
   if (!meta) {
-    meta = document.createElement("meta");
-    meta.name = "description";
+    meta = document.createElement('meta');
+    meta.name = 'description';
     document.head.appendChild(meta);
   }
-  meta.setAttribute("content", content);
+  meta.setAttribute('content', content);
 }
 
 function ensureHostElement(tagName) {
@@ -64,18 +64,18 @@ function ensureHostElement(tagName) {
 }
 
 function loadTutorialEntry(moduleEntryPath) {
-  const script = document.createElement("script");
-  script.type = "module";
+  const script = document.createElement('script');
+  script.type = 'module';
   script.src = toVersionedUrl(moduleEntryPath);
   document.body.appendChild(script);
 }
 
 function renderBootstrapError(message) {
   console.error(`[tutorial-page] ${message}`);
-  const notice = document.createElement("div");
+  const notice = document.createElement('div');
   notice.style.cssText =
-    "padding:24px;margin:20px auto;max-width:640px;border-radius:12px;" +
-    "background:#fff3f3;border:1px solid #e8a0a0;color:#7a2020;font-family:system-ui,sans-serif;";
+    'padding:24px;margin:20px auto;max-width:640px;border-radius:12px;' +
+    'background:#fff3f3;border:1px solid #e8a0a0;color:#7a2020;font-family:system-ui,sans-serif;';
   notice.textContent = message;
   document.body.appendChild(notice);
 }
@@ -83,28 +83,28 @@ function renderBootstrapError(message) {
 function bootstrapTutorialPage(tutorialId) {
   const config = getTutorialConfig(tutorialId);
   if (!config) {
-    renderBootstrapError(`Unknown tutorial id: "${tutorialId ?? ""}".`);
+    renderBootstrapError(`Unknown tutorial id: "${tutorialId ?? ''}".`);
     return;
   }
 
   document.title = config.title;
   ensureMetaDescription(config.description);
 
-  ensurePreconnectLink("https://fonts.googleapis.com");
-  ensurePreconnectLink("https://fonts.gstatic.com", true);
+  ensurePreconnectLink('https://fonts.googleapis.com');
+  ensurePreconnectLink('https://fonts.gstatic.com', true);
 
   if (config.fontHref) {
-    ensureStylesheet(config.fontHref, "font", false);
+    ensureStylesheet(config.fontHref, 'font', false);
   }
-  ensureStylesheet("../shared/tutorial-base.css", "tutorial-base");
-  ensureStylesheet("./styles.css", "tutorial-local");
+  ensureStylesheet('../shared/tutorial-base.css', 'tutorial-base');
+  ensureStylesheet('./styles.css', 'tutorial-local');
 
   ensureHostElement(config.tagName);
-  loadTutorialEntry(config.moduleEntryPath ?? "./app.js");
+  loadTutorialEntry(config.moduleEntryPath ?? './app.js');
 }
 
 function getTutorialIdFromScriptTag() {
-  const tutorialScripts = [...document.querySelectorAll("script[data-tutorial]")];
+  const tutorialScripts = [...document.querySelectorAll('script[data-tutorial]')];
   if (!tutorialScripts.length) {
     return null;
   }
@@ -128,8 +128,8 @@ function start() {
   bootstrapTutorialPage(getTutorialIdFromScriptTag());
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", start, { once: true });
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', start, { once: true });
 } else {
   start();
 }

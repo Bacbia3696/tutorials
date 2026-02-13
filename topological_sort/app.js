@@ -1,8 +1,12 @@
-import { html } from "../shared/lit.js";
-import { defineTutorialApp } from "../shared/tutorial-app.js";
+import { html } from '../shared/lit.js';
+import { renderRunnerControls } from '../shared/components/runner-controls.js';
+import { renderTraceLogPanel } from '../shared/components/trace-log-panel.js';
+import { renderStatusPanel } from '../shared/components/status-panel.js';
+import { renderCodeLensPanel } from '../shared/components/code-lens-panel.js';
+import { defineTutorialApp } from '../shared/tutorial-app.js';
 
 defineTutorialApp(import.meta.url, {
-  tutorialId: "topological_sort",
+  tutorialId: 'topological_sort',
   renderTemplate: () => html`
     <div class="bg-net net-a"></div>
     <div class="bg-net net-b"></div>
@@ -47,27 +51,13 @@ G H</textarea>
             </div>
           </div>
 
-          <aside class="controls-runner">
-            <h3>Playback Controls</h3>
-
-            <div class="runner-grid">
-              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-              <button id="stepBtn" class="btn">Step</button>
-              <button id="instantBtn" class="btn">Apply Instantly</button>
-              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-            </div>
-
-            <div class="runner-speed">
-              <label for="speedRange">Speed</label>
-              <input id="speedRange" type="range" min="120" max="1200" step="20" value="400" />
-              <span id="speedLabel">400 ms</span>
-            </div>
-
-            <p class="key-hint">
+          ${renderRunnerControls({
+            speedMs: 400,
+            keyHint: html`
               Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd>
               finish, <kbd>L</kbd> load, <kbd>M</kbd> sample, <kbd>R</kbd> random.
-            </p>
-          </aside>
+            `,
+          })}
         </div>
       </section>
 
@@ -112,22 +102,17 @@ G H</textarea>
         </div>
       </section>
 
-      <section class="panel status">
-        <div>
-          <h2>Status</h2>
-          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready.</p>
-        </div>
-        <div class="metrics">
+      ${renderStatusPanel({
+        metricsContent: html`
           <p><span class="metric-label">Processed Nodes:</span> <span id="processedMetric">0 / 0</span></p>
           <p><span class="metric-label">Order Length:</span> <span id="orderMetric">0</span></p>
           <p><span class="metric-label">Cycle Detected:</span> <span id="cycleMetric">No</span></p>
           <p><span class="metric-label">Step:</span> <span id="stepCounter">0 / 0</span></p>
-        </div>
-      </section>
+        `,
+      })}
 
-      <section class="panel code-view">
-        <h2>Pseudocode Lens</h2>
-        <div class="code-grid">
+      ${renderCodeLensPanel({
+        content: html`
           <div class="code-panel" data-op="topo">
             <h3>Kahn's Algorithm</h3>
             <ol>
@@ -142,8 +127,8 @@ G H</textarea>
               <li data-line="9">otherwise order is valid</li>
             </ol>
           </div>
-        </div>
-      </section>
+        `,
+      })}
 
       <section class="panel concept">
         <h2>Core Idea</h2>
@@ -163,13 +148,7 @@ G H</textarea>
         </div>
       </section>
 
-      <section class="panel log-view">
-        <div class="row between">
-          <h2>Trace Log</h2>
-          <button id="clearLogBtn" class="btn btn-muted">Clear Log</button>
-        </div>
-        <div id="logOutput" class="log-output" role="log" aria-live="polite" aria-relevant="additions"></div>
-      </section>
+      ${renderTraceLogPanel()}
     </main>
   `,
 });

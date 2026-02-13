@@ -1,24 +1,21 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
 import {
   createLabelToIndex,
   edgeKeyForMode,
   parseNodeLabelsInput,
   parseWeightedEdgesInput,
-} from "../shared/graph-input.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import {
-  computeCircularNodePositions,
-  createSvgElement,
-} from "../shared/graph-core.js";
+} from '../shared/graph-input.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { computeCircularNodePositions, createSvgElement } from '../shared/graph-core.js';
 import {
   prepareGraphCanvas,
   renderGraphEdges,
   renderGraphNodes,
-} from "../shared/graph-renderer.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+} from '../shared/graph-renderer.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 const SAMPLE_GRAPH = {
-  nodes: ["A", "B", "C", "D", "E", "F", "G"],
+  nodes: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
   edgesText: `A B 7
 A D 5
 B C 8
@@ -84,20 +81,20 @@ function computeComponentsFromSnapshot(snapshot) {
 
 function edgeStatusForSnapshot(snapshot, edgeId) {
   if (!snapshot) {
-    return "pending";
+    return 'pending';
   }
 
   const selected = new Set(snapshot.selectedEdgeIds);
   if (selected.has(edgeId)) {
-    return "selected";
+    return 'selected';
   }
 
   const rejected = new Set(snapshot.rejectedEdgeIds);
   if (rejected.has(edgeId)) {
-    return "rejected";
+    return 'rejected';
   }
 
-  return "pending";
+  return 'pending';
 }
 
 class KruskalTracer {
@@ -141,7 +138,7 @@ class KruskalTracer {
   #emit(events, message, line, state, extras = {}) {
     const snapshot = this.#snapshot(state, extras);
     events.push({
-      opType: "kruskal",
+      opType: 'kruskal',
       message,
       line,
       snapshot,
@@ -153,13 +150,10 @@ class KruskalTracer {
     const path = [];
     let cursor = nodeIndex;
 
-    this.#emit(
-      events,
-      `Find root of ${labels[nodeIndex]}.`,
-      4,
-      state,
-      { activeEdgeId: edgeId, activeNodes: [nodeIndex] },
-    );
+    this.#emit(events, `Find root of ${labels[nodeIndex]}.`, 4, state, {
+      activeEdgeId: edgeId,
+      activeNodes: [nodeIndex],
+    });
 
     while (state.parent[cursor] !== cursor) {
       path.push(cursor);
@@ -168,20 +162,17 @@ class KruskalTracer {
 
     const root = cursor;
     if (path.length === 0) {
-      this.#emit(
-        events,
-        `${labels[nodeIndex]} is already a root (${labels[root]}).`,
-        4,
-        state,
-        { activeEdgeId: edgeId, activeNodes: [nodeIndex, root] },
-      );
+      this.#emit(events, `${labels[nodeIndex]} is already a root (${labels[root]}).`, 4, state, {
+        activeEdgeId: edgeId,
+        activeNodes: [nodeIndex, root],
+      });
       return root;
     }
 
     const chainLabels = [...path, root].map((index) => labels[index]);
     this.#emit(
       events,
-      `Root chain for ${labels[nodeIndex]}: ${chainLabels.join(" -> ")}.`,
+      `Root chain for ${labels[nodeIndex]}: ${chainLabels.join(' -> ')}.`,
       4,
       state,
       { activeEdgeId: edgeId, activeNodes: [nodeIndex, root] },
@@ -252,15 +243,10 @@ class KruskalTracer {
 
     const orderText = this.graph.sortedEdges
       .map((edge) => `${labels[edge.from]}-${labels[edge.to]}(${edge.weight})`)
-      .join(", ");
+      .join(', ');
 
     this.#emit(events, `Sort edges by weight: ${orderText}.`, 1, state);
-    this.#emit(
-      events,
-      `Initialize DSU with ${size} singleton components and empty MST.`,
-      2,
-      state,
-    );
+    this.#emit(events, `Initialize DSU with ${size} singleton components and empty MST.`, 2, state);
 
     for (const edge of this.graph.sortedEdges) {
       const fromLabel = labels[edge.from];
@@ -270,12 +256,7 @@ class KruskalTracer {
       state.activeNodes = [edge.from, edge.to];
       state.checkedCount += 1;
 
-      this.#emit(
-        events,
-        `Inspect edge ${fromLabel}-${toLabel} (w=${edge.weight}).`,
-        3,
-        state,
-      );
+      this.#emit(events, `Inspect edge ${fromLabel}-${toLabel} (w=${edge.weight}).`, 3, state);
 
       const rootFrom = this.#findRootWithTrace(edge.from, state, events, edge.id, labels);
       const rootTo = this.#findRootWithTrace(edge.to, state, events, edge.id, labels);
@@ -298,7 +279,7 @@ class KruskalTracer {
 
       const rankNote = union.rankIncreased
         ? `rank[${labels[union.parentRoot]}] increased to ${state.rank[union.parentRoot]}`
-        : "rank unchanged";
+        : 'rank unchanged';
       const attachNote = union.swapped
         ? `(swap roots by rank) attach ${labels[union.childRoot]} under ${labels[union.parentRoot]}`
         : `attach ${labels[union.childRoot]} under ${labels[union.parentRoot]}`;
@@ -311,12 +292,7 @@ class KruskalTracer {
       );
 
       if (state.acceptedCount === state.targetEdgeCount) {
-        this.#emit(
-          events,
-          `MST has ${state.targetEdgeCount} edges. Stop early.`,
-          7,
-          state,
-        );
+        this.#emit(events, `MST has ${state.targetEdgeCount} edges. Stop early.`, 7, state);
         break;
       }
     }
@@ -325,7 +301,7 @@ class KruskalTracer {
     state.activeNodes = [];
 
     const connected = size <= 1 || state.acceptedCount === state.targetEdgeCount;
-    const edgeWord = state.acceptedCount === 1 ? "edge" : "edges";
+    const edgeWord = state.acceptedCount === 1 ? 'edge' : 'edges';
     const summary = connected
       ? `Kruskal complete. MST uses ${state.acceptedCount} ${edgeWord} with total weight ${state.totalWeight}.`
       : `Graph is disconnected. Built a minimum spanning forest with ${state.acceptedCount} ${edgeWord}, weight ${state.totalWeight}, components ${state.componentCount}.`;
@@ -345,32 +321,32 @@ class KruskalTracer {
 }
 
 const elements = {
-  nodesInput: document.getElementById("nodesInput"),
-  edgesInput: document.getElementById("edgesInput"),
-  loadGraphBtn: document.getElementById("loadGraphBtn"),
-  sampleGraphBtn: document.getElementById("sampleGraphBtn"),
-  randomGraphBtn: document.getElementById("randomGraphBtn"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  selectedMetric: document.getElementById("selectedMetric"),
-  weightMetric: document.getElementById("weightMetric"),
-  componentMetric: document.getElementById("componentMetric"),
-  resultMetric: document.getElementById("resultMetric"),
-  stepCounter: document.getElementById("stepCounter"),
-  graphViewPanel: document.getElementById("graphViewPanel"),
-  graphCanvas: document.getElementById("graphCanvas"),
-  edgeOrderStrip: document.getElementById("edgeOrderStrip"),
-  nodeCards: document.getElementById("nodeCards"),
-  dsuTableContainer: document.getElementById("dsuTableContainer"),
-  componentList: document.getElementById("componentList"),
-  edgeRows: document.getElementById("edgeRows"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  nodesInput: document.getElementById('nodesInput'),
+  edgesInput: document.getElementById('edgesInput'),
+  loadGraphBtn: document.getElementById('loadGraphBtn'),
+  sampleGraphBtn: document.getElementById('sampleGraphBtn'),
+  randomGraphBtn: document.getElementById('randomGraphBtn'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  selectedMetric: document.getElementById('selectedMetric'),
+  weightMetric: document.getElementById('weightMetric'),
+  componentMetric: document.getElementById('componentMetric'),
+  resultMetric: document.getElementById('resultMetric'),
+  stepCounter: document.getElementById('stepCounter'),
+  graphViewPanel: document.getElementById('graphViewPanel'),
+  graphCanvas: document.getElementById('graphCanvas'),
+  edgeOrderStrip: document.getElementById('edgeOrderStrip'),
+  nodeCards: document.getElementById('nodeCards'),
+  dsuTableContainer: document.getElementById('dsuTableContainer'),
+  componentList: document.getElementById('componentList'),
+  edgeRows: document.getElementById('edgeRows'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -387,7 +363,7 @@ const helpers = createRuntimeHelpers({
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
-  elements.graphViewPanel.classList.toggle("playing", enabled);
+  elements.graphViewPanel.classList.toggle('playing', enabled);
 }
 
 function cloneSnapshot(snapshot) {
@@ -411,7 +387,7 @@ function cloneSnapshot(snapshot) {
 }
 
 function renderGraphCanvas(snapshot, activeEdgeId = null) {
-  elements.graphCanvas.classList.toggle("has-active-edge", activeEdgeId !== null);
+  elements.graphCanvas.classList.toggle('has-active-edge', activeEdgeId !== null);
 
   const prepared = prepareGraphCanvas({
     svgElement: elements.graphCanvas,
@@ -444,9 +420,9 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     edgeLabelTextFn: (edge) => String(edge.weight),
     edgeLabelWidthFn: (text) => 10 + text.length * 7,
     edgeLabelBgClassFn: (_edge, isActive) =>
-      isActive ? ["graph-edge-label-bg", "active"] : "graph-edge-label-bg",
+      isActive ? ['graph-edge-label-bg', 'active'] : 'graph-edge-label-bg',
     edgeLabelClassFn: (_edge, isActive) =>
-      isActive ? ["graph-edge-label", "active"] : "graph-edge-label",
+      isActive ? ['graph-edge-label', 'active'] : 'graph-edge-label',
   });
 
   const activeSet = new Set(snapshot?.activeNodes ?? []);
@@ -456,13 +432,13 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
     nodeCount: state.graph.nodes.length,
     positions,
     nodeClassFn: (index) => [
-      snapshot?.parent[index] === index ? "root" : "",
-      activeSet.has(index) ? "active" : "",
+      snapshot?.parent[index] === index ? 'root' : '',
+      activeSet.has(index) ? 'active' : '',
     ],
     renderNodeContent: ({ group, index, position }) => {
       if (activeSet.has(index)) {
-        const halo = createSvgElement("circle", {
-          class: "graph-active-halo",
+        const halo = createSvgElement('circle', {
+          class: 'graph-active-halo',
           cx: position.x,
           cy: position.y,
           r: nodeRadius + 8,
@@ -470,22 +446,22 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
         group.appendChild(halo);
       }
 
-      const circle = createSvgElement("circle", {
+      const circle = createSvgElement('circle', {
         cx: position.x,
         cy: position.y,
         r: nodeRadius,
       });
       group.appendChild(circle);
 
-      const label = createSvgElement("text", {
+      const label = createSvgElement('text', {
         x: position.x,
         y: position.y,
       });
       label.textContent = state.graph.nodes[index];
       group.appendChild(label);
 
-      const parentLabel = createSvgElement("text", {
-        class: "graph-parent",
+      const parentLabel = createSvgElement('text', {
+        class: 'graph-parent',
         x: position.x,
         y: position.y + 34,
       });
@@ -497,16 +473,16 @@ function renderGraphCanvas(snapshot, activeEdgeId = null) {
 }
 
 function renderEdgeOrder(snapshot) {
-  elements.edgeOrderStrip.innerHTML = "";
+  elements.edgeOrderStrip.innerHTML = '';
 
   if (!state.graph) {
     return;
   }
 
   if (!snapshot) {
-    const empty = document.createElement("span");
-    empty.className = "order-empty";
-    empty.textContent = "Load a graph to see sorted edges.";
+    const empty = document.createElement('span');
+    empty.className = 'order-empty';
+    empty.textContent = 'Load a graph to see sorted edges.';
     elements.edgeOrderStrip.appendChild(empty);
     return;
   }
@@ -516,10 +492,10 @@ function renderEdgeOrder(snapshot) {
     const toLabel = state.graph.nodes[edge.to];
     const status = edgeStatusForSnapshot(snapshot, edge.id);
 
-    const pill = document.createElement("span");
+    const pill = document.createElement('span');
     pill.className = `edge-pill ${status}`;
     if (snapshot.activeEdgeId === edge.id) {
-      pill.classList.add("active");
+      pill.classList.add('active');
     }
     pill.textContent = `${fromLabel}-${toLabel}(${edge.weight})`;
     elements.edgeOrderStrip.appendChild(pill);
@@ -527,7 +503,7 @@ function renderEdgeOrder(snapshot) {
 }
 
 function renderNodes(snapshot) {
-  elements.nodeCards.innerHTML = "";
+  elements.nodeCards.innerHTML = '';
 
   if (!state.graph || !snapshot) {
     return;
@@ -536,14 +512,14 @@ function renderNodes(snapshot) {
   const activeSet = new Set(snapshot.activeNodes);
 
   for (let i = 0; i < state.graph.nodes.length; i += 1) {
-    const card = document.createElement("article");
-    card.className = "node-card";
+    const card = document.createElement('article');
+    card.className = 'node-card';
 
     if (snapshot.parent[i] === i) {
-      card.classList.add("root");
+      card.classList.add('root');
     }
     if (activeSet.has(i)) {
-      card.classList.add("active");
+      card.classList.add('active');
     }
 
     const root = findRootFromParent(snapshot.parent, i);
@@ -551,7 +527,7 @@ function renderNodes(snapshot) {
     card.innerHTML = `
       <div class="node-top">
         <span class="node-label">${state.graph.nodes[i]}</span>
-        <span class="node-status">${snapshot.parent[i] === i ? "root" : "child"}</span>
+        <span class="node-status">${snapshot.parent[i] === i ? 'root' : 'child'}</span>
       </div>
       <div class="node-line">parent: ${state.graph.nodes[snapshot.parent[i]]}</div>
       <div class="node-line">root: ${state.graph.nodes[root]}</div>
@@ -563,35 +539,35 @@ function renderNodes(snapshot) {
 }
 
 function renderDsuTable(snapshot) {
-  elements.dsuTableContainer.innerHTML = "";
+  elements.dsuTableContainer.innerHTML = '';
 
   if (!state.graph || !snapshot) {
     return;
   }
 
-  const table = document.createElement("table");
-  table.className = "dsu-table";
+  const table = document.createElement('table');
+  table.className = 'dsu-table';
 
   const activeSet = new Set(snapshot.activeNodes);
 
-  const labelsRow = document.createElement("tr");
-  labelsRow.innerHTML = `<th>node</th>${state.graph.nodes.map((label) => `<th>${label}</th>`).join("")}`;
+  const labelsRow = document.createElement('tr');
+  labelsRow.innerHTML = `<th>node</th>${state.graph.nodes.map((label) => `<th>${label}</th>`).join('')}`;
 
-  const parentRow = document.createElement("tr");
+  const parentRow = document.createElement('tr');
   parentRow.innerHTML = `<th>parent</th>${snapshot.parent
     .map((parent, index) => {
-      const cls = activeSet.has(index) ? " class=\"highlight\"" : "";
+      const cls = activeSet.has(index) ? ' class="highlight"' : '';
       return `<td${cls}>${state.graph.nodes[parent]}</td>`;
     })
-    .join("")}`;
+    .join('')}`;
 
-  const rankRow = document.createElement("tr");
+  const rankRow = document.createElement('tr');
   rankRow.innerHTML = `<th>rank</th>${snapshot.rank
     .map((rank, index) => {
-      const cls = activeSet.has(index) ? " class=\"highlight\"" : "";
+      const cls = activeSet.has(index) ? ' class="highlight"' : '';
       return `<td${cls}>${rank}</td>`;
     })
-    .join("")}`;
+    .join('')}`;
 
   table.appendChild(labelsRow);
   table.appendChild(parentRow);
@@ -600,7 +576,7 @@ function renderDsuTable(snapshot) {
 }
 
 function renderComponents(snapshot) {
-  elements.componentList.innerHTML = "";
+  elements.componentList.innerHTML = '';
 
   if (!state.graph || !snapshot) {
     return;
@@ -608,17 +584,17 @@ function renderComponents(snapshot) {
 
   const components = computeComponentsFromSnapshot(snapshot);
   for (const component of components) {
-    const chip = document.createElement("div");
-    chip.className = "component-chip";
+    const chip = document.createElement('div');
+    chip.className = 'component-chip';
     const rootLabel = state.graph.nodes[component.root];
-    const members = component.members.map((index) => state.graph.nodes[index]).join(", ");
+    const members = component.members.map((index) => state.graph.nodes[index]).join(', ');
     chip.innerHTML = `<span class="component-root">root ${rootLabel}</span> {${members}}`;
     elements.componentList.appendChild(chip);
   }
 }
 
 function renderEdges(snapshot, activeEdgeId = null) {
-  elements.edgeRows.innerHTML = "";
+  elements.edgeRows.innerHTML = '';
 
   if (!state.graph) {
     return;
@@ -626,16 +602,16 @@ function renderEdges(snapshot, activeEdgeId = null) {
 
   for (const edge of state.graph.sortedEdges) {
     const status = edgeStatusForSnapshot(snapshot, edge.id);
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     row.classList.add(`status-${status}`);
 
     if (activeEdgeId !== null && edge.id === activeEdgeId) {
-      row.classList.add("active-edge");
+      row.classList.add('active-edge');
     }
 
     const left = state.graph.nodes[edge.from];
     const right = state.graph.nodes[edge.to];
-    const order = state.graph.edgeOrderById.get(edge.id) ?? "-";
+    const order = state.graph.edgeOrderById.get(edge.id) ?? '-';
 
     row.innerHTML = `
       <td>${order}</td>
@@ -675,13 +651,15 @@ function updateMetrics() {
   const componentCount = state.lastSnapshot ? state.lastSnapshot.componentCount : totalNodes;
 
   elements.selectedMetric.textContent = `${selectedCount} / ${targetEdgeCount}`;
-  elements.weightMetric.textContent = state.lastSnapshot ? String(state.lastSnapshot.totalWeight) : "-";
-  elements.componentMetric.textContent = state.graph ? String(componentCount) : "-";
+  elements.weightMetric.textContent = state.lastSnapshot
+    ? String(state.lastSnapshot.totalWeight)
+    : '-';
+  elements.componentMetric.textContent = state.graph ? String(componentCount) : '-';
 
   if (state.lastConnected === null) {
-    elements.resultMetric.textContent = "-";
+    elements.resultMetric.textContent = '-';
   } else {
-    elements.resultMetric.textContent = state.lastConnected ? "MST complete" : "Forest only";
+    elements.resultMetric.textContent = state.lastConnected ? 'MST complete' : 'Forest only';
   }
 
   const step = operationRunner ? operationRunner.eventIndex : 0;
@@ -703,7 +681,7 @@ function finalizePendingOperation(meta) {
   state.lastConnected = meta.connected;
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.appendLog(meta.summary, meta.success ? 'ok' : '');
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(state.lastSnapshot, null);
@@ -731,7 +709,7 @@ function loadGraphFromInputs() {
   const labelToIndex = createLabelToIndex(nodesParsed.nodes);
   const edgesParsed = parseWeightedEdgesInput(elements.edgesInput.value, {
     labelToIndex,
-    mode: "undirected",
+    mode: 'undirected',
     lineFormatMessage: (lineNumber) =>
       `Edge line ${lineNumber} is invalid. Format must be: FROM TO WEIGHT.`,
     duplicateEdgeMessage: (lineNumber, fromLabel, toLabel) =>
@@ -752,13 +730,13 @@ function loadGraphFromInputs() {
 
   renderSnapshot(state.lastSnapshot, null);
   renderEdges(state.lastSnapshot, null);
-  helpers.focusCodePanel("kruskal");
+  helpers.focusCodePanel('kruskal');
   helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.edges.length} undirected edges.`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
   return true;
 }
 
@@ -777,7 +755,7 @@ function generateRandomGraph() {
       return false;
     }
 
-    const key = edgeKeyForMode("undirected", from, to);
+    const key = edgeKeyForMode('undirected', from, to);
     if (seen.has(key)) {
       return false;
     }
@@ -816,27 +794,27 @@ function generateRandomGraph() {
 }
 
 function loadSampleGraph() {
-  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(", ");
+  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(', ');
   elements.edgesInput.value = SAMPLE_GRAPH.edgesText;
   loadGraphFromInputs();
 }
 
 function loadRandomGraph() {
   const randomGraph = generateRandomGraph();
-  elements.nodesInput.value = randomGraph.nodes.join(", ");
-  elements.edgesInput.value = randomGraph.edgeLines.join("\n");
+  elements.nodesInput.value = randomGraph.nodes.join(', ');
+  elements.edgesInput.value = randomGraph.edgeLines.join('\n');
   loadGraphFromInputs();
 }
 
 function prepareOperation() {
   if (!state.graph || !state.tracer) {
-    helpers.updateStatus("Load a graph first.");
+    helpers.updateStatus('Load a graph first.');
     return null;
   }
 
   const trace = state.tracer.generateRun();
   return {
-    opType: "kruskal",
+    opType: 'kruskal',
     events: trace.events,
     connected: trace.connected,
     acceptedCount: trace.acceptedCount,
@@ -877,17 +855,19 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadGraphBtn.addEventListener("click", loadGraphFromInputs);
-  elements.sampleGraphBtn.addEventListener("click", loadSampleGraph);
-  elements.randomGraphBtn.addEventListener("click", loadRandomGraph);
+  elements.loadGraphBtn.addEventListener('click', loadGraphFromInputs);
+  elements.sampleGraphBtn.addEventListener('click', loadSampleGraph);
+  elements.randomGraphBtn.addEventListener('click', loadRandomGraph);
 
   setupRunnerControls({
     elements,
@@ -907,7 +887,7 @@ function init() {
     },
   });
 
-  helpers.focusCodePanel("kruskal");
+  helpers.focusCodePanel('kruskal');
   loadSampleGraph();
 }
 

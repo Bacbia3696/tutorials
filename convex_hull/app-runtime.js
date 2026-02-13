@@ -1,6 +1,6 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 const SAMPLE_POINTS_TEXT = `-6 -2
 -4 4
@@ -16,7 +16,7 @@ const SAMPLE_POINTS_TEXT = `-6 -2
 -5 1`;
 
 function createSvgElement(tagName, attributes = {}) {
-  const element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tagName);
   for (const [key, value] of Object.entries(attributes)) {
     element.setAttribute(key, String(value));
   }
@@ -27,7 +27,10 @@ function formatNumber(value) {
   if (Number.isInteger(value)) {
     return String(value);
   }
-  return value.toFixed(2).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
+  return value
+    .toFixed(2)
+    .replace(/\.0+$/, '')
+    .replace(/(\.\d*[1-9])0+$/, '$1');
 }
 
 function formatPoint(point) {
@@ -37,7 +40,7 @@ function formatPoint(point) {
 function parsePointsInput(raw, { maxPoints = 40 } = {}) {
   const trimmed = raw.trim();
   if (!trimmed) {
-    return { error: "Points input cannot be empty." };
+    return { error: 'Points input cannot be empty.' };
   }
 
   const lines = trimmed
@@ -54,7 +57,7 @@ function parsePointsInput(raw, { maxPoints = 40 } = {}) {
   let removedDuplicates = 0;
 
   for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i].replaceAll(",", " ");
+    const line = lines[i].replaceAll(',', ' ');
     const parts = line.split(/\s+/).filter(Boolean);
 
     if (parts.length !== 2) {
@@ -88,7 +91,7 @@ function parsePointsInput(raw, { maxPoints = 40 } = {}) {
   }
 
   if (points.length === 0) {
-    return { error: "No unique points found after removing duplicates." };
+    return { error: 'No unique points found after removing duplicates.' };
   }
 
   return {
@@ -140,7 +143,7 @@ class ConvexHullTracer {
       lowerStack: [],
       upperStack: [],
       hullIds: [],
-      phase: "idle",
+      phase: 'idle',
       scanIndex: null,
       candidateId: null,
       checkTriple: null,
@@ -157,17 +160,17 @@ class ConvexHullTracer {
       lowerStack: [...state.lowerStack],
       upperStack: [...state.upperStack],
       hullIds: [...state.hullIds],
-      phase: pick("phase", state.phase),
-      scanIndex: pick("scanIndex", state.scanIndex),
-      candidateId: pick("candidateId", state.candidateId),
-      checkTriple: pick("checkTriple", state.checkTriple),
-      checkCount: pick("checkCount", state.checkCount),
+      phase: pick('phase', state.phase),
+      scanIndex: pick('scanIndex', state.scanIndex),
+      candidateId: pick('candidateId', state.candidateId),
+      checkTriple: pick('checkTriple', state.checkTriple),
+      checkCount: pick('checkCount', state.checkCount),
     };
   }
 
   #emit(events, state, { message, line, phase, scanIndex, candidateId, checkTriple }) {
     events.push({
-      opType: "hull",
+      opType: 'hull',
       line,
       message,
       snapshot: this.#snapshot(state, {
@@ -193,9 +196,9 @@ class ConvexHullTracer {
 
   #hullSummary(hullIds) {
     if (hullIds.length === 0) {
-      return "No hull vertices available.";
+      return 'No hull vertices available.';
     }
-    return hullIds.map((id) => this.#pointLabel(id)).join(" -> ");
+    return hullIds.map((id) => this.#pointLabel(id)).join(' -> ');
   }
 
   generateRun() {
@@ -204,16 +207,16 @@ class ConvexHullTracer {
 
     this.#emit(events, state, {
       line: 1,
-      phase: "sort",
+      phase: 'sort',
       message: `Sorted points: ${this.#hullSummary(state.sortedIds)}.`,
     });
 
     if (state.sortedIds.length === 1) {
-      state.phase = "done";
+      state.phase = 'done';
       state.hullIds = [state.sortedIds[0]];
       this.#emit(events, state, {
         line: 9,
-        phase: "done",
+        phase: 'done',
         message: `Single-point hull: ${this.#hullSummary(state.hullIds)}.`,
       });
 
@@ -226,14 +229,14 @@ class ConvexHullTracer {
       };
     }
 
-    state.phase = "lower";
+    state.phase = 'lower';
     for (let i = 0; i < state.sortedIds.length; i += 1) {
       const candidateId = state.sortedIds[i];
       const candidate = this.pointById.get(candidateId);
 
       this.#emit(events, state, {
         line: 2,
-        phase: "lower",
+        phase: 'lower',
         scanIndex: i,
         candidateId,
         message: `Lower pass: consider ${formatPoint(candidate)}.`,
@@ -243,7 +246,7 @@ class ConvexHullTracer {
         const aId = state.lowerStack[state.lowerStack.length - 2];
         const bId = state.lowerStack[state.lowerStack.length - 1];
         const cross = this.#cross(aId, bId, candidateId);
-        const turn = cross > 0 ? "left" : cross < 0 ? "right" : "collinear";
+        const turn = cross > 0 ? 'left' : cross < 0 ? 'right' : 'collinear';
 
         state.checkCount += 1;
         state.checkTriple = {
@@ -255,7 +258,7 @@ class ConvexHullTracer {
 
         this.#emit(events, state, {
           line: 3,
-          phase: "lower",
+          phase: 'lower',
           scanIndex: i,
           candidateId,
           checkTriple: state.checkTriple,
@@ -268,7 +271,7 @@ class ConvexHullTracer {
           const removedId = state.lowerStack.pop();
           this.#emit(events, state, {
             line: 3,
-            phase: "lower",
+            phase: 'lower',
             scanIndex: i,
             candidateId,
             checkTriple: state.checkTriple,
@@ -284,21 +287,21 @@ class ConvexHullTracer {
       state.lowerStack.push(candidateId);
       this.#emit(events, state, {
         line: 4,
-        phase: "lower",
+        phase: 'lower',
         scanIndex: i,
         candidateId,
         message: `Push ${formatPoint(candidate)} onto lower stack.`,
       });
     }
 
-    state.phase = "upper";
+    state.phase = 'upper';
     for (let i = state.sortedIds.length - 1; i >= 0; i -= 1) {
       const candidateId = state.sortedIds[i];
       const candidate = this.pointById.get(candidateId);
 
       this.#emit(events, state, {
         line: 5,
-        phase: "upper",
+        phase: 'upper',
         scanIndex: i,
         candidateId,
         message: `Upper pass: consider ${formatPoint(candidate)}.`,
@@ -308,7 +311,7 @@ class ConvexHullTracer {
         const aId = state.upperStack[state.upperStack.length - 2];
         const bId = state.upperStack[state.upperStack.length - 1];
         const cross = this.#cross(aId, bId, candidateId);
-        const turn = cross > 0 ? "left" : cross < 0 ? "right" : "collinear";
+        const turn = cross > 0 ? 'left' : cross < 0 ? 'right' : 'collinear';
 
         state.checkCount += 1;
         state.checkTriple = {
@@ -320,7 +323,7 @@ class ConvexHullTracer {
 
         this.#emit(events, state, {
           line: 6,
-          phase: "upper",
+          phase: 'upper',
           scanIndex: i,
           candidateId,
           checkTriple: state.checkTriple,
@@ -333,7 +336,7 @@ class ConvexHullTracer {
           const removedId = state.upperStack.pop();
           this.#emit(events, state, {
             line: 6,
-            phase: "upper",
+            phase: 'upper',
             scanIndex: i,
             candidateId,
             checkTriple: state.checkTriple,
@@ -349,7 +352,7 @@ class ConvexHullTracer {
       state.upperStack.push(candidateId);
       this.#emit(events, state, {
         line: 7,
-        phase: "upper",
+        phase: 'upper',
         scanIndex: i,
         candidateId,
         message: `Push ${formatPoint(candidate)} onto upper stack.`,
@@ -360,7 +363,7 @@ class ConvexHullTracer {
       .slice(0, Math.max(state.lowerStack.length - 1, 0))
       .concat(state.upperStack.slice(0, Math.max(state.upperStack.length - 1, 0)));
 
-    state.phase = "merge";
+    state.phase = 'merge';
     state.scanIndex = null;
     state.candidateId = null;
     state.checkTriple = null;
@@ -368,15 +371,15 @@ class ConvexHullTracer {
 
     this.#emit(events, state, {
       line: 8,
-      phase: "merge",
+      phase: 'merge',
       message: `Merge chains: hull = lower[:-1] + upper[:-1]. Vertices so far: ${state.hullIds.length}.`,
     });
 
-    state.phase = "done";
+    state.phase = 'done';
     const hullMessage = this.#hullSummary(state.hullIds);
     this.#emit(events, state, {
       line: 9,
-      phase: "done",
+      phase: 'done',
       message: `Final hull (CCW): ${hullMessage}.`,
     });
 
@@ -406,34 +409,34 @@ function generateRandomPointsText() {
     points.push({ x, y });
   }
 
-  return points.map((point) => `${point.x} ${point.y}`).join("\n");
+  return points.map((point) => `${point.x} ${point.y}`).join('\n');
 }
 
 const elements = {
-  pointsInput: document.getElementById("pointsInput"),
-  loadPointsBtn: document.getElementById("loadPointsBtn"),
-  samplePointsBtn: document.getElementById("samplePointsBtn"),
-  randomPointsBtn: document.getElementById("randomPointsBtn"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  geometryViewPanel: document.querySelector(".geometry-view"),
-  hullCanvas: document.getElementById("hullCanvas"),
-  sortedStrip: document.getElementById("sortedStrip"),
-  lowerStrip: document.getElementById("lowerStrip"),
-  upperStrip: document.getElementById("upperStrip"),
-  hullStrip: document.getElementById("hullStrip"),
-  pointRows: document.getElementById("pointRows"),
-  statusMessage: document.getElementById("statusMessage"),
-  pointsMetric: document.getElementById("pointsMetric"),
-  hullMetric: document.getElementById("hullMetric"),
-  checksMetric: document.getElementById("checksMetric"),
-  stepCounter: document.getElementById("stepCounter"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  pointsInput: document.getElementById('pointsInput'),
+  loadPointsBtn: document.getElementById('loadPointsBtn'),
+  samplePointsBtn: document.getElementById('samplePointsBtn'),
+  randomPointsBtn: document.getElementById('randomPointsBtn'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  geometryViewPanel: document.querySelector('.geometry-view'),
+  hullCanvas: document.getElementById('hullCanvas'),
+  sortedStrip: document.getElementById('sortedStrip'),
+  lowerStrip: document.getElementById('lowerStrip'),
+  upperStrip: document.getElementById('upperStrip'),
+  hullStrip: document.getElementById('hullStrip'),
+  pointRows: document.getElementById('pointRows'),
+  statusMessage: document.getElementById('statusMessage'),
+  pointsMetric: document.getElementById('pointsMetric'),
+  hullMetric: document.getElementById('hullMetric'),
+  checksMetric: document.getElementById('checksMetric'),
+  stepCounter: document.getElementById('stepCounter'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -454,7 +457,7 @@ const helpers = createRuntimeHelpers({
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
-  elements.geometryViewPanel?.classList.toggle("playing", enabled);
+  elements.geometryViewPanel?.classList.toggle('playing', enabled);
 }
 
 function cloneSnapshot(snapshot) {
@@ -487,19 +490,17 @@ function getPointById(id) {
 }
 
 function renderStrip(container, ids, { emptyText, variant, activeId, checkTriple }) {
-  container.innerHTML = "";
+  container.innerHTML = '';
 
   if (!ids || ids.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "pill empty";
+    const empty = document.createElement('span');
+    empty.className = 'pill empty';
     empty.textContent = emptyText;
     container.appendChild(empty);
     return;
   }
 
-  const checkIds = new Set(
-    checkTriple ? [checkTriple.aId, checkTriple.bId, checkTriple.cId] : [],
-  );
+  const checkIds = new Set(checkTriple ? [checkTriple.aId, checkTriple.bId, checkTriple.cId] : []);
 
   for (const id of ids) {
     const point = getPointById(id);
@@ -507,15 +508,15 @@ function renderStrip(container, ids, { emptyText, variant, activeId, checkTriple
       continue;
     }
 
-    const pill = document.createElement("span");
+    const pill = document.createElement('span');
     pill.className = `pill ${variant}`;
     pill.textContent = `${point.label} (${formatNumber(point.x)}, ${formatNumber(point.y)})`;
 
     if (id === activeId) {
-      pill.classList.add("active");
+      pill.classList.add('active');
     }
     if (checkIds.has(id)) {
-      pill.classList.add("check");
+      pill.classList.add('check');
     }
 
     container.appendChild(pill);
@@ -523,10 +524,10 @@ function renderStrip(container, ids, { emptyText, variant, activeId, checkTriple
 }
 
 function renderPointTable(snapshot) {
-  elements.pointRows.innerHTML = "";
+  elements.pointRows.innerHTML = '';
 
   if (!state.points.length) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     row.innerHTML = `<td colspan="3" class="empty-row">Load points to inspect table state.</td>`;
     elements.pointRows.appendChild(row);
     return;
@@ -537,19 +538,19 @@ function renderPointTable(snapshot) {
   const hullSet = new Set(snapshot?.hullIds ?? state.lastHullIds);
 
   for (const point of state.points) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
 
     if (snapshot?.candidateId === point.id) {
-      row.classList.add("row-current");
+      row.classList.add('row-current');
     }
 
-    let role = "inside";
+    let role = 'inside';
     if (hullSet.has(point.id)) {
-      role = "hull";
+      role = 'hull';
     } else if (lowerSet.has(point.id)) {
-      role = "lower";
+      role = 'lower';
     } else if (upperSet.has(point.id)) {
-      role = "upper";
+      role = 'upper';
     }
 
     row.innerHTML = `
@@ -574,9 +575,9 @@ function drawPolyline(svg, ids, project, className) {
       const projected = project(point);
       return `${projected.x},${projected.y}`;
     })
-    .join(" ");
+    .join(' ');
 
-  const polyline = createSvgElement("polyline", {
+  const polyline = createSvgElement('polyline', {
     points: pointsText,
     class: className,
   });
@@ -595,9 +596,9 @@ function drawPolygon(svg, ids, project, className) {
       const projected = project(point);
       return `${projected.x},${projected.y}`;
     })
-    .join(" ");
+    .join(' ');
 
-  const polygon = createSvgElement("polygon", {
+  const polygon = createSvgElement('polygon', {
     points: pointsText,
     class: className,
   });
@@ -609,14 +610,14 @@ function renderHullCanvas(snapshot) {
   svg.replaceChildren();
 
   if (!state.points.length) {
-    const empty = createSvgElement("text", {
+    const empty = createSvgElement('text', {
       x: 460,
       y: 260,
-      class: "canvas-empty",
-      "text-anchor": "middle",
-      "dominant-baseline": "middle",
+      class: 'canvas-empty',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'middle',
     });
-    empty.textContent = "Load points to visualize convex hull construction.";
+    empty.textContent = 'Load points to visualize convex hull construction.';
     svg.appendChild(empty);
     return;
   }
@@ -626,9 +627,9 @@ function renderHullCanvas(snapshot) {
   const project = computeProjection(state.points, width, height);
 
   const hullIds = snapshot?.hullIds ?? state.lastHullIds;
-  drawPolygon(svg, hullIds, project, "hull-polygon");
-  drawPolyline(svg, snapshot?.lowerStack ?? [], project, "lower-path");
-  drawPolyline(svg, snapshot?.upperStack ?? [], project, "upper-path");
+  drawPolygon(svg, hullIds, project, 'hull-polygon');
+  drawPolyline(svg, snapshot?.lowerStack ?? [], project, 'lower-path');
+  drawPolyline(svg, snapshot?.upperStack ?? [], project, 'upper-path');
 
   if (snapshot?.checkTriple) {
     const a = getPointById(snapshot.checkTriple.aId);
@@ -638,16 +639,16 @@ function renderHullCanvas(snapshot) {
       const pa = project(a);
       const pb = project(b);
       const pc = project(c);
-      const check = createSvgElement("polyline", {
+      const check = createSvgElement('polyline', {
         points: `${pa.x},${pa.y} ${pb.x},${pb.y} ${pc.x},${pc.y}`,
-        class: snapshot.checkTriple.cross > 0 ? "turn-check left" : "turn-check non-left",
+        class: snapshot.checkTriple.cross > 0 ? 'turn-check left' : 'turn-check non-left',
       });
       svg.appendChild(check);
 
-      const crossTag = createSvgElement("text", {
+      const crossTag = createSvgElement('text', {
         x: pb.x + 10,
         y: pb.y - 10,
-        class: "cross-label",
+        class: 'cross-label',
       });
       crossTag.textContent = `cross=${formatNumber(snapshot.checkTriple.cross)}`;
       svg.appendChild(crossTag);
@@ -665,19 +666,19 @@ function renderHullCanvas(snapshot) {
 
   for (const point of state.points) {
     const position = project(point);
-    const classes = ["point-node"];
+    const classes = ['point-node'];
 
     if (hullSet.has(point.id)) {
-      classes.push("hull");
+      classes.push('hull');
     }
     if (lowerSet.has(point.id)) {
-      classes.push("lower");
+      classes.push('lower');
     }
     if (upperSet.has(point.id)) {
-      classes.push("upper");
+      classes.push('upper');
     }
     if (snapshot?.candidateId === point.id) {
-      classes.push("candidate");
+      classes.push('candidate');
     }
 
     if (
@@ -686,35 +687,35 @@ function renderHullCanvas(snapshot) {
         snapshot.checkTriple.bId === point.id ||
         snapshot.checkTriple.cId === point.id)
     ) {
-      classes.push("check");
+      classes.push('check');
     }
 
-    const group = createSvgElement("g", {
-      class: classes.join(" "),
+    const group = createSvgElement('g', {
+      class: classes.join(' '),
     });
 
-    const circle = createSvgElement("circle", {
+    const circle = createSvgElement('circle', {
       cx: position.x,
       cy: position.y,
       r: 9,
     });
     group.appendChild(circle);
 
-    const label = createSvgElement("text", {
+    const label = createSvgElement('text', {
       x: position.x + 12,
       y: position.y - 10,
-      class: "point-label",
+      class: 'point-label',
     });
     label.textContent = point.label;
     group.appendChild(label);
 
     if (rankMap.has(point.id)) {
-      const rank = createSvgElement("text", {
+      const rank = createSvgElement('text', {
         x: position.x,
         y: position.y + 1,
-        class: "point-rank",
-        "text-anchor": "middle",
-        "dominant-baseline": "middle",
+        class: 'point-rank',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
       });
       rank.textContent = String(rankMap.get(point.id));
       group.appendChild(rank);
@@ -728,29 +729,29 @@ function renderSnapshot(snapshot) {
   renderHullCanvas(snapshot);
 
   renderStrip(elements.sortedStrip, snapshot?.sortedIds ?? [], {
-    emptyText: "sorted order unavailable",
-    variant: "sorted",
+    emptyText: 'sorted order unavailable',
+    variant: 'sorted',
     activeId: snapshot?.candidateId ?? null,
     checkTriple: snapshot?.checkTriple ?? null,
   });
 
   renderStrip(elements.lowerStrip, snapshot?.lowerStack ?? [], {
-    emptyText: "lower stack is empty",
-    variant: "lower",
+    emptyText: 'lower stack is empty',
+    variant: 'lower',
     activeId: snapshot?.candidateId ?? null,
     checkTriple: snapshot?.checkTriple ?? null,
   });
 
   renderStrip(elements.upperStrip, snapshot?.upperStack ?? [], {
-    emptyText: "upper stack is empty",
-    variant: "upper",
+    emptyText: 'upper stack is empty',
+    variant: 'upper',
     activeId: snapshot?.candidateId ?? null,
     checkTriple: snapshot?.checkTriple ?? null,
   });
 
   renderStrip(elements.hullStrip, snapshot?.hullIds ?? state.lastHullIds, {
-    emptyText: "hull not merged yet",
-    variant: "hull",
+    emptyText: 'hull not merged yet',
+    variant: 'hull',
     activeId: null,
     checkTriple: null,
   });
@@ -785,7 +786,7 @@ function finalizePendingOperation(meta) {
   state.lastCheckCount = meta.checkCount;
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.appendLog(meta.summary, meta.success ? 'ok' : '');
   helpers.clearCodeHighlights();
 
   renderSnapshot(state.lastSnapshot);
@@ -794,7 +795,7 @@ function finalizePendingOperation(meta) {
 
 function prepareOperation() {
   if (!state.tracer || state.points.length === 0) {
-    const message = "Load points first.";
+    const message = 'Load points first.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
@@ -815,10 +816,10 @@ function loadPoints(points, { message }) {
   state.lastCheckCount = 0;
 
   renderSnapshot(state.lastSnapshot);
-  helpers.focusCodePanel("hull");
+  helpers.focusCodePanel('hull');
   helpers.clearCodeHighlights();
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
   updateMetrics();
 }
 
@@ -837,8 +838,8 @@ function loadPointsFromInput() {
 
   const duplicateNote =
     parsed.removedDuplicates > 0
-      ? ` (${parsed.removedDuplicates} duplicate point${parsed.removedDuplicates === 1 ? "" : "s"} removed)`
-      : "";
+      ? ` (${parsed.removedDuplicates} duplicate point${parsed.removedDuplicates === 1 ? '' : 's'} removed)`
+      : '';
 
   loadPoints(parsed.points, {
     message: `Loaded ${parsed.points.length} unique points${duplicateNote}.`,
@@ -867,13 +868,13 @@ function init() {
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadPointsBtn.addEventListener("click", loadPointsFromInput);
-  elements.samplePointsBtn.addEventListener("click", loadSamplePoints);
-  elements.randomPointsBtn.addEventListener("click", loadRandomPoints);
+  elements.loadPointsBtn.addEventListener('click', loadPointsFromInput);
+  elements.samplePointsBtn.addEventListener('click', loadSamplePoints);
+  elements.randomPointsBtn.addEventListener('click', loadRandomPoints);
 
   setupRunnerControls({
     elements,
@@ -908,7 +909,7 @@ function init() {
     },
   });
 
-  helpers.focusCodePanel("hull");
+  helpers.focusCodePanel('hull');
   loadSamplePoints();
 }
 

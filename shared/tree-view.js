@@ -4,18 +4,18 @@ function safePositiveNumber(value, fallback) {
 
 export function mountAutoFitTree(container, diagram, options = {}) {
   const {
-    shellClass = "tree-shell",
-    viewportClass = "tree-viewport",
+    shellClass = 'tree-shell',
+    viewportClass = 'tree-viewport',
     paddingPx = 24,
     minHeightPx = 300,
     maxHeightPx = 860,
     maxViewportHeightRatio = 0.82,
   } = options;
 
-  const shell = document.createElement("div");
+  const shell = document.createElement('div');
   shell.className = shellClass;
 
-  const viewport = document.createElement("div");
+  const viewport = document.createElement('div');
   viewport.className = viewportClass;
 
   viewport.appendChild(diagram);

@@ -1,6 +1,6 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 class KMPTracer {
   snapshot({
@@ -49,14 +49,14 @@ class KMPTracer {
     return lps;
   }
 
-  generateBuild(pattern, textForSnapshot = "") {
+  generateBuild(pattern, textForSnapshot = '') {
     const events = [];
     const m = pattern.length;
     const lps = new Array(m).fill(0);
 
     const emit = (message, line, extras = {}) => {
       events.push({
-        opType: "build",
+        opType: 'build',
         message,
         line,
         snapshot: this.snapshot({
@@ -72,26 +72,22 @@ class KMPTracer {
     let len = 0;
     let i = 1;
 
-    emit("Initialize: lps[0]=0, len=0, i=1", 1, {
+    emit('Initialize: lps[0]=0, len=0, i=1', 1, {
       buildIndex: i,
       prefixLength: len,
     });
 
     while (i < m) {
       const equal = pattern[i] === pattern[len];
-      emit(
-        `Compare pattern[${i}]='${pattern[i]}' with pattern[${len}]='${pattern[len]}'`,
-        2,
-        {
-          buildIndex: i,
-          prefixLength: len,
-          compare: {
-            patternIndex: i,
-            prefixIndex: len,
-            equal,
-          },
+      emit(`Compare pattern[${i}]='${pattern[i]}' with pattern[${len}]='${pattern[len]}'`, 2, {
+        buildIndex: i,
+        prefixLength: len,
+        compare: {
+          patternIndex: i,
+          prefixIndex: len,
+          equal,
         },
-      );
+      });
 
       if (equal) {
         len += 1;
@@ -145,7 +141,7 @@ class KMPTracer {
       }
     }
 
-    emit(`Build complete: lps = [${lps.join(", ")}]`, 8, {
+    emit(`Build complete: lps = [${lps.join(', ')}]`, 8, {
       done: true,
       result: [...lps],
       buildIndex: null,
@@ -164,7 +160,7 @@ class KMPTracer {
 
     const emit = (message, line, extras = {}) => {
       events.push({
-        opType: "search",
+        opType: 'search',
         message,
         line,
         snapshot: this.snapshot({
@@ -178,33 +174,29 @@ class KMPTracer {
       });
     };
 
-    emit(`Precompute LPS: [${lps.join(", ")}]`, 1, {
+    emit(`Precompute LPS: [${lps.join(', ')}]`, 1, {
       scanTextIndex: 0,
       scanPatternIndex: 0,
     });
 
     let i = 0;
     let j = 0;
-    emit("Initialize pointers: i=0, j=0", 2, {
+    emit('Initialize pointers: i=0, j=0', 2, {
       scanTextIndex: i,
       scanPatternIndex: j,
     });
 
     while (i < n) {
       const equal = text[i] === pattern[j];
-      emit(
-        `Compare text[${i}]='${text[i]}' with pattern[${j}]='${pattern[j]}'`,
-        3,
-        {
-          scanTextIndex: i,
-          scanPatternIndex: j,
-          compare: {
-            textIndex: i,
-            patternIndex: j,
-            equal,
-          },
+      emit(`Compare text[${i}]='${text[i]}' with pattern[${j}]='${pattern[j]}'`, 3, {
+        scanTextIndex: i,
+        scanPatternIndex: j,
+        compare: {
+          textIndex: i,
+          patternIndex: j,
+          equal,
         },
-      );
+      });
 
       if (equal) {
         i += 1;
@@ -258,8 +250,8 @@ class KMPTracer {
 
     emit(
       matches.length > 0
-        ? `Search complete: matches at [${matches.join(", ")}]`
-        : "Search complete: no matches found",
+        ? `Search complete: matches at [${matches.join(', ')}]`
+        : 'Search complete: no matches found',
       8,
       {
         done: true,
@@ -274,35 +266,35 @@ class KMPTracer {
 }
 
 const elements = {
-  textInput: document.getElementById("textInput"),
-  patternInput: document.getElementById("patternInput"),
-  loadBtn: document.getElementById("loadBtn"),
-  sampleBtn: document.getElementById("sampleBtn"),
-  opType: document.getElementById("opType"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  textLength: document.getElementById("textLength"),
-  patternLength: document.getElementById("patternLength"),
-  matchCount: document.getElementById("matchCount"),
-  lastResult: document.getElementById("lastResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  textStrip: document.getElementById("textStrip"),
-  patternStrip: document.getElementById("patternStrip"),
-  lpsStrip: document.getElementById("lpsStrip"),
-  matchesList: document.getElementById("matchesList"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  textInput: document.getElementById('textInput'),
+  patternInput: document.getElementById('patternInput'),
+  loadBtn: document.getElementById('loadBtn'),
+  sampleBtn: document.getElementById('sampleBtn'),
+  opType: document.getElementById('opType'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  textLength: document.getElementById('textLength'),
+  patternLength: document.getElementById('patternLength'),
+  matchCount: document.getElementById('matchCount'),
+  lastResult: document.getElementById('lastResult'),
+  stepCounter: document.getElementById('stepCounter'),
+  textStrip: document.getElementById('textStrip'),
+  patternStrip: document.getElementById('patternStrip'),
+  lpsStrip: document.getElementById('lpsStrip'),
+  matchesList: document.getElementById('matchesList'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
   tracer: new KMPTracer(),
-  text: "",
-  pattern: "",
+  text: '',
+  pattern: '',
   lastLps: [],
   lastMatches: [],
   lastResult: null,
@@ -330,22 +322,22 @@ function parseTextPattern(rawText, rawPattern) {
   const pattern = normalizeSequence(rawPattern);
 
   if (!text) {
-    return { error: "Text cannot be empty." };
+    return { error: 'Text cannot be empty.' };
   }
   if (!pattern) {
-    return { error: "Pattern cannot be empty." };
+    return { error: 'Pattern cannot be empty.' };
   }
   if (!isValidSequence(text)) {
-    return { error: "Text must use letters a-z only." };
+    return { error: 'Text must use letters a-z only.' };
   }
   if (!isValidSequence(pattern)) {
-    return { error: "Pattern must use letters a-z only." };
+    return { error: 'Pattern must use letters a-z only.' };
   }
   if (text.length > 90) {
-    return { error: "Use text length up to 90 for readability." };
+    return { error: 'Use text length up to 90 for readability.' };
   }
   if (pattern.length > 40) {
-    return { error: "Use pattern length up to 40 for readability." };
+    return { error: 'Use pattern length up to 40 for readability.' };
   }
 
   return { text, pattern };
@@ -353,11 +345,11 @@ function parseTextPattern(rawText, rawPattern) {
 
 function sampleCase() {
   const bank = [
-    { text: "ababcabcabababd", pattern: "ababd" },
-    { text: "aaaaaabaaaba", pattern: "aaaba" },
-    { text: "abxabcabcabyabcaby", pattern: "abcaby" },
-    { text: "abcabcabcabc", pattern: "abcabc" },
-    { text: "aabaaac", pattern: "aabaa" },
+    { text: 'ababcabcabababd', pattern: 'ababd' },
+    { text: 'aaaaaabaaaba', pattern: 'aaaba' },
+    { text: 'abxabcabcabyabcaby', pattern: 'abcaby' },
+    { text: 'abcabcabcabc', pattern: 'abcabc' },
+    { text: 'aabaaac', pattern: 'aabaa' },
   ];
   const index = Math.floor(Math.random() * bank.length);
   return bank[index];
@@ -374,31 +366,31 @@ function collectMatchedIndices(matches, patternLength) {
 }
 
 function renderTextStrip(snapshot) {
-  elements.textStrip.innerHTML = "";
+  elements.textStrip.innerHTML = '';
 
   if (!snapshot.text) {
-    const empty = document.createElement("div");
-    empty.className = "cell-empty";
-    empty.textContent = "(no text loaded)";
+    const empty = document.createElement('div');
+    empty.className = 'cell-empty';
+    empty.textContent = '(no text loaded)';
     elements.textStrip.appendChild(empty);
     return;
   }
 
   const matched = collectMatchedIndices(snapshot.matches ?? [], snapshot.pattern.length);
   for (let idx = 0; idx < snapshot.text.length; idx += 1) {
-    const cell = document.createElement("div");
-    cell.className = "char-cell";
+    const cell = document.createElement('div');
+    cell.className = 'char-cell';
 
     if (matched.has(idx)) {
-      cell.classList.add("matched");
+      cell.classList.add('matched');
     }
     if (snapshot.scanTextIndex === idx) {
-      cell.classList.add("active");
+      cell.classList.add('active');
     }
 
     const compare = snapshot.compare;
     if (compare && compare.textIndex === idx) {
-      cell.classList.add(compare.equal ? "compare-ok" : "compare-bad");
+      cell.classList.add(compare.equal ? 'compare-ok' : 'compare-bad');
     }
 
     cell.innerHTML = `<span class="cell-index">${idx}</span><span class="cell-char">${snapshot.text[idx]}</span>`;
@@ -407,40 +399,40 @@ function renderTextStrip(snapshot) {
 }
 
 function renderPatternStrip(snapshot) {
-  elements.patternStrip.innerHTML = "";
+  elements.patternStrip.innerHTML = '';
 
   if (!snapshot.pattern) {
-    const empty = document.createElement("div");
-    empty.className = "cell-empty";
-    empty.textContent = "(no pattern loaded)";
+    const empty = document.createElement('div');
+    empty.className = 'cell-empty';
+    empty.textContent = '(no pattern loaded)';
     elements.patternStrip.appendChild(empty);
     return;
   }
 
   for (let idx = 0; idx < snapshot.pattern.length; idx += 1) {
-    const cell = document.createElement("div");
-    cell.className = "char-cell";
+    const cell = document.createElement('div');
+    cell.className = 'char-cell';
 
     if (snapshot.scanPatternIndex === idx || snapshot.buildIndex === idx) {
-      cell.classList.add("active");
+      cell.classList.add('active');
     }
     if (Number.isInteger(snapshot.prefixLength) && idx < snapshot.prefixLength) {
-      cell.classList.add("prefix-zone");
+      cell.classList.add('prefix-zone');
     }
     if (
       Number.isInteger(snapshot.prefixLength) &&
       snapshot.prefixLength > 0 &&
       idx === snapshot.prefixLength - 1
     ) {
-      cell.classList.add("prefix-tip");
+      cell.classList.add('prefix-tip');
     }
 
     const compare = snapshot.compare;
     if (compare && compare.patternIndex === idx) {
-      cell.classList.add(compare.equal ? "compare-ok" : "compare-bad");
+      cell.classList.add(compare.equal ? 'compare-ok' : 'compare-bad');
     }
     if (compare && compare.prefixIndex === idx) {
-      cell.classList.add(compare.equal ? "compare-ok" : "compare-bad");
+      cell.classList.add(compare.equal ? 'compare-ok' : 'compare-bad');
     }
 
     cell.innerHTML = `<span class="cell-index">${idx}</span><span class="cell-char">${snapshot.pattern[idx]}</span>`;
@@ -449,30 +441,30 @@ function renderPatternStrip(snapshot) {
 }
 
 function renderLpsStrip(snapshot) {
-  elements.lpsStrip.innerHTML = "";
+  elements.lpsStrip.innerHTML = '';
 
   if (!snapshot.pattern) {
-    const empty = document.createElement("div");
-    empty.className = "cell-empty";
-    empty.textContent = "Load text/pattern to build LPS view.";
+    const empty = document.createElement('div');
+    empty.className = 'cell-empty';
+    empty.textContent = 'Load text/pattern to build LPS view.';
     elements.lpsStrip.appendChild(empty);
     return;
   }
 
   for (let idx = 0; idx < snapshot.pattern.length; idx += 1) {
-    const cell = document.createElement("div");
-    cell.className = "lps-cell";
+    const cell = document.createElement('div');
+    cell.className = 'lps-cell';
 
     if (snapshot.buildIndex === idx || snapshot.scanPatternIndex === idx) {
-      cell.classList.add("active");
+      cell.classList.add('active');
     }
 
     const compare = snapshot.compare;
     if (compare && compare.patternIndex === idx) {
-      cell.classList.add(compare.equal ? "compare-ok" : "compare-bad");
+      cell.classList.add(compare.equal ? 'compare-ok' : 'compare-bad');
     }
     if (compare && compare.prefixIndex === idx) {
-      cell.classList.add(compare.equal ? "compare-ok" : "compare-bad");
+      cell.classList.add(compare.equal ? 'compare-ok' : 'compare-bad');
     }
 
     const value = snapshot.lps[idx] ?? 0;
@@ -486,19 +478,19 @@ function renderLpsStrip(snapshot) {
 }
 
 function renderMatches(snapshot) {
-  elements.matchesList.innerHTML = "";
+  elements.matchesList.innerHTML = '';
 
   if (!snapshot.matches || snapshot.matches.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "match-chip empty";
-    empty.textContent = "(no matches yet)";
+    const empty = document.createElement('div');
+    empty.className = 'match-chip empty';
+    empty.textContent = '(no matches yet)';
     elements.matchesList.appendChild(empty);
     return;
   }
 
   for (const start of snapshot.matches) {
-    const chip = document.createElement("div");
-    chip.className = "match-chip";
+    const chip = document.createElement('div');
+    chip.className = 'match-chip';
     const end = start + snapshot.pattern.length - 1;
     chip.textContent = `start=${start}, end=${end}`;
     elements.matchesList.appendChild(chip);
@@ -532,7 +524,7 @@ function updateMetrics() {
   elements.textLength.textContent = String(state.text.length);
   elements.patternLength.textContent = String(state.pattern.length);
   elements.matchCount.textContent = String(state.lastMatches.length);
-  elements.lastResult.textContent = state.lastResult === null ? "-" : String(state.lastResult);
+  elements.lastResult.textContent = state.lastResult === null ? '-' : String(state.lastResult);
 
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const total = operationRunner ? operationRunner.pendingLength : 0;
@@ -573,26 +565,25 @@ function naiveSearch(text, pattern) {
 }
 
 function finalizePendingOperation(meta) {
-  if (meta.opType === "build") {
+  if (meta.opType === 'build') {
     state.lastLps = [...meta.lps];
     state.lastMatches = [];
     state.lastResult = `lps ready (${state.lastLps.length} values)`;
   } else {
     state.lastLps = [...meta.lps];
     state.lastMatches = [...meta.matches];
-    state.lastResult =
-      meta.matches.length > 0 ? `${meta.matches.length} match(es)` : "no match";
+    state.lastResult = meta.matches.length > 0 ? `${meta.matches.length} match(es)` : 'no match';
   }
 
   const mismatch =
     Array.isArray(meta.naiveMatches) && !arrayEqual(meta.naiveMatches, meta.matches ?? []);
 
   const summary = mismatch
-    ? `${meta.summary} (warning: naive=[${meta.naiveMatches.join(", ")}])`
+    ? `${meta.summary} (warning: naive=[${meta.naiveMatches.join(', ')}])`
     : meta.summary;
 
   helpers.updateStatus(summary);
-  helpers.appendLog(summary, mismatch ? "" : "ok");
+  helpers.appendLog(summary, mismatch ? '' : 'ok');
 
   renderSnapshot(null);
   helpers.clearCodeHighlights();
@@ -607,7 +598,7 @@ function applyEvent(event) {
 
 function prepareOperation() {
   if (!state.text || !state.pattern) {
-    const message = "Load text and pattern first.";
+    const message = 'Load text and pattern first.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
@@ -615,13 +606,13 @@ function prepareOperation() {
 
   const opType = elements.opType.value;
 
-  if (opType === "build") {
+  if (opType === 'build') {
     const trace = state.tracer.generateBuild(state.pattern, state.text);
     return {
       opType,
       events: trace.events,
       lps: trace.lps,
-      summary: `Built LPS: [${trace.lps.join(", ")}]`,
+      summary: `Built LPS: [${trace.lps.join(', ')}]`,
     };
   }
 
@@ -636,8 +627,8 @@ function prepareOperation() {
     naiveMatches,
     summary:
       trace.matches.length > 0
-        ? `KMP matches at [${trace.matches.join(", ")}]`
-        : "KMP search found no matches.",
+        ? `KMP matches at [${trace.matches.join(', ')}]`
+        : 'KMP search found no matches.',
   };
 }
 
@@ -658,7 +649,7 @@ function loadTextPattern(text, pattern) {
 
   const message = `Loaded text (n=${text.length}) and pattern (m=${pattern.length}).`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
 }
 
 function handleLoad() {
@@ -702,14 +693,14 @@ function init() {
       );
     },
     onNoPending: () => {
-      helpers.updateStatus("No pending operation.");
+      helpers.updateStatus('No pending operation.');
     },
   });
 
-  elements.loadBtn.addEventListener("click", handleLoad);
-  elements.sampleBtn.addEventListener("click", handleSample);
+  elements.loadBtn.addEventListener('click', handleLoad);
+  elements.sampleBtn.addEventListener('click', handleSample);
 
-  elements.opType.addEventListener("change", () => {
+  elements.opType.addEventListener('change', () => {
     helpers.focusCodePanel(elements.opType.value);
     helpers.clearCodeHighlights();
   });
@@ -728,8 +719,8 @@ function init() {
     extraShortcuts: {
       l: () => handleLoad(),
       r: () => handleSample(),
-      1: () => setOperationType("build"),
-      2: () => setOperationType("search"),
+      1: () => setOperationType('build'),
+      2: () => setOperationType('search'),
     },
   });
 

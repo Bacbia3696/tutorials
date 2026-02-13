@@ -1,6 +1,6 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 const SAMPLE_INTERVALS_TEXT = `1 6
 2 7
@@ -11,7 +11,7 @@ const SAMPLE_INTERVALS_TEXT = `1 6
 12 15`;
 
 function createSvgElement(tagName, attributes = {}) {
-  const element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tagName);
   for (const [key, value] of Object.entries(attributes)) {
     element.setAttribute(key, String(value));
   }
@@ -22,7 +22,10 @@ function formatNumber(value) {
   if (Number.isInteger(value)) {
     return String(value);
   }
-  return value.toFixed(2).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
+  return value
+    .toFixed(2)
+    .replace(/\.0+$/, '')
+    .replace(/(\.\d*[1-9])0+$/, '$1');
 }
 
 function formatInterval(interval) {
@@ -32,7 +35,7 @@ function formatInterval(interval) {
 function parseIntervalsInput(raw, { maxIntervals = 40 } = {}) {
   const trimmed = raw.trim();
   if (!trimmed) {
-    return { error: "Intervals input cannot be empty." };
+    return { error: 'Intervals input cannot be empty.' };
   }
 
   const lines = trimmed
@@ -50,7 +53,7 @@ function parseIntervalsInput(raw, { maxIntervals = 40 } = {}) {
   let swappedBounds = 0;
 
   for (let i = 0; i < lines.length; i += 1) {
-    const normalized = lines[i].replaceAll(",", " ");
+    const normalized = lines[i].replaceAll(',', ' ');
     const parts = normalized.split(/\s+/).filter(Boolean);
 
     if (parts.length !== 2) {
@@ -90,7 +93,7 @@ function parseIntervalsInput(raw, { maxIntervals = 40 } = {}) {
   }
 
   if (intervals.length === 0) {
-    return { error: "No unique intervals found after removing duplicates." };
+    return { error: 'No unique intervals found after removing duplicates.' };
   }
 
   return {
@@ -117,7 +120,7 @@ function generateRandomIntervalsText() {
     intervals.push({ left, right });
   }
 
-  return intervals.map((interval) => `${interval.left} ${interval.right}`).join("\n");
+  return intervals.map((interval) => `${interval.left} ${interval.right}`).join('\n');
 }
 
 class LineSweepTracer {
@@ -129,13 +132,13 @@ class LineSweepTracer {
     for (const interval of this.intervals) {
       this.events.push({
         intervalId: interval.id,
-        type: "start",
+        type: 'start',
         x: interval.left,
         tieValue: interval.right,
       });
       this.events.push({
         intervalId: interval.id,
-        type: "end",
+        type: 'end',
         x: interval.right,
         tieValue: interval.left,
       });
@@ -146,16 +149,16 @@ class LineSweepTracer {
         return a.x - b.x;
       }
 
-      const typeOrderA = a.type === "start" ? 0 : 1;
-      const typeOrderB = b.type === "start" ? 0 : 1;
+      const typeOrderA = a.type === 'start' ? 0 : 1;
+      const typeOrderB = b.type === 'start' ? 0 : 1;
       if (typeOrderA !== typeOrderB) {
         return typeOrderA - typeOrderB;
       }
 
-      if (a.type === "start" && a.tieValue !== b.tieValue) {
+      if (a.type === 'start' && a.tieValue !== b.tieValue) {
         return a.tieValue - b.tieValue;
       }
-      if (a.type === "end" && a.tieValue !== b.tieValue) {
+      if (a.type === 'end' && a.tieValue !== b.tieValue) {
         return b.tieValue - a.tieValue;
       }
 
@@ -182,7 +185,7 @@ class LineSweepTracer {
       if (!pair) {
         continue;
       }
-      if (event.type === "start") {
+      if (event.type === 'start') {
         pair.startId = event.id;
       } else {
         pair.endId = event.id;
@@ -213,21 +216,25 @@ class LineSweepTracer {
     return {
       sortedEventIds: [...state.sortedEventIds],
       processedEventIds: [...state.processedEventIds],
-      nextEventIndex: pick("nextEventIndex", state.nextEventIndex),
+      nextEventIndex: pick('nextEventIndex', state.nextEventIndex),
       activeIds: [...state.activeIds],
-      activeCount: pick("activeCount", state.activeCount),
-      maxActive: pick("maxActive", state.maxActive),
+      activeCount: pick('activeCount', state.activeCount),
+      maxActive: pick('maxActive', state.maxActive),
       bestXs: [...state.bestXs],
-      sweepX: pick("sweepX", state.sweepX),
-      currentEventId: pick("currentEventId", state.currentEventId),
-      currentIntervalId: pick("currentIntervalId", state.currentIntervalId),
-      currentType: pick("currentType", state.currentType),
+      sweepX: pick('sweepX', state.sweepX),
+      currentEventId: pick('currentEventId', state.currentEventId),
+      currentIntervalId: pick('currentIntervalId', state.currentIntervalId),
+      currentType: pick('currentType', state.currentType),
     };
   }
 
-  #emit(events, state, { message, line, nextEventIndex, sweepX, currentEventId, currentIntervalId, currentType }) {
+  #emit(
+    events,
+    state,
+    { message, line, nextEventIndex, sweepX, currentEventId, currentIntervalId, currentType },
+  ) {
     events.push({
-      opType: "sweep",
+      opType: 'sweep',
       line,
       message,
       snapshot: this.#snapshot(state, {
@@ -250,7 +257,7 @@ class LineSweepTracer {
 
   #intervalList(ids) {
     if (!ids.length) {
-      return "none";
+      return 'none';
     }
     return ids
       .map((id) => {
@@ -260,14 +267,14 @@ class LineSweepTracer {
         }
         return `${interval.label}${formatInterval(interval)}`;
       })
-      .join(", ");
+      .join(', ');
   }
 
   #bestSummary(bestXs) {
     if (!bestXs.length) {
-      return "none";
+      return 'none';
     }
-    return bestXs.map((x) => formatNumber(x)).join(", ");
+    return bestXs.map((x) => formatNumber(x)).join(', ');
   }
 
   #sortActive(activeIds) {
@@ -289,12 +296,12 @@ class LineSweepTracer {
       line: 1,
       message:
         `Created ${this.events.length} endpoint events from ${this.intervals.length} intervals ` +
-        "(start + end per interval).",
+        '(start + end per interval).',
     });
 
     const orderText = this.events
       .map((event) => `${formatNumber(event.x)}:${event.type[0].toUpperCase()}${event.intervalId}`)
-      .join(" | ");
+      .join(' | ');
     this.#emit(events, state, {
       line: 2,
       message: `Sorted events: ${orderText}.`,
@@ -302,7 +309,7 @@ class LineSweepTracer {
 
     this.#emit(events, state, {
       line: 3,
-      message: "Initialize active=0, best=0, bestPositions=[].",
+      message: 'Initialize active=0, best=0, bestPositions=[].',
     });
 
     for (let i = 0; i < this.events.length; i += 1) {
@@ -319,7 +326,7 @@ class LineSweepTracer {
         message: `Process event ${i + 1}/${this.events.length}: ${this.#eventSummary(event)}.`,
       });
 
-      if (event.type === "start") {
+      if (event.type === 'start') {
         if (!state.activeIds.includes(event.intervalId)) {
           state.activeIds.push(event.intervalId);
         }
@@ -339,7 +346,7 @@ class LineSweepTracer {
       state.currentType = event.type;
       state.sweepX = event.x;
 
-      const delta = event.type === "start" ? "+1" : "-1";
+      const delta = event.type === 'start' ? '+1' : '-1';
       this.#emit(events, state, {
         line: 5,
         message:
@@ -355,7 +362,7 @@ class LineSweepTracer {
           line: 6,
           message:
             `New max overlap ${state.maxActive} at x=${formatNumber(event.x)}. ` +
-            "Reset best positions.",
+            'Reset best positions.',
         });
       } else if (state.activeCount === state.maxActive && state.maxActive > 0) {
         const alreadyRecorded = state.bestXs.some((x) => Object.is(x, event.x));
@@ -397,29 +404,29 @@ class LineSweepTracer {
 }
 
 const elements = {
-  intervalsInput: document.getElementById("intervalsInput"),
-  loadIntervalsBtn: document.getElementById("loadIntervalsBtn"),
-  sampleIntervalsBtn: document.getElementById("sampleIntervalsBtn"),
-  randomIntervalsBtn: document.getElementById("randomIntervalsBtn"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  sweepViewPanel: document.querySelector(".sweep-view"),
-  timelineCanvas: document.getElementById("timelineCanvas"),
-  eventStrip: document.getElementById("eventStrip"),
-  activeStrip: document.getElementById("activeStrip"),
-  intervalRows: document.getElementById("intervalRows"),
-  statusMessage: document.getElementById("statusMessage"),
-  intervalsMetric: document.getElementById("intervalsMetric"),
-  eventsMetric: document.getElementById("eventsMetric"),
-  activeMetric: document.getElementById("activeMetric"),
-  maxMetric: document.getElementById("maxMetric"),
-  stepCounter: document.getElementById("stepCounter"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  intervalsInput: document.getElementById('intervalsInput'),
+  loadIntervalsBtn: document.getElementById('loadIntervalsBtn'),
+  sampleIntervalsBtn: document.getElementById('sampleIntervalsBtn'),
+  randomIntervalsBtn: document.getElementById('randomIntervalsBtn'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  sweepViewPanel: document.querySelector('.sweep-view'),
+  timelineCanvas: document.getElementById('timelineCanvas'),
+  eventStrip: document.getElementById('eventStrip'),
+  activeStrip: document.getElementById('activeStrip'),
+  intervalRows: document.getElementById('intervalRows'),
+  statusMessage: document.getElementById('statusMessage'),
+  intervalsMetric: document.getElementById('intervalsMetric'),
+  eventsMetric: document.getElementById('eventsMetric'),
+  activeMetric: document.getElementById('activeMetric'),
+  maxMetric: document.getElementById('maxMetric'),
+  stepCounter: document.getElementById('stepCounter'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -440,7 +447,7 @@ const helpers = createRuntimeHelpers({
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
-  elements.sweepViewPanel?.classList.toggle("playing", enabled);
+  elements.sweepViewPanel?.classList.toggle('playing', enabled);
 }
 
 function cloneSnapshot(snapshot) {
@@ -476,17 +483,17 @@ function getEventById(id) {
 
 function getIntervalState(interval, snapshot) {
   if (!state.tracer) {
-    return "pending";
+    return 'pending';
   }
 
   const pair = state.tracer.intervalEventIds.get(interval.id);
   if (!pair) {
-    return "pending";
+    return 'pending';
   }
 
   const activeSet = new Set(snapshot?.activeIds ?? []);
   if (activeSet.has(interval.id)) {
-    return "active";
+    return 'active';
   }
 
   const processedSet = new Set(snapshot?.processedEventIds ?? []);
@@ -494,21 +501,21 @@ function getIntervalState(interval, snapshot) {
   const ended = pair.endId !== null && processedSet.has(pair.endId);
 
   if (!started) {
-    return "pending";
+    return 'pending';
   }
   if (ended) {
-    return "closed";
+    return 'closed';
   }
-  return "active";
+  return 'active';
 }
 
 function renderEventStrip(snapshot) {
-  elements.eventStrip.innerHTML = "";
+  elements.eventStrip.innerHTML = '';
 
   if (!state.tracer || !snapshot || snapshot.sortedEventIds.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "event-pill empty";
-    empty.textContent = "Load intervals to generate events.";
+    const empty = document.createElement('span');
+    empty.className = 'event-pill empty';
+    empty.textContent = 'Load intervals to generate events.';
     elements.eventStrip.appendChild(empty);
     return;
   }
@@ -523,31 +530,31 @@ function renderEventStrip(snapshot) {
     }
 
     const interval = getIntervalById(event.intervalId);
-    const pill = document.createElement("span");
+    const pill = document.createElement('span');
     pill.className = `event-pill ${event.type}`;
 
     if (eventId === currentEventId) {
-      pill.classList.add("current");
+      pill.classList.add('current');
     } else if (processedSet.has(eventId)) {
-      pill.classList.add("processed");
+      pill.classList.add('processed');
     } else {
-      pill.classList.add("pending");
+      pill.classList.add('pending');
     }
 
-    const opSign = event.type === "start" ? "+" : "-";
+    const opSign = event.type === 'start' ? '+' : '-';
     pill.textContent = `${formatNumber(event.x)} ${opSign}${interval ? interval.label : `#${event.intervalId}`}`;
     elements.eventStrip.appendChild(pill);
   }
 }
 
 function renderActiveStrip(snapshot) {
-  elements.activeStrip.innerHTML = "";
+  elements.activeStrip.innerHTML = '';
 
   const activeIds = snapshot?.activeIds ?? [];
   if (activeIds.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "active-pill empty";
-    empty.textContent = "No active intervals.";
+    const empty = document.createElement('span');
+    empty.className = 'active-pill empty';
+    empty.textContent = 'No active intervals.';
     elements.activeStrip.appendChild(empty);
     return;
   }
@@ -558,10 +565,10 @@ function renderActiveStrip(snapshot) {
       continue;
     }
 
-    const pill = document.createElement("span");
-    pill.className = "active-pill";
+    const pill = document.createElement('span');
+    pill.className = 'active-pill';
     if (snapshot?.currentIntervalId === intervalId) {
-      pill.classList.add("current");
+      pill.classList.add('current');
     }
     pill.textContent = `${interval.label} ${formatInterval(interval)}`;
     elements.activeStrip.appendChild(pill);
@@ -569,21 +576,21 @@ function renderActiveStrip(snapshot) {
 }
 
 function renderIntervalTable(snapshot) {
-  elements.intervalRows.innerHTML = "";
+  elements.intervalRows.innerHTML = '';
 
   if (!state.intervals.length) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     row.innerHTML = '<td colspan="3" class="empty-row">Load intervals to inspect state.</td>';
     elements.intervalRows.appendChild(row);
     return;
   }
 
   for (const interval of state.intervals) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     const intervalState = getIntervalState(interval, snapshot);
 
     if (interval.id === snapshot?.currentIntervalId) {
-      row.classList.add("row-current");
+      row.classList.add('row-current');
     }
 
     row.classList.add(`row-${intervalState}`);
@@ -603,15 +610,15 @@ function renderTimeline(snapshot) {
   svg.replaceChildren();
 
   if (!state.intervals.length) {
-    svg.setAttribute("viewBox", "0 0 920 420");
-    const empty = createSvgElement("text", {
+    svg.setAttribute('viewBox', '0 0 920 420');
+    const empty = createSvgElement('text', {
       x: 460,
       y: 210,
-      class: "timeline-empty",
-      "text-anchor": "middle",
-      "dominant-baseline": "middle",
+      class: 'timeline-empty',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'middle',
     });
-    empty.textContent = "Load intervals to visualize the sweep line.";
+    empty.textContent = 'Load intervals to visualize the sweep line.';
     svg.appendChild(empty);
     return;
   }
@@ -623,7 +630,7 @@ function renderTimeline(snapshot) {
   const height = Math.min(baseHeight, 640);
   const axisY = height - 44;
 
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
   let minX = state.intervals[0].left;
   let maxX = state.intervals[0].right;
@@ -642,12 +649,12 @@ function renderTimeline(snapshot) {
   const projectX = (x) =>
     leftPad + ((x - minX) / Math.max(maxX - minX, 1)) * (width - leftPad - rightPad);
 
-  const axis = createSvgElement("line", {
+  const axis = createSvgElement('line', {
     x1: leftPad,
     y1: axisY,
     x2: width - rightPad,
     y2: axisY,
-    class: "axis-line",
+    class: 'axis-line',
   });
   svg.appendChild(axis);
 
@@ -670,20 +677,20 @@ function renderTimeline(snapshot) {
   const markerList = [...markerValues].sort((a, b) => a - b);
   for (const x of markerList) {
     const projectedX = projectX(x);
-    const tick = createSvgElement("line", {
+    const tick = createSvgElement('line', {
       x1: projectedX,
       y1: axisY,
       x2: projectedX,
       y2: axisY + 7,
-      class: "axis-tick",
+      class: 'axis-tick',
     });
     svg.appendChild(tick);
 
-    const label = createSvgElement("text", {
+    const label = createSvgElement('text', {
       x: projectedX,
       y: axisY + 20,
-      class: "axis-label",
-      "text-anchor": "middle",
+      class: 'axis-label',
+      'text-anchor': 'middle',
     });
     label.textContent = formatNumber(x);
     svg.appendChild(label);
@@ -696,70 +703,70 @@ function renderTimeline(snapshot) {
     const y = top + interval.row * rowGap;
 
     const stateClass = getIntervalState(interval, snapshot);
-    const classes = ["interval-segment", stateClass];
+    const classes = ['interval-segment', stateClass];
     if (interval.id === currentIntervalId) {
-      classes.push("current");
+      classes.push('current');
     }
 
-    const segment = createSvgElement("line", {
+    const segment = createSvgElement('line', {
       x1: projectX(interval.left),
       y1: y,
       x2: projectX(interval.right),
       y2: y,
-      class: classes.join(" "),
+      class: classes.join(' '),
     });
     svg.appendChild(segment);
 
-    const startDot = createSvgElement("circle", {
+    const startDot = createSvgElement('circle', {
       cx: projectX(interval.left),
       cy: y,
       r: 3.8,
-      class: `endpoint ${activeSet.has(interval.id) ? "active" : ""}`,
+      class: `endpoint ${activeSet.has(interval.id) ? 'active' : ''}`,
     });
     svg.appendChild(startDot);
 
-    const endDot = createSvgElement("circle", {
+    const endDot = createSvgElement('circle', {
       cx: projectX(interval.right),
       cy: y,
       r: 3.8,
-      class: `endpoint ${activeSet.has(interval.id) ? "active" : ""}`,
+      class: `endpoint ${activeSet.has(interval.id) ? 'active' : ''}`,
     });
     svg.appendChild(endDot);
 
-    const label = createSvgElement("text", {
+    const label = createSvgElement('text', {
       x: 10,
       y: y + 4,
-      class: "interval-label",
+      class: 'interval-label',
     });
     label.textContent = `${interval.label} ${formatInterval(interval)}`;
     svg.appendChild(label);
   }
 
   for (const x of state.lastBestXs) {
-    const marker = createSvgElement("circle", {
+    const marker = createSvgElement('circle', {
       cx: projectX(x),
       cy: axisY,
       r: 5,
-      class: "best-marker",
+      class: 'best-marker',
     });
     svg.appendChild(marker);
   }
 
   if (snapshot?.sweepX !== null && snapshot?.sweepX !== undefined) {
     const sweepX = projectX(snapshot.sweepX);
-    const sweepLine = createSvgElement("line", {
+    const sweepLine = createSvgElement('line', {
       x1: sweepX,
       y1: top - 14,
       x2: sweepX,
       y2: axisY + 2,
-      class: "sweep-line",
+      class: 'sweep-line',
     });
     svg.appendChild(sweepLine);
 
-    const sweepLabel = createSvgElement("text", {
+    const sweepLabel = createSvgElement('text', {
       x: sweepX + 8,
       y: top - 16,
-      class: "sweep-label",
+      class: 'sweep-label',
     });
     sweepLabel.textContent = `sweep x=${formatNumber(snapshot.sweepX)}`;
     svg.appendChild(sweepLabel);
@@ -806,7 +813,7 @@ function finalizePendingOperation(meta) {
   state.lastBestXs = [...meta.bestXs];
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.appendLog(meta.summary, meta.success ? 'ok' : '');
   helpers.clearCodeHighlights();
 
   renderSnapshot(state.lastSnapshot);
@@ -815,7 +822,7 @@ function finalizePendingOperation(meta) {
 
 function prepareOperation() {
   if (!state.tracer || state.intervals.length === 0) {
-    const message = "Load intervals first.";
+    const message = 'Load intervals first.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
@@ -839,10 +846,10 @@ function loadIntervals(intervals, { message }) {
   state.lastBestXs = [];
 
   renderSnapshot(state.lastSnapshot);
-  helpers.focusCodePanel("sweep");
+  helpers.focusCodePanel('sweep');
   helpers.clearCodeHighlights();
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
   updateMetrics();
 }
 
@@ -862,16 +869,16 @@ function loadIntervalsFromInput() {
   const notes = [];
   if (parsed.removedDuplicates > 0) {
     notes.push(
-      `${parsed.removedDuplicates} duplicate interval${parsed.removedDuplicates === 1 ? "" : "s"} removed`,
+      `${parsed.removedDuplicates} duplicate interval${parsed.removedDuplicates === 1 ? '' : 's'} removed`,
     );
   }
   if (parsed.swappedBounds > 0) {
     notes.push(
-      `${parsed.swappedBounds} bound pair${parsed.swappedBounds === 1 ? "" : "s"} reordered`,
+      `${parsed.swappedBounds} bound pair${parsed.swappedBounds === 1 ? '' : 's'} reordered`,
     );
   }
 
-  const suffix = notes.length > 0 ? ` (${notes.join("; ")})` : "";
+  const suffix = notes.length > 0 ? ` (${notes.join('; ')})` : '';
   loadIntervals(parsed.intervals, {
     message: `Loaded ${parsed.intervals.length} unique intervals${suffix}.`,
   });
@@ -899,13 +906,13 @@ function init() {
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadIntervalsBtn.addEventListener("click", loadIntervalsFromInput);
-  elements.sampleIntervalsBtn.addEventListener("click", loadSampleIntervals);
-  elements.randomIntervalsBtn.addEventListener("click", loadRandomIntervals);
+  elements.loadIntervalsBtn.addEventListener('click', loadIntervalsFromInput);
+  elements.sampleIntervalsBtn.addEventListener('click', loadSampleIntervals);
+  elements.randomIntervalsBtn.addEventListener('click', loadRandomIntervals);
 
   setupRunnerControls({
     elements,
@@ -940,7 +947,7 @@ function init() {
     },
   });
 
-  helpers.focusCodePanel("sweep");
+  helpers.focusCodePanel('sweep');
   loadSampleIntervals();
 }
 

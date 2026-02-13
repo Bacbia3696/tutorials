@@ -1,4 +1,4 @@
-import { bindShortcutHandler } from "./tutorial-core.js";
+import { bindShortcutHandler } from './tutorial-core.js';
 
 export function setupRunnerControls({
   elements,
@@ -11,19 +11,19 @@ export function setupRunnerControls({
   clearLog,
   extraShortcuts = {},
 }) {
-  elements.animateBtn.addEventListener("click", runAnimated);
-  elements.stepBtn.addEventListener("click", runStep);
-  elements.instantBtn.addEventListener("click", runInstant);
-  elements.finishBtn.addEventListener("click", runFinish);
+  elements.animateBtn.addEventListener('click', runAnimated);
+  elements.stepBtn.addEventListener('click', runStep);
+  elements.instantBtn.addEventListener('click', runInstant);
+  elements.finishBtn.addEventListener('click', runFinish);
 
-  elements.speedRange.addEventListener("input", () => {
+  elements.speedRange.addEventListener('input', () => {
     const speedMs = Number(elements.speedRange.value);
     setSpeedMs(speedMs);
     elements.speedLabel.textContent = `${speedMs} ms`;
   });
 
   elements.speedLabel.textContent = `${getSpeedMs()} ms`;
-  elements.clearLogBtn.addEventListener("click", () => {
+  elements.clearLogBtn.addEventListener('click', () => {
     clearLog();
   });
 
@@ -37,11 +37,7 @@ export function setupRunnerControls({
   return bindShortcutHandler({ actions: shortcuts });
 }
 
-export function bindDebouncedResize({
-  onResize,
-  delayMs = 120,
-  target = window,
-}) {
+export function bindDebouncedResize({ onResize, delayMs = 120, target = window }) {
   let timer = null;
 
   const handler = () => {
@@ -54,12 +50,12 @@ export function bindDebouncedResize({
     }, delayMs);
   };
 
-  target.addEventListener("resize", handler);
+  target.addEventListener('resize', handler);
   return () => {
     if (timer !== null) {
       clearTimeout(timer);
       timer = null;
     }
-    target.removeEventListener("resize", handler);
+    target.removeEventListener('resize', handler);
   };
 }

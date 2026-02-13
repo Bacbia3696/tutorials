@@ -1,8 +1,12 @@
-import { html } from "../shared/lit.js";
-import { defineTutorialApp } from "../shared/tutorial-app.js";
+import { html } from '../shared/lit.js';
+import { renderRunnerControls } from '../shared/components/runner-controls.js';
+import { renderTraceLogPanel } from '../shared/components/trace-log-panel.js';
+import { renderStatusPanel } from '../shared/components/status-panel.js';
+import { renderCodeLensPanel } from '../shared/components/code-lens-panel.js';
+import { defineTutorialApp } from '../shared/tutorial-app.js';
 
 defineTutorialApp(import.meta.url, {
-  tutorialId: "dsu",
+  tutorialId: 'dsu',
   renderTemplate: () => html`
     <div class="bg-shape shape-a"></div>
     <div class="bg-shape shape-b"></div>
@@ -52,28 +56,14 @@ defineTutorialApp(import.meta.url, {
             </div>
           </div>
 
-          <aside class="controls-runner">
-            <h3>Playback Controls</h3>
-
-            <div class="runner-grid">
-              <button id="animateBtn" class="btn btn-primary">Run Animated</button>
-              <button id="stepBtn" class="btn">Step</button>
-              <button id="instantBtn" class="btn">Apply Instantly</button>
-              <button id="finishBtn" class="btn btn-muted">Finish Current</button>
-            </div>
-
-            <div class="runner-speed">
-              <label for="speedRange">Speed</label>
-              <input id="speedRange" type="range" min="120" max="1200" step="20" value="440" />
-              <span id="speedLabel">440 ms</span>
-            </div>
-
-            <p class="key-hint">
+          ${renderRunnerControls({
+            speedMs: 440,
+            keyHint: html`
               Keys: <kbd>A</kbd> animate, <kbd>S</kbd> step, <kbd>I</kbd> instant, <kbd>F</kbd>
               finish, <kbd>L</kbd> load, <kbd>R</kbd> sample, <kbd>1</kbd> union, <kbd>2</kbd> find,
               <kbd>3</kbd> connected.
-            </p>
-          </aside>
+            `,
+          })}
         </div>
       </section>
 
@@ -86,27 +76,22 @@ defineTutorialApp(import.meta.url, {
         <div id="forestContainer" class="forest-container"></div>
       </section>
 
-      <section class="panel status">
-        <div>
-          <h2>Status</h2>
-          <p id="statusMessage" role="status" aria-live="polite" aria-atomic="true">Ready.</p>
-        </div>
-        <div class="metrics">
+      ${renderStatusPanel({
+        metricsContent: html`
           <p><span class="metric-label">Elements:</span> <span id="elementCount">0</span></p>
           <p><span class="metric-label">Components:</span> <span id="componentCount">0</span></p>
           <p><span class="metric-label">Last Result:</span> <span id="lastResult">-</span></p>
           <p><span class="metric-label">Step:</span> <span id="stepCounter">0 / 0</span></p>
-        </div>
-      </section>
+        `,
+      })}
 
       <section class="panel parent-view">
         <h2>Parent & Rank Arrays</h2>
         <div id="parentTableContainer" class="parent-table-scroll"></div>
       </section>
 
-      <section class="panel code-view">
-        <h2>Pseudocode Lens</h2>
-        <div class="code-grid">
+      ${renderCodeLensPanel({
+        content: html`
           <div class="code-panel" data-op="find">
             <h3>Find(x)</h3>
             <ol>
@@ -134,21 +119,15 @@ defineTutorialApp(import.meta.url, {
               <li data-line="1">return Find(a) == Find(b)</li>
             </ol>
           </div>
-        </div>
-      </section>
+        `,
+      })}
 
       <section class="panel components-view">
         <h2>Connected Components</h2>
         <div id="componentsList" class="components-list"></div>
       </section>
 
-      <section class="panel log-view">
-        <div class="row between">
-          <h2>Trace Log</h2>
-          <button id="clearLogBtn" class="btn btn-muted">Clear Log</button>
-        </div>
-        <div id="logOutput" class="log-output" role="log" aria-live="polite" aria-relevant="additions"></div>
-      </section>
+      ${renderTraceLogPanel()}
     </main>
   `,
 });

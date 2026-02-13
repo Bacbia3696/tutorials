@@ -16,8 +16,7 @@ convex-hull-tutorial-app {
   --font-sans: "Cabin", "Trebuchet MS", sans-serif;
   --font-mono: "Space Mono", "Courier New", monospace;
   --page-padding: 22px;
-  --page-bg:
-    radial-gradient(circle at 12% 14%, #f8dfc8 0%, transparent 34%),
+  --page-bg: radial-gradient(circle at 12% 14%, #f8dfc8 0%, transparent 34%),
     radial-gradient(circle at 87% 86%, #cce7f0 0%, transparent 38%),
     linear-gradient(160deg, var(--bg-a), var(--bg-b));
   --layout-max-width: 1240px;
@@ -135,8 +134,7 @@ kbd {
   border: 1px solid var(--edge);
   border-radius: 12px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 251, 254, 0.92)),
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 251, 254, 0.92)),
     radial-gradient(circle at 18% 18%, rgba(210, 234, 245, 0.3), transparent 40%);
   min-height: 320px;
 }

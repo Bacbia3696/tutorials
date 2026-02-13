@@ -1,11 +1,8 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
-import {
-  bindDebouncedResize,
-  setupRunnerControls,
-} from "../shared/tutorial-bootstrap.js";
-import { parseArrayInput, randomIntegerArray } from "../shared/array-input.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
-import { mountAutoFitTree } from "../shared/tree-view.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
+import { bindDebouncedResize, setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { parseArrayInput, randomIntegerArray } from '../shared/array-input.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
+import { mountAutoFitTree } from '../shared/tree-view.js';
 
 class LazySegTreeTracer {
   constructor(values) {
@@ -43,7 +40,7 @@ class LazySegTreeTracer {
 
     const emit = (message, node, line, extras = {}) => {
       events.push({
-        opType: "update",
+        opType: 'update',
         message,
         node,
         line,
@@ -58,11 +55,7 @@ class LazySegTreeTracer {
         return;
       }
       const pending = lazy[node];
-      emit(
-        `Resolve pending +${pending} on [${left}, ${right}] before descending`,
-        node,
-        2,
-      );
+      emit(`Resolve pending +${pending} on [${left}, ${right}] before descending`, node, 2);
 
       const mid = Math.floor((left + right) / 2);
       const leftLength = mid - left + 1;
@@ -72,11 +65,7 @@ class LazySegTreeTracer {
       lazy[node * 2] += pending;
       tree[node * 2 + 1] += rightLength * pending;
       lazy[node * 2 + 1] += pending;
-      emit(
-        `Push pending +${pending} to children of [${left}, ${right}]`,
-        node,
-        3,
-      );
+      emit(`Push pending +${pending} to children of [${left}, ${right}]`, node, 3);
 
       lazy[node] = 0;
       emit(`Clear lazy tag at [${left}, ${right}]`, node, 3);
@@ -118,12 +107,9 @@ class LazySegTreeTracer {
     };
 
     update(1, 0, this.n - 1);
-    emit(
-      `Update complete: added ${delta} to every index in [${qLeft}, ${qRight}]`,
-      1,
-      0,
-      { done: true },
-    );
+    emit(`Update complete: added ${delta} to every index in [${qLeft}, ${qRight}]`, 1, 0, {
+      done: true,
+    });
 
     this.tree = tree;
     this.lazy = lazy;
@@ -137,7 +123,7 @@ class LazySegTreeTracer {
 
     const emit = (message, node, line, extras = {}) => {
       events.push({
-        opType: "query",
+        opType: 'query',
         message,
         node,
         line,
@@ -152,11 +138,7 @@ class LazySegTreeTracer {
         return;
       }
       const pending = lazy[node];
-      emit(
-        `Resolve pending +${pending} on [${left}, ${right}] before descending`,
-        node,
-        2,
-      );
+      emit(`Resolve pending +${pending} on [${left}, ${right}] before descending`, node, 2);
 
       const mid = Math.floor((left + right) / 2);
       const leftLength = mid - left + 1;
@@ -166,11 +148,7 @@ class LazySegTreeTracer {
       lazy[node * 2] += pending;
       tree[node * 2 + 1] += rightLength * pending;
       lazy[node * 2 + 1] += pending;
-      emit(
-        `Push pending +${pending} down from [${left}, ${right}]`,
-        node,
-        3,
-      );
+      emit(`Push pending +${pending} down from [${left}, ${right}]`, node, 3);
 
       lazy[node] = 0;
       emit(`Clear lazy tag at [${left}, ${right}]`, node, 3);
@@ -187,12 +165,9 @@ class LazySegTreeTracer {
       }
 
       if (qLeft <= left && right <= qRight) {
-        emit(
-          `Total overlap: contribute sum(${tree[node]}) from [${left}, ${right}]`,
-          node,
-          5,
-          { contribution: tree[node] },
-        );
+        emit(`Total overlap: contribute sum(${tree[node]}) from [${left}, ${right}]`, node, 5, {
+          contribution: tree[node],
+        });
         return tree[node];
       }
 
@@ -230,28 +205,28 @@ class LazySegTreeTracer {
 }
 
 const elements = {
-  arrayInput: document.getElementById("arrayInput"),
-  loadArrayBtn: document.getElementById("loadArrayBtn"),
-  randomArrayBtn: document.getElementById("randomArrayBtn"),
-  opType: document.getElementById("opType"),
-  leftIndex: document.getElementById("leftIndex"),
-  rightIndex: document.getElementById("rightIndex"),
-  deltaValue: document.getElementById("deltaValue"),
-  deltaWrap: document.getElementById("deltaWrap"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  rootSum: document.getElementById("rootSum"),
-  queryResult: document.getElementById("queryResult"),
-  stepCounter: document.getElementById("stepCounter"),
-  arrayStrip: document.getElementById("arrayStrip"),
-  treeContainer: document.getElementById("treeContainer"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  arrayInput: document.getElementById('arrayInput'),
+  loadArrayBtn: document.getElementById('loadArrayBtn'),
+  randomArrayBtn: document.getElementById('randomArrayBtn'),
+  opType: document.getElementById('opType'),
+  leftIndex: document.getElementById('leftIndex'),
+  rightIndex: document.getElementById('rightIndex'),
+  deltaValue: document.getElementById('deltaValue'),
+  deltaWrap: document.getElementById('deltaWrap'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  rootSum: document.getElementById('rootSum'),
+  queryResult: document.getElementById('queryResult'),
+  stepCounter: document.getElementById('stepCounter'),
+  arrayStrip: document.getElementById('arrayStrip'),
+  treeContainer: document.getElementById('treeContainer'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -269,12 +244,11 @@ const helpers = createRuntimeHelpers({
 });
 let operationRunner = null;
 
-
 function renderArray() {
-  elements.arrayStrip.innerHTML = "";
+  elements.arrayStrip.innerHTML = '';
   state.values.forEach((value, index) => {
-    const cell = document.createElement("div");
-    cell.className = "array-cell";
+    const cell = document.createElement('div');
+    cell.className = 'array-cell';
     cell.innerHTML = `<span class="idx">i=${index}</span><span class="val">${value}</span>`;
     elements.arrayStrip.appendChild(cell);
   });
@@ -284,7 +258,7 @@ function renderTree(treeValues, lazyValues, activeNode = null) {
   state.lastRenderedTree = treeValues;
   state.lastRenderedLazy = lazyValues;
   state.lastActiveNode = activeNode;
-  elements.treeContainer.innerHTML = "";
+  elements.treeContainer.innerHTML = '';
 
   if (!state.segTree) {
     return;
@@ -297,23 +271,22 @@ function renderTree(treeValues, lazyValues, activeNode = null) {
   const topPadding = 14;
   const bottomPadding = 14;
   const panelWidth = Math.max(elements.treeContainer.clientWidth - 8, 620);
-  const nodeWidth =
-    state.segTree.n <= 10 ? 98 : state.segTree.n <= 14 ? 92 : 86;
+  const nodeWidth = state.segTree.n <= 10 ? 98 : state.segTree.n <= 14 ? 92 : 86;
   const sidePadding = Math.ceil(nodeWidth / 2) + 10;
   const minSpacingWidth = sidePadding * 2 + state.segTree.n * 64;
   const diagramHeight = topPadding + bottomPadding + (maxDepth + 1) * rowHeight;
   const diagramWidth = Math.max(panelWidth, minSpacingWidth);
 
-  const diagram = document.createElement("div");
-  diagram.className = "tree-diagram";
+  const diagram = document.createElement('div');
+  diagram.className = 'tree-diagram';
   diagram.style.width = `${diagramWidth}px`;
   diagram.style.height = `${diagramHeight}px`;
-  diagram.style.setProperty("--tree-node-width", `${nodeWidth}px`);
+  diagram.style.setProperty('--tree-node-width', `${nodeWidth}px`);
 
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("class", "tree-links");
-  svg.setAttribute("viewBox", `0 0 ${diagramWidth} ${diagramHeight}`);
-  svg.setAttribute("preserveAspectRatio", "none");
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'tree-links');
+  svg.setAttribute('viewBox', `0 0 ${diagramWidth} ${diagramHeight}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
 
   const coords = new Map();
   for (const node of nodes) {
@@ -334,23 +307,23 @@ function renderTree(treeValues, lazyValues, activeNode = null) {
 
     if (coords.has(leftChild)) {
       const child = coords.get(leftChild);
-      const edge = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      edge.setAttribute("x1", String(parent.x));
-      edge.setAttribute("y1", String(parent.y + nodeHeight - 6));
-      edge.setAttribute("x2", String(child.x));
-      edge.setAttribute("y2", String(child.y + 4));
-      edge.setAttribute("class", "tree-edge");
+      const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      edge.setAttribute('x1', String(parent.x));
+      edge.setAttribute('y1', String(parent.y + nodeHeight - 6));
+      edge.setAttribute('x2', String(child.x));
+      edge.setAttribute('y2', String(child.y + 4));
+      edge.setAttribute('class', 'tree-edge');
       svg.appendChild(edge);
     }
 
     if (coords.has(rightChild)) {
       const child = coords.get(rightChild);
-      const edge = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      edge.setAttribute("x1", String(parent.x));
-      edge.setAttribute("y1", String(parent.y + nodeHeight - 6));
-      edge.setAttribute("x2", String(child.x));
-      edge.setAttribute("y2", String(child.y + 4));
-      edge.setAttribute("class", "tree-edge");
+      const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      edge.setAttribute('x1', String(parent.x));
+      edge.setAttribute('y1', String(parent.y + nodeHeight - 6));
+      edge.setAttribute('x2', String(child.x));
+      edge.setAttribute('y2', String(child.y + 4));
+      edge.setAttribute('class', 'tree-edge');
       svg.appendChild(edge);
     }
   }
@@ -358,19 +331,19 @@ function renderTree(treeValues, lazyValues, activeNode = null) {
   diagram.appendChild(svg);
 
   for (const node of nodes) {
-    const card = document.createElement("div");
+    const card = document.createElement('div');
     const left = state.segTree.start[node];
     const right = state.segTree.end[node];
     const sum = treeValues[node] ?? 0;
     const lazy = lazyValues[node] ?? 0;
     const { x, y } = coords.get(node);
 
-    card.className = "node-card tree-node";
+    card.className = 'node-card tree-node';
     if (lazy !== 0) {
-      card.classList.add("has-lazy");
+      card.classList.add('has-lazy');
     }
     if (activeNode === node) {
-      card.classList.add("active");
+      card.classList.add('active');
     }
     card.style.left = `${x}px`;
     card.style.top = `${y}px`;
@@ -394,9 +367,8 @@ function rerenderTreeForResize() {
 }
 
 function updateMetrics() {
-  elements.rootSum.textContent = state.segTree ? state.segTree.tree[1] : "-";
-  elements.queryResult.textContent =
-    state.lastQueryResult === null ? "-" : state.lastQueryResult;
+  elements.rootSum.textContent = state.segTree ? state.segTree.tree[1] : '-';
+  elements.queryResult.textContent = state.lastQueryResult === null ? '-' : state.lastQueryResult;
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const total = operationRunner ? operationRunner.pendingLength : 0;
   elements.stepCounter.textContent = `${step} / ${total}`;
@@ -423,21 +395,17 @@ function finalizePendingOperation(meta) {
   if (meta.nextValues) {
     state.values = meta.nextValues;
   }
-  if (typeof meta.result === "number") {
+  if (typeof meta.result === 'number') {
     state.lastQueryResult = meta.result;
   }
 
   const mismatch =
-    typeof meta.result === "number" &&
-    typeof meta.naive === "number" &&
-    meta.result !== meta.naive;
+    typeof meta.result === 'number' && typeof meta.naive === 'number' && meta.result !== meta.naive;
 
-  const text = mismatch
-    ? `${meta.summary} (warning: naive check is ${meta.naive})`
-    : meta.summary;
+  const text = mismatch ? `${meta.summary} (warning: naive check is ${meta.naive})` : meta.summary;
 
   helpers.updateStatus(text);
-  helpers.appendLog(text, mismatch ? "" : "ok");
+  helpers.appendLog(text, mismatch ? '' : 'ok');
 
   renderArray();
   renderTree(state.segTree.tree, state.segTree.lazy, null);
@@ -453,13 +421,13 @@ function applyEvent(event) {
 
 function validateRange(left, right, size) {
   if (!Number.isInteger(left) || !Number.isInteger(right)) {
-    return "L and R must be integers.";
+    return 'L and R must be integers.';
   }
   if (left < 0 || right < 0) {
-    return "L and R must be non-negative.";
+    return 'L and R must be non-negative.';
   }
   if (left > right) {
-    return "Require L <= R.";
+    return 'Require L <= R.';
   }
   if (right >= size) {
     return `R is out of range. Max index is ${size - 1}.`;
@@ -469,7 +437,7 @@ function validateRange(left, right, size) {
 
 function prepareOperation() {
   if (!state.segTree) {
-    helpers.updateStatus("Load an array first.");
+    helpers.updateStatus('Load an array first.');
     return null;
   }
 
@@ -484,10 +452,10 @@ function prepareOperation() {
     return null;
   }
 
-  if (opType === "update") {
+  if (opType === 'update') {
     const delta = Number(elements.deltaValue.value);
     if (!Number.isFinite(delta) || !Number.isInteger(delta)) {
-      const message = "Delta must be an integer.";
+      const message = 'Delta must be an integer.';
       helpers.updateStatus(message);
       helpers.appendLog(message);
       return null;
@@ -508,9 +476,7 @@ function prepareOperation() {
   }
 
   const trace = state.segTree.generateRangeQuery(left, right);
-  const naive = state.values
-    .slice(left, right + 1)
-    .reduce((acc, value) => acc + value, 0);
+  const naive = state.values.slice(left, right + 1).reduce((acc, value) => acc + value, 0);
 
   return {
     opType,
@@ -540,13 +506,13 @@ function loadArray(values) {
 
   const message = `Loaded array of length ${values.length}. Ready for operations.`;
   helpers.updateStatus(message);
-  helpers.appendLog(`${message} Values: [${values.join(", ")}]`, "ok");
+  helpers.appendLog(`${message} Values: [${values.join(', ')}]`, 'ok');
 }
 
 function handleArrayLoadInput() {
   const parsed = parseArrayInput(elements.arrayInput.value, {
     maxValues: 16,
-    maxValuesMessage: "Please use at most 16 values so the tree stays readable.",
+    maxValuesMessage: 'Please use at most 16 values so the tree stays readable.',
   });
   if (parsed.error) {
     helpers.updateStatus(parsed.error);
@@ -558,13 +524,13 @@ function handleArrayLoadInput() {
 
 function handleRandomArray() {
   const values = randomIntegerArray({ minLength: 6, maxLength: 10, maxValue: 10 });
-  elements.arrayInput.value = values.join(", ");
+  elements.arrayInput.value = values.join(', ');
   loadArray(values);
 }
 
 function handleOperationTypeChange() {
-  const isUpdate = elements.opType.value === "update";
-  elements.deltaWrap.style.display = isUpdate ? "flex" : "none";
+  const isUpdate = elements.opType.value === 'update';
+  elements.deltaWrap.style.display = isUpdate ? 'flex' : 'none';
   helpers.focusCodePanel(elements.opType.value);
   helpers.clearCodeHighlights();
 }
@@ -573,9 +539,9 @@ function setOperationType(opType) {
   elements.opType.value = opType;
   handleOperationTypeChange();
   helpers.updateStatus(
-    opType === "update"
-      ? "Shortcut: switched to Range Add Update mode."
-      : "Shortcut: switched to Range Sum Query mode.",
+    opType === 'update'
+      ? 'Shortcut: switched to Range Add Update mode.'
+      : 'Shortcut: switched to Range Sum Query mode.',
   );
 }
 
@@ -591,17 +557,19 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadArrayBtn.addEventListener("click", handleArrayLoadInput);
-  elements.randomArrayBtn.addEventListener("click", handleRandomArray);
+  elements.loadArrayBtn.addEventListener('click', handleArrayLoadInput);
+  elements.randomArrayBtn.addEventListener('click', handleRandomArray);
 
-  elements.opType.addEventListener("change", handleOperationTypeChange);
+  elements.opType.addEventListener('change', handleOperationTypeChange);
 
   setupRunnerControls({
     elements,
@@ -617,8 +585,8 @@ function init() {
     extraShortcuts: {
       l: () => handleArrayLoadInput(),
       r: () => handleRandomArray(),
-      u: () => setOperationType("update"),
-      q: () => setOperationType("query"),
+      u: () => setOperationType('update'),
+      q: () => setOperationType('query'),
     },
   });
 

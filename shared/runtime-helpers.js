@@ -1,4 +1,4 @@
-import { createCodeHighlighter, createLogger } from "./tutorial-core.js";
+import { createCodeHighlighter, createLogger } from './tutorial-core.js';
 
 /**
  * Creates a set of commonly-used runtime helper functions for tutorial apps.
@@ -13,7 +13,7 @@ import { createCodeHighlighter, createLogger } from "./tutorial-core.js";
 export function createRuntimeHelpers({
   logOutput,
   statusMessage,
-  codePanelSelector = ".code-panel",
+  codePanelSelector = '.code-panel',
 }) {
   const logger = createLogger(logOutput);
   const codeHighlighter = createCodeHighlighter(codePanelSelector);
@@ -35,7 +35,7 @@ export function createRuntimeHelpers({
      * @param {string} message
      * @param {string} [tone=""] - Optional tone class (e.g., "ok", "error")
      */
-    appendLog(message, tone = "") {
+    appendLog(message, tone = '') {
       logger.append(message, tone);
     },
 

@@ -1,15 +1,12 @@
-import { createOperationRunner } from "../shared/tutorial-core.js";
+import { createOperationRunner } from '../shared/tutorial-core.js';
 import {
   createLabelToIndex,
   edgeKeyForMode,
   parseNodeLabelsInput,
   parseWeightedEdgesInput,
-} from "../shared/graph-input.js";
-import { setupRunnerControls } from "../shared/tutorial-bootstrap.js";
-import {
-  computeCircularNodePositions,
-  createSvgElement,
-} from "../shared/graph-core.js";
+} from '../shared/graph-input.js';
+import { setupRunnerControls } from '../shared/tutorial-bootstrap.js';
+import { computeCircularNodePositions, createSvgElement } from '../shared/graph-core.js';
 import {
   createDirectedPairSet,
   ensureArrowMarker,
@@ -17,11 +14,11 @@ import {
   prepareGraphCanvas,
   renderGraphEdges,
   renderGraphNodes,
-} from "../shared/graph-renderer.js";
-import { createRuntimeHelpers } from "../shared/runtime-helpers.js";
+} from '../shared/graph-renderer.js';
+import { createRuntimeHelpers } from '../shared/runtime-helpers.js';
 
 const SAMPLE_GRAPH = {
-  nodes: ["S", "A", "B", "C", "D", "E"],
+  nodes: ['S', 'A', 'B', 'C', 'D', 'E'],
   edgesText: `S A 4
 S E 5
 A C 6
@@ -33,7 +30,7 @@ E D -1`,
 };
 
 function formatDistance(value) {
-  return Number.isFinite(value) ? String(value) : "inf";
+  return Number.isFinite(value) ? String(value) : 'inf';
 }
 
 function buildGraph(nodes, displayEdges, mode) {
@@ -47,7 +44,7 @@ function buildGraph(nodes, displayEdges, mode) {
       displayId: edge.id,
     });
 
-    if (mode === "undirected") {
+    if (mode === 'undirected') {
       relaxEdges.push({
         from: edge.to,
         to: edge.from,
@@ -99,7 +96,7 @@ class BellmanFordTracer {
 
   #emit(events, message, line, state, extras = {}) {
     events.push({
-      opType: "bellman",
+      opType: 'bellman',
       message,
       line,
       snapshot: this.#snapshot(state, extras),
@@ -186,12 +183,7 @@ class BellmanFordTracer {
       }
 
       if (!updatedInPass) {
-        this.#emit(
-          events,
-          `No updates on pass ${pass}. Stop early.`,
-          6,
-          state,
-        );
+        this.#emit(events, `No updates on pass ${pass}. Stop early.`, 6, state);
         break;
       }
 
@@ -230,7 +222,7 @@ class BellmanFordTracer {
     }
 
     if (!cycleDetected) {
-      this.#emit(events, "Cycle-check pass found no further relaxation.", 7, state);
+      this.#emit(events, 'Cycle-check pass found no further relaxation.', 7, state);
     }
 
     const reachable = state.distances.filter((distance) => Number.isFinite(distance)).length;
@@ -255,32 +247,32 @@ class BellmanFordTracer {
 }
 
 const elements = {
-  nodesInput: document.getElementById("nodesInput"),
-  edgesInput: document.getElementById("edgesInput"),
-  loadGraphBtn: document.getElementById("loadGraphBtn"),
-  sampleGraphBtn: document.getElementById("sampleGraphBtn"),
-  randomGraphBtn: document.getElementById("randomGraphBtn"),
-  graphMode: document.getElementById("graphMode"),
-  sourceSelect: document.getElementById("sourceSelect"),
-  animateBtn: document.getElementById("animateBtn"),
-  stepBtn: document.getElementById("stepBtn"),
-  instantBtn: document.getElementById("instantBtn"),
-  finishBtn: document.getElementById("finishBtn"),
-  speedRange: document.getElementById("speedRange"),
-  speedLabel: document.getElementById("speedLabel"),
-  statusMessage: document.getElementById("statusMessage"),
-  passMetric: document.getElementById("passMetric"),
-  relaxMetric: document.getElementById("relaxMetric"),
-  cycleMetric: document.getElementById("cycleMetric"),
-  stepCounter: document.getElementById("stepCounter"),
-  graphViewPanel: document.getElementById("graphViewPanel"),
-  modeIndicator: document.getElementById("modeIndicator"),
-  graphCanvas: document.getElementById("graphCanvas"),
-  passStrip: document.getElementById("passStrip"),
-  distanceCards: document.getElementById("distanceCards"),
-  edgeRows: document.getElementById("edgeRows"),
-  clearLogBtn: document.getElementById("clearLogBtn"),
-  logOutput: document.getElementById("logOutput"),
+  nodesInput: document.getElementById('nodesInput'),
+  edgesInput: document.getElementById('edgesInput'),
+  loadGraphBtn: document.getElementById('loadGraphBtn'),
+  sampleGraphBtn: document.getElementById('sampleGraphBtn'),
+  randomGraphBtn: document.getElementById('randomGraphBtn'),
+  graphMode: document.getElementById('graphMode'),
+  sourceSelect: document.getElementById('sourceSelect'),
+  animateBtn: document.getElementById('animateBtn'),
+  stepBtn: document.getElementById('stepBtn'),
+  instantBtn: document.getElementById('instantBtn'),
+  finishBtn: document.getElementById('finishBtn'),
+  speedRange: document.getElementById('speedRange'),
+  speedLabel: document.getElementById('speedLabel'),
+  statusMessage: document.getElementById('statusMessage'),
+  passMetric: document.getElementById('passMetric'),
+  relaxMetric: document.getElementById('relaxMetric'),
+  cycleMetric: document.getElementById('cycleMetric'),
+  stepCounter: document.getElementById('stepCounter'),
+  graphViewPanel: document.getElementById('graphViewPanel'),
+  modeIndicator: document.getElementById('modeIndicator'),
+  graphCanvas: document.getElementById('graphCanvas'),
+  passStrip: document.getElementById('passStrip'),
+  distanceCards: document.getElementById('distanceCards'),
+  edgeRows: document.getElementById('edgeRows'),
+  clearLogBtn: document.getElementById('clearLogBtn'),
+  logOutput: document.getElementById('logOutput'),
 };
 
 const state = {
@@ -299,7 +291,7 @@ const helpers = createRuntimeHelpers({
 let operationRunner = null;
 
 function setAnimationEmphasis(enabled) {
-  elements.graphViewPanel.classList.toggle("playing", enabled);
+  elements.graphViewPanel.classList.toggle('playing', enabled);
 }
 
 function cloneSnapshot(snapshot) {
@@ -324,12 +316,12 @@ function getSelectedSourceIndex() {
 }
 
 function applyModeUi(mode) {
-  const directed = mode === "directed";
-  elements.graphViewPanel.classList.toggle("mode-directed", directed);
-  elements.graphViewPanel.classList.toggle("mode-undirected", !directed);
+  const directed = mode === 'directed';
+  elements.graphViewPanel.classList.toggle('mode-directed', directed);
+  elements.graphViewPanel.classList.toggle('mode-undirected', !directed);
   elements.modeIndicator.textContent = directed
-    ? "Directed mode: edges are relaxed one-way."
-    : "Undirected mode: each edge is treated as two directed relaxations.";
+    ? 'Directed mode: edges are relaxed one-way.'
+    : 'Undirected mode: each edge is treated as two directed relaxations.';
 }
 
 function getTreeEdgeIds(snapshot) {
@@ -344,12 +336,11 @@ function getTreeEdgeIds(snapshot) {
       continue;
     }
     const match = state.graph.displayEdges.find((edge) => {
-      if (state.mode === "directed") {
+      if (state.mode === 'directed') {
         return edge.from === parent && edge.to === node;
       }
       return (
-        (edge.from === parent && edge.to === node) ||
-        (edge.from === node && edge.to === parent)
+        (edge.from === parent && edge.to === node) || (edge.from === node && edge.to === parent)
       );
     });
     if (match) {
@@ -365,7 +356,7 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
     svgElement: elements.graphCanvas,
     fallbackSize: { width: 900, height: 520 },
     hasGraph: Boolean(state.graph),
-    emptyMessage: "Load a graph to visualize it.",
+    emptyMessage: 'Load a graph to visualize it.',
   });
   if (!prepared.ready) {
     return;
@@ -380,26 +371,26 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
   });
   const treeEdgeIds = getTreeEdgeIds(snapshot);
   const sourceIndex = getSelectedSourceIndex();
-  const drawDirected = state.mode === "directed";
+  const drawDirected = state.mode === 'directed';
 
   if (drawDirected) {
     ensureArrowMarker({
       svgElement: elements.graphCanvas,
-      id: "bf-arrow",
+      id: 'bf-arrow',
       markerWidth: 8,
       markerHeight: 8,
       refX: 7.2,
       refY: 4,
-      fill: "rgba(124, 85, 64, 0.9)",
+      fill: 'rgba(124, 85, 64, 0.9)',
     });
     ensureArrowMarker({
       svgElement: elements.graphCanvas,
-      id: "bf-arrow-active",
+      id: 'bf-arrow-active',
       markerWidth: 6,
       markerHeight: 6,
       refX: 5.5,
       refY: 3,
-      fill: "rgba(205, 110, 42, 0.98)",
+      fill: 'rgba(205, 110, 42, 0.98)',
     });
   }
 
@@ -410,13 +401,13 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
     positions,
     nodeRadius: 23,
     directed: drawDirected,
-    markerId: "bf-arrow",
-    activeMarkerId: "bf-arrow-active",
+    markerId: 'bf-arrow',
+    activeMarkerId: 'bf-arrow-active',
     activeEdgeId: activeDisplayEdgeId,
     curveOffsetForEdge: (edge) =>
       drawDirected ? getReverseCurveOffset(edge, directedPairs, 22) : 0,
     labelOffset: 11,
-    edgeClassFn: (edge) => (treeEdgeIds.has(edge.id) ? ["tree"] : []),
+    edgeClassFn: (edge) => (treeEdgeIds.has(edge.id) ? ['tree'] : []),
     edgeLabelTextFn: (edge) => String(edge.weight),
     edgeLabelWidthFn: (text) => 10 + text.length * 7,
     edgeLabelVerticalOffset: 0.4,
@@ -427,15 +418,15 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
     nodeCount: state.graph.nodes.length,
     positions,
     nodeClassFn: (index) => [
-      sourceIndex === index ? "source" : "",
-      !Number.isFinite(snapshot?.distances[index]) ? "unreachable" : "",
-      snapshot?.updatedNode === index ? "updated" : "",
-      snapshot?.cycleDetected && snapshot?.updatedNode === index ? "cycle" : "",
+      sourceIndex === index ? 'source' : '',
+      !Number.isFinite(snapshot?.distances[index]) ? 'unreachable' : '',
+      snapshot?.updatedNode === index ? 'updated' : '',
+      snapshot?.cycleDetected && snapshot?.updatedNode === index ? 'cycle' : '',
     ],
     renderNodeContent: ({ group, index, position }) => {
       if (snapshot?.updatedNode === index) {
-        const halo = createSvgElement("circle", {
-          class: "graph-current-halo",
+        const halo = createSvgElement('circle', {
+          class: 'graph-current-halo',
           cx: position.x,
           cy: position.y,
           r: 31,
@@ -443,23 +434,23 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
         group.appendChild(halo);
       }
 
-      const circle = createSvgElement("circle", {
+      const circle = createSvgElement('circle', {
         cx: position.x,
         cy: position.y,
         r: 23,
       });
       group.appendChild(circle);
 
-      const name = createSvgElement("text", {
-        class: "label",
+      const name = createSvgElement('text', {
+        class: 'label',
         x: position.x,
         y: position.y - 1,
       });
       name.textContent = state.graph.nodes[index];
       group.appendChild(name);
 
-      const dist = createSvgElement("text", {
-        class: "dist",
+      const dist = createSvgElement('text', {
+        class: 'dist',
         x: position.x,
         y: position.y + 34,
       });
@@ -470,12 +461,12 @@ function renderGraphCanvas(snapshot, activeDisplayEdgeId = null) {
 }
 
 function renderPassStrip(snapshot) {
-  elements.passStrip.innerHTML = "";
+  elements.passStrip.innerHTML = '';
 
   if (!state.graph) {
-    const idle = document.createElement("span");
-    idle.className = "pass-chip idle";
-    idle.textContent = "Load a graph first";
+    const idle = document.createElement('span');
+    idle.className = 'pass-chip idle';
+    idle.textContent = 'Load a graph first';
     elements.passStrip.appendChild(idle);
     return;
   }
@@ -484,59 +475,59 @@ function renderPassStrip(snapshot) {
   const currentPass = snapshot?.passIndex ?? 0;
 
   for (let pass = 1; pass <= maxPass; pass += 1) {
-    const chip = document.createElement("span");
-    chip.className = "pass-chip";
+    const chip = document.createElement('span');
+    chip.className = 'pass-chip';
     chip.textContent = `pass ${pass}`;
 
     if (currentPass > pass || currentPass > maxPass) {
-      chip.classList.add("done");
+      chip.classList.add('done');
     }
     if (currentPass === pass) {
-      chip.classList.add("current");
+      chip.classList.add('current');
     }
 
     elements.passStrip.appendChild(chip);
   }
 
-  const cycleChip = document.createElement("span");
-  cycleChip.className = "pass-chip cycle";
-  cycleChip.textContent = "check n";
+  const cycleChip = document.createElement('span');
+  cycleChip.className = 'pass-chip cycle';
+  cycleChip.textContent = 'check n';
   if (currentPass >= state.graph.nodes.length) {
-    cycleChip.classList.add("current");
+    cycleChip.classList.add('current');
   }
   if (snapshot?.cycleDetected) {
-    cycleChip.classList.add("done");
+    cycleChip.classList.add('done');
   }
   elements.passStrip.appendChild(cycleChip);
 }
 
 function renderDistances(snapshot) {
-  elements.distanceCards.innerHTML = "";
+  elements.distanceCards.innerHTML = '';
   if (!state.graph || !snapshot) {
     return;
   }
 
   for (let i = 0; i < state.graph.nodes.length; i += 1) {
-    const card = document.createElement("article");
-    card.className = "distance-card";
+    const card = document.createElement('article');
+    card.className = 'distance-card';
 
     const isUnreachable = !Number.isFinite(snapshot.distances[i]);
     if (isUnreachable) {
-      card.classList.add("unreachable");
+      card.classList.add('unreachable');
     }
     if (snapshot.updatedNode === i) {
-      card.classList.add("updated", "current");
+      card.classList.add('updated', 'current');
     }
 
     const sourceIndex = getSelectedSourceIndex();
-    let nodeState = "stable";
+    let nodeState = 'stable';
     if (sourceIndex === i) {
-      nodeState = "source";
+      nodeState = 'source';
     } else if (isUnreachable) {
-      nodeState = "unseen";
+      nodeState = 'unseen';
     }
 
-    const prev = snapshot.previous[i] === null ? "-" : state.graph.nodes[snapshot.previous[i]];
+    const prev = snapshot.previous[i] === null ? '-' : state.graph.nodes[snapshot.previous[i]];
 
     card.innerHTML = `
       <div class="distance-head">
@@ -552,17 +543,17 @@ function renderDistances(snapshot) {
 }
 
 function renderEdges(activeDisplayEdgeId = null) {
-  elements.edgeRows.innerHTML = "";
+  elements.edgeRows.innerHTML = '';
   if (!state.graph) {
     return;
   }
 
-  const arrow = state.mode === "directed" ? "->" : "<->";
+  const arrow = state.mode === 'directed' ? '->' : '<->';
 
   for (const edge of state.graph.displayEdges) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     if (activeDisplayEdgeId !== null && edge.id === activeDisplayEdgeId) {
-      row.classList.add("active-edge");
+      row.classList.add('active-edge');
     }
 
     row.innerHTML = `
@@ -594,7 +585,7 @@ function updateMetrics() {
   }
 
   elements.relaxMetric.textContent = String(state.lastRelaxCount);
-  elements.cycleMetric.textContent = state.lastCycleDetected ? "Yes" : "No";
+  elements.cycleMetric.textContent = state.lastCycleDetected ? 'Yes' : 'No';
 
   const step = operationRunner ? operationRunner.eventIndex : 0;
   const totalSteps = operationRunner ? operationRunner.pendingLength : 0;
@@ -618,7 +609,7 @@ function finalizePendingOperation(meta) {
   state.lastCycleDetected = meta.cycleDetected;
 
   helpers.updateStatus(meta.summary);
-  helpers.appendLog(meta.summary, meta.success ? "ok" : "");
+  helpers.appendLog(meta.summary, meta.success ? 'ok' : '');
 
   renderSnapshot(state.lastSnapshot, null);
   helpers.clearCodeHighlights();
@@ -627,17 +618,17 @@ function finalizePendingOperation(meta) {
 
 function populateSourceSelect(nodes) {
   const previousValue = elements.sourceSelect.value;
-  elements.sourceSelect.innerHTML = "";
+  elements.sourceSelect.innerHTML = '';
 
   nodes.forEach((label, index) => {
-    const option = document.createElement("option");
+    const option = document.createElement('option');
     option.value = String(index);
     option.textContent = label;
     elements.sourceSelect.appendChild(option);
   });
 
   const hasPrevious = nodes.some((_, index) => String(index) === previousValue);
-  elements.sourceSelect.value = hasPrevious ? previousValue : "0";
+  elements.sourceSelect.value = hasPrevious ? previousValue : '0';
 }
 
 function clearGraphState() {
@@ -693,13 +684,13 @@ function loadGraphFromInputs() {
   state.lastSnapshot = state.tracer.createBlankSnapshot();
 
   renderSnapshot(state.lastSnapshot, null);
-  helpers.focusCodePanel("bellman");
+  helpers.focusCodePanel('bellman');
   helpers.clearCodeHighlights();
   updateMetrics();
 
   const message = `Loaded ${state.graph.nodes.length} nodes and ${state.graph.displayEdges.length} edges in ${state.mode} mode.`;
   helpers.updateStatus(message);
-  helpers.appendLog(message, "ok");
+  helpers.appendLog(message, 'ok');
   return true;
 }
 
@@ -720,7 +711,7 @@ function applyModeAndReload(mode) {
 }
 
 function randomWeight(mode) {
-  if (mode === "directed") {
+  if (mode === 'directed') {
     return -3 + Math.floor(Math.random() * 12);
   }
   return 1 + Math.floor(Math.random() * 12);
@@ -769,28 +760,28 @@ function generateRandomGraph(mode) {
 }
 
 function loadSampleGraph() {
-  setGraphMode("directed");
-  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(", ");
+  setGraphMode('directed');
+  elements.nodesInput.value = SAMPLE_GRAPH.nodes.join(', ');
   elements.edgesInput.value = SAMPLE_GRAPH.edgesText;
   loadGraphFromInputs();
 }
 
 function loadRandomGraph() {
   const random = generateRandomGraph(state.mode);
-  elements.nodesInput.value = random.nodes.join(", ");
-  elements.edgesInput.value = random.edgeLines.join("\n");
+  elements.nodesInput.value = random.nodes.join(', ');
+  elements.edgesInput.value = random.edgeLines.join('\n');
   loadGraphFromInputs();
 }
 
 function prepareOperation() {
   if (!state.tracer || !state.graph) {
-    helpers.updateStatus("Load a graph first.");
+    helpers.updateStatus('Load a graph first.');
     return null;
   }
 
   const sourceIndex = getSelectedSourceIndex();
   if (sourceIndex === null || sourceIndex < 0 || sourceIndex >= state.graph.nodes.length) {
-    const message = "Choose a valid source node.";
+    const message = 'Choose a valid source node.';
     helpers.updateStatus(message);
     helpers.appendLog(message);
     return null;
@@ -798,7 +789,7 @@ function prepareOperation() {
 
   const trace = state.tracer.generateRun(sourceIndex);
   return {
-    opType: "bellman",
+    opType: 'bellman',
     events: trace.events,
     cycleDetected: trace.cycleDetected,
     relaxCount: trace.relaxCount,
@@ -835,19 +826,21 @@ function init() {
     updateMetrics,
     finalizeOperation: finalizePendingOperation,
     onPrepared: (operation) => {
-      helpers.appendLog(`Prepared ${operation.opType} run with ${operation.events.length} trace steps.`);
+      helpers.appendLog(
+        `Prepared ${operation.opType} run with ${operation.events.length} trace steps.`,
+      );
     },
     onNoPending: () => {
       setAnimationEmphasis(false);
-      helpers.updateStatus("No pending operation to finish.");
+      helpers.updateStatus('No pending operation to finish.');
     },
   });
 
-  elements.loadGraphBtn.addEventListener("click", loadGraphFromInputs);
-  elements.sampleGraphBtn.addEventListener("click", loadSampleGraph);
-  elements.randomGraphBtn.addEventListener("click", loadRandomGraph);
+  elements.loadGraphBtn.addEventListener('click', loadGraphFromInputs);
+  elements.sampleGraphBtn.addEventListener('click', loadSampleGraph);
+  elements.randomGraphBtn.addEventListener('click', loadRandomGraph);
 
-  elements.graphMode.addEventListener("change", () => {
+  elements.graphMode.addEventListener('change', () => {
     applyModeAndReload(elements.graphMode.value);
   });
 
@@ -866,12 +859,12 @@ function init() {
       l: () => loadGraphFromInputs(),
       m: () => loadSampleGraph(),
       r: () => loadRandomGraph(),
-      d: () => applyModeAndReload("directed"),
-      u: () => applyModeAndReload("undirected"),
+      d: () => applyModeAndReload('directed'),
+      u: () => applyModeAndReload('undirected'),
     },
   });
 
-  helpers.focusCodePanel("bellman");
+  helpers.focusCodePanel('bellman');
   applyModeUi(state.mode);
   loadSampleGraph();
 }
