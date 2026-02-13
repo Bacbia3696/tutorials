@@ -4,6 +4,7 @@
 
 Interactive, browser-based labs for learning core data structures and graph algorithms:
 - `trie/`: insert/search/prefix/delete tracing for Trie
+- `kmp/`: LPS construction + Knuth-Morris-Pratt string matching trace
 - `segment_tree/`: range update and range query with lazy propagation
 - `sparse_segment_tree/`: dynamic segment tree with lazy node creation over large index spaces
 - `fenwick_tree/`: point updates and prefix/range sums with BIT
@@ -32,6 +33,7 @@ python3 -m http.server 4173
 
 Then open `http://localhost:4173/` for the landing page, or navigate directly to a tutorial:
 - `http://localhost:4173/trie/`
+- `http://localhost:4173/kmp/`
 - `http://localhost:4173/segment_tree/`
 - `http://localhost:4173/sparse_segment_tree/`
 - `http://localhost:4173/fenwick_tree/`
@@ -45,7 +47,7 @@ Then open `http://localhost:4173/` for the landing page, or navigate directly to
 ## Repository Layout
 
 - `index.html`: landing page skeleton rendered from `shared/tutorial-registry.js` via `shared/landing-page.js`
-- `trie/`, `segment_tree/`, `sparse_segment_tree/`, `fenwick_tree/`, `dsu/`, `dijkstra/`, `bellman_ford/`, `kruskal/`, `eulerian_path/`, `topological_sort/`
+- `trie/`, `kmp/`, `segment_tree/`, `sparse_segment_tree/`, `fenwick_tree/`, `dsu/`, `dijkstra/`, `bellman_ford/`, `kruskal/`, `eulerian_path/`, `topological_sort/`
   - `index.html`: minimal page stub that delegates bootstrapping to `shared/tutorial-page.js`
   - `styles.css`: module-specific theme and layout
   - `app.js`: Lit host component template + runtime bootstrap

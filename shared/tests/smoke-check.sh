@@ -3,6 +3,7 @@ set -euo pipefail
 
 MODULES=(
   trie
+  kmp
   segment_tree
   sparse_segment_tree
   fenwick_tree

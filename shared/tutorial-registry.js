@@ -1,5 +1,6 @@
 const tutorialOrder = [
   "trie",
+  "kmp",
   "segment_tree",
   "sparse_segment_tree",
   "fenwick_tree",
@@ -33,6 +34,22 @@ export const tutorialRegistry = Object.freeze({
     fontHref:
       "https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap",
     tagName: "trie-tutorial-app",
+    moduleEntryPath: "./app.js",
+  }),
+  kmp: freezeTutorial({
+    id: "kmp",
+    category: "ds",
+    route: "kmp/",
+    title: "KMP Algorithm Tutorial Lab",
+    description:
+      "Interactive Knuth-Morris-Pratt (KMP) tutorial. Trace LPS array construction and pattern matching step-by-step.",
+    landingTitle: "KMP String Matching",
+    landingDescription:
+      "Build the LPS table and scan text with the Knuth-Morris-Pratt algorithm. See how mismatch fallback skips redundant comparisons.",
+    landingTags: ["kmp", "string-matching", "lps"],
+    fontHref:
+      "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap",
+    tagName: "kmp-tutorial-app",
     moduleEntryPath: "./app.js",
   }),
   segment_tree: freezeTutorial({
