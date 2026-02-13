@@ -12,6 +12,7 @@ MODULES=(
   bellman_ford
   kruskal
   convex_hull
+  line_sweep
   eulerian_path
   topological_sort
 )

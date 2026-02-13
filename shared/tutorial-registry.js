@@ -9,6 +9,7 @@ const tutorialOrder = [
   "bellman_ford",
   "kruskal",
   "convex_hull",
+  "line_sweep",
   "eulerian_path",
   "topological_sort",
 ];
@@ -179,6 +180,22 @@ export const tutorialRegistry = Object.freeze({
     fontHref:
       "https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap",
     tagName: "convex-hull-tutorial-app",
+    moduleEntryPath: "./app.js",
+  }),
+  line_sweep: freezeTutorial({
+    id: "line_sweep",
+    category: "graph",
+    route: "line_sweep/",
+    title: "Line Sweep Tutorial Lab",
+    description:
+      "Interactive Line Sweep tutorial for interval overlap analysis. Trace event sorting, active-set updates, and maximum-overlap checkpoints step-by-step.",
+    landingTitle: "Line Sweep (Interval Overlap)",
+    landingDescription:
+      "Convert intervals into endpoint events, sort by coordinate, and sweep once to track active intervals and maximum overlap.",
+    landingTags: ["line-sweep", "intervals", "event-sorting", "overlap"],
+    fontHref:
+      "https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap",
+    tagName: "line-sweep-tutorial-app",
     moduleEntryPath: "./app.js",
   }),
   eulerian_path: freezeTutorial({
