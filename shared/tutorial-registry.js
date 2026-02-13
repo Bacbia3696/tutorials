@@ -8,6 +8,7 @@ const tutorialOrder = [
   "dijkstra",
   "bellman_ford",
   "kruskal",
+  "convex_hull",
   "eulerian_path",
   "topological_sort",
 ];
@@ -162,6 +163,22 @@ export const tutorialRegistry = Object.freeze({
     fontHref:
       "https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Roboto+Mono:wght@400;500&display=swap",
     tagName: "kruskal-tutorial-app",
+    moduleEntryPath: "./app.js",
+  }),
+  convex_hull: freezeTutorial({
+    id: "convex_hull",
+    category: "graph",
+    route: "convex_hull/",
+    title: "Convex Hull Tutorial Lab",
+    description:
+      "Interactive Convex Hull tutorial using Andrew's Monotonic Chain algorithm. Trace point sorting, orientation checks, stack pops, and final hull assembly step-by-step.",
+    landingTitle: "Convex Hull (Monotonic Chain)",
+    landingDescription:
+      "Build the convex hull of 2D points by scanning sorted points twice. Watch orientation checks keep only left turns while lower and upper chains form.",
+    landingTags: ["computational-geometry", "orientation-test", "monotonic-chain"],
+    fontHref:
+      "https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap",
+    tagName: "convex-hull-tutorial-app",
     moduleEntryPath: "./app.js",
   }),
   eulerian_path: freezeTutorial({

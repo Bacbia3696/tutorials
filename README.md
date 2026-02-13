@@ -12,6 +12,7 @@ Interactive, browser-based labs for learning core data structures and graph algo
 - `dijkstra/`: shortest paths in weighted graphs with step-by-step relaxation tracing
 - `bellman_ford/`: pass-by-pass relaxation tracing with negative-cycle detection
 - `kruskal/`: minimum spanning tree construction with sorted-edge + DSU cycle checks
+- `convex_hull/`: Andrew's monotonic chain tracing with orientation checks and hull assembly
 - `eulerian_path/`: Eulerian path detection + construction with Hierholzer stack traversal
 - `topological_sort/`: Kahn's algorithm tracing for queue/indegree/order evolution
 
@@ -41,13 +42,14 @@ Then open `http://localhost:4173/` for the landing page, or navigate directly to
 - `http://localhost:4173/dsu/`
 - `http://localhost:4173/bellman_ford/`
 - `http://localhost:4173/kruskal/`
+- `http://localhost:4173/convex_hull/`
 - `http://localhost:4173/eulerian_path/`
 - `http://localhost:4173/topological_sort/`
 
 ## Repository Layout
 
 - `index.html`: landing page skeleton rendered from `shared/tutorial-registry.js` via `shared/landing-page.js`
-- `trie/`, `kmp/`, `segment_tree/`, `sparse_segment_tree/`, `fenwick_tree/`, `dsu/`, `dijkstra/`, `bellman_ford/`, `kruskal/`, `eulerian_path/`, `topological_sort/`
+- `trie/`, `kmp/`, `segment_tree/`, `sparse_segment_tree/`, `fenwick_tree/`, `dsu/`, `dijkstra/`, `bellman_ford/`, `kruskal/`, `convex_hull/`, `eulerian_path/`, `topological_sort/`
   - `index.html`: minimal page stub that delegates bootstrapping to `shared/tutorial-page.js`
   - `styles.css`: module-specific theme and layout
   - `app.js`: Lit host component template + runtime bootstrap

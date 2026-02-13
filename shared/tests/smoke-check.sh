@@ -11,6 +11,7 @@ MODULES=(
   dijkstra
   bellman_ford
   kruskal
+  convex_hull
   eulerian_path
   topological_sort
 )
