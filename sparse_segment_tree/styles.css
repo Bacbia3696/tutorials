@@ -308,6 +308,13 @@ code {
   color: #35524a;
 }
 
+.node-card .node-children {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: #516b63;
+}
+
 .node-card.has-lazy {
   border-color: rgba(255, 153, 0, 0.5);
   background: linear-gradient(160deg, #fff8ea, #fff1d8);

@@ -53,27 +53,30 @@ class LazySegTreeTracer {
       });
     };
 
-    const resolveLazy = (node, left, right) => {
-      if (lazy[node] === 0) {
+    const pushDown = (node, left, right) => {
+      if (lazy[node] === 0 || left === right) {
         return;
       }
       const pending = lazy[node];
-      tree[node] += (right - left + 1) * pending;
       emit(
-        `Resolve pending +${pending} on [${left}, ${right}], update node sum`,
+        `Resolve pending +${pending} on [${left}, ${right}] before descending`,
         node,
         2,
       );
 
-      if (left !== right) {
-        lazy[node * 2] += pending;
-        lazy[node * 2 + 1] += pending;
-        emit(
-          `Push pending +${pending} to children of [${left}, ${right}]`,
-          node,
-          3,
-        );
-      }
+      const mid = Math.floor((left + right) / 2);
+      const leftLength = mid - left + 1;
+      const rightLength = right - mid;
+
+      tree[node * 2] += leftLength * pending;
+      lazy[node * 2] += pending;
+      tree[node * 2 + 1] += rightLength * pending;
+      lazy[node * 2 + 1] += pending;
+      emit(
+        `Push pending +${pending} to children of [${left}, ${right}]`,
+        node,
+        3,
+      );
 
       lazy[node] = 0;
       emit(`Clear lazy tag at [${left}, ${right}]`, node, 3);
@@ -81,7 +84,6 @@ class LazySegTreeTracer {
 
     const update = (node, left, right) => {
       emit(`Visit [${left}, ${right}]`, node, 1);
-      resolveLazy(node, left, right);
 
       if (right < qLeft || left > qRight) {
         emit(`No overlap with query range [${qLeft}, ${qRight}]`, node, 4);
@@ -89,27 +91,28 @@ class LazySegTreeTracer {
       }
 
       if (qLeft <= left && right <= qRight) {
-        tree[node] += (right - left + 1) * delta;
+        const length = right - left + 1;
+        tree[node] += length * delta;
+        if (left !== right) {
+          lazy[node] += delta;
+        }
         emit(
-          `Total overlap: add ${delta} * len(${right - left + 1}) to [${left}, ${right}]`,
+          `Total overlap: add ${delta} * len(${length}) to [${left}, ${right}], mark node lazy if internal`,
           node,
           5,
         );
-        if (left !== right) {
-          lazy[node * 2] += delta;
-          lazy[node * 2 + 1] += delta;
-          emit(
-            `Mark children lazy += ${delta} for segment [${left}, ${right}]`,
-            node,
-            5,
-          );
-        }
         return;
       }
 
+      pushDown(node, left, right);
+
       const mid = Math.floor((left + right) / 2);
-      update(node * 2, left, mid);
-      update(node * 2 + 1, mid + 1, right);
+      if (qLeft <= mid) {
+        update(node * 2, left, mid);
+      }
+      if (qRight > mid) {
+        update(node * 2 + 1, mid + 1, right);
+      }
       tree[node] = tree[node * 2] + tree[node * 2 + 1];
       emit(`Recompute [${left}, ${right}] = leftChild + rightChild`, node, 6);
     };
@@ -144,27 +147,30 @@ class LazySegTreeTracer {
       });
     };
 
-    const resolveLazy = (node, left, right) => {
-      if (lazy[node] === 0) {
+    const pushDown = (node, left, right) => {
+      if (lazy[node] === 0 || left === right) {
         return;
       }
       const pending = lazy[node];
-      tree[node] += (right - left + 1) * pending;
       emit(
-        `Resolve pending +${pending} on [${left}, ${right}] before query`,
+        `Resolve pending +${pending} on [${left}, ${right}] before descending`,
         node,
         2,
       );
 
-      if (left !== right) {
-        lazy[node * 2] += pending;
-        lazy[node * 2 + 1] += pending;
-        emit(
-          `Push pending +${pending} down from [${left}, ${right}]`,
-          node,
-          3,
-        );
-      }
+      const mid = Math.floor((left + right) / 2);
+      const leftLength = mid - left + 1;
+      const rightLength = right - mid;
+
+      tree[node * 2] += leftLength * pending;
+      lazy[node * 2] += pending;
+      tree[node * 2 + 1] += rightLength * pending;
+      lazy[node * 2 + 1] += pending;
+      emit(
+        `Push pending +${pending} down from [${left}, ${right}]`,
+        node,
+        3,
+      );
 
       lazy[node] = 0;
       emit(`Clear lazy tag at [${left}, ${right}]`, node, 3);
@@ -172,7 +178,6 @@ class LazySegTreeTracer {
 
     const query = (node, left, right) => {
       emit(`Visit [${left}, ${right}]`, node, 1);
-      resolveLazy(node, left, right);
 
       if (right < qLeft || left > qRight) {
         emit(`No overlap with [${qLeft}, ${qRight}] => return 0`, node, 4, {
@@ -191,9 +196,17 @@ class LazySegTreeTracer {
         return tree[node];
       }
 
+      pushDown(node, left, right);
+
       const mid = Math.floor((left + right) / 2);
-      const leftPart = query(node * 2, left, mid);
-      const rightPart = query(node * 2 + 1, mid + 1, right);
+      let leftPart = 0;
+      let rightPart = 0;
+      if (qLeft <= mid) {
+        leftPart = query(node * 2, left, mid);
+      }
+      if (qRight > mid) {
+        rightPart = query(node * 2 + 1, mid + 1, right);
+      }
       const total = leftPart + rightPart;
       emit(
         `Combine children for [${left}, ${right}] => ${leftPart} + ${rightPart} = ${total}`,

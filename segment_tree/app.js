@@ -112,24 +112,24 @@ defineTutorialApp(import.meta.url, {
           <div class="code-panel" data-op="update">
             <h3>Range Add Update</h3>
             <ol>
-              <li data-line="1">Visit node</li>
-              <li data-line="2">Resolve pending lazy tag on current node</li>
-              <li data-line="3">Push pending tag to children if internal node</li>
+              <li data-line="1">Visit current node (repeats for each recursive call)</li>
+              <li data-line="2">For partial overlap: resolve pending lazy on current node</li>
+              <li data-line="3">For partial overlap: push pending lazy to children</li>
               <li data-line="4">Return if no overlap</li>
-              <li data-line="5">If total overlap: update sum and mark children lazy</li>
-              <li data-line="6">Otherwise recurse, then recompute sum from children</li>
+              <li data-line="5">If total overlap: update sum and mark current node lazy (if internal), then return</li>
+              <li data-line="6">If partial overlap: recurse and recompute sum</li>
             </ol>
           </div>
 
           <div class="code-panel" data-op="query">
             <h3>Range Sum Query</h3>
             <ol>
-              <li data-line="1">Visit node</li>
-              <li data-line="2">Resolve pending lazy tag on current node</li>
-              <li data-line="3">Push pending tag to children if internal node</li>
+              <li data-line="1">Visit current node (repeats for each recursive call)</li>
+              <li data-line="2">For partial overlap: resolve pending lazy on current node</li>
+              <li data-line="3">For partial overlap: push pending lazy to children</li>
               <li data-line="4">Return 0 if no overlap</li>
               <li data-line="5">If total overlap: return node sum</li>
-              <li data-line="6">Otherwise recurse and return left + right</li>
+              <li data-line="6">If partial overlap: recurse and return left + right</li>
             </ol>
           </div>
         </div>

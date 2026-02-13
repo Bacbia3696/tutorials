@@ -12,8 +12,9 @@ defineTutorialApp(import.meta.url, {
         <p class="eyebrow">Segment Tree Playground</p>
         <h1>Sparse Segment Tree Lab</h1>
         <p class="hero-copy">
-          Learn dynamic segment trees over huge index ranges. Nodes are created only
-          when an update touches a segment, while untouched areas stay implicit.
+          Learn dynamic segment trees over huge index ranges with lazy propagation.
+          Nodes are created only when recursion needs them, while untouched ranges
+          remain implicit.
         </p>
       </header>
 
@@ -39,7 +40,7 @@ defineTutorialApp(import.meta.url, {
 
               <div class="control-group">
                 <label for="boundRight">Universe Right (R)</label>
-                <input id="boundRight" type="number" value="63" />
+                <input id="boundRight" type="number" value="15" />
               </div>
 
               <div class="control-group control-group-end">
@@ -52,29 +53,24 @@ defineTutorialApp(import.meta.url, {
               <div class="control-group">
                 <label for="opType">Operation</label>
                 <select id="opType">
-                  <option value="update">Point Add Update</option>
+                  <option value="update">Range Add Update</option>
                   <option value="query">Range Sum Query</option>
                 </select>
               </div>
 
-              <div class="control-group" id="pointIndexWrap">
-                <label for="pointIndex">Point Index</label>
-                <input id="pointIndex" type="number" value="42" />
+              <div class="control-group" id="leftWrap">
+                <label for="leftIndex">Left Index (L)</label>
+                <input id="leftIndex" type="number" value="4" />
+              </div>
+
+              <div class="control-group" id="rightWrap">
+                <label for="rightIndex">Right Index (R)</label>
+                <input id="rightIndex" type="number" value="8" />
               </div>
 
               <div class="control-group" id="deltaWrap">
                 <label for="deltaValue">Delta (+V)</label>
                 <input id="deltaValue" type="number" value="5" />
-              </div>
-
-              <div class="control-group" id="leftWrap">
-                <label for="leftIndex">Left Index (L)</label>
-                <input id="leftIndex" type="number" value="0" />
-              </div>
-
-              <div class="control-group" id="rightWrap">
-                <label for="rightIndex">Right Index (R)</label>
-                <input id="rightIndex" type="number" value="127" />
               </div>
             </div>
           </div>
@@ -106,14 +102,15 @@ defineTutorialApp(import.meta.url, {
       </section>
 
       <section class="array-view panel">
-        <h2>Materialized Point Values (naive map)</h2>
+        <h2>Probe Point Values (sampled)</h2>
         <div id="pointStrip" class="point-strip"></div>
       </section>
 
       <section class="tree-view panel">
         <h2>Sparse Tree Nodes</h2>
         <p class="hint">
-          Card format: <code>#id [l,r]</code>, <code>sum</code>. Only materialized nodes are shown.
+          Card format: <code>#id [l,r]</code>, <code>sum</code>, <code>lazy</code>, child ids.
+          Only materialized nodes are shown.
           Active recursion node pulses. The view auto-fits to keep the full materialized tree visible.
         </p>
         <div id="treeContainer" class="tree-container"></div>
@@ -136,25 +133,26 @@ defineTutorialApp(import.meta.url, {
         <h2>Algorithm Lens</h2>
         <div class="code-grid">
           <div class="code-panel" data-op="update">
-            <h3>Point Add Update</h3>
+            <h3>Range Add Update</h3>
             <ol>
-              <li data-line="1">Visit node segment [l, r]</li>
-              <li data-line="2">If leaf, apply delta to node sum and return</li>
-              <li data-line="3">Compute midpoint</li>
-              <li data-line="4">Create needed child lazily if missing</li>
-              <li data-line="5">Recurse into chosen child branch</li>
-              <li data-line="6">Recompute current node sum from children</li>
+              <li data-line="1">Visit current node (repeats for each recursive call)</li>
+              <li data-line="2">For partial overlap: resolve pending lazy on current node</li>
+              <li data-line="3">For partial overlap: push pending lazy to children</li>
+              <li data-line="4">Return if no overlap</li>
+              <li data-line="5">If total overlap: update sum and mark lazy (if internal), then return</li>
+              <li data-line="6">If partial overlap: recurse to needed halves, then recompute sum</li>
             </ol>
           </div>
 
           <div class="code-panel" data-op="query">
             <h3>Range Sum Query</h3>
             <ol>
-              <li data-line="1">If node is missing, contribution is 0</li>
-              <li data-line="2">Return 0 for no overlap</li>
-              <li data-line="3">Return node sum for total overlap</li>
-              <li data-line="4">Otherwise recurse into both halves</li>
-              <li data-line="5">Return left contribution + right contribution</li>
+              <li data-line="1">Visit current segment/node context (repeats per recursive call)</li>
+              <li data-line="2">For partial overlap: resolve pending lazy on current node</li>
+              <li data-line="3">For partial overlap: push pending lazy to children</li>
+              <li data-line="4">Return 0 if no overlap</li>
+              <li data-line="5">If total overlap: return node sum</li>
+              <li data-line="6">If partial overlap: recurse and return combined child sums</li>
             </ol>
           </div>
         </div>

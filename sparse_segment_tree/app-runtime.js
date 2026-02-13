@@ -24,6 +24,7 @@ class SparseSegTreeTracer {
       depth,
       parentId,
       sum: 0,
+      lazy: 0,
       leftChild: null,
       rightChild: null,
     };
@@ -44,6 +45,7 @@ class SparseSegTreeTracer {
       depth: node.depth,
       parentId: node.parentId,
       sum: node.sum,
+      lazy: node.lazy,
       leftChildId: node.leftChild ? node.leftChild.id : null,
       rightChildId: node.rightChild ? node.rightChild.id : null,
     }));
@@ -61,7 +63,82 @@ class SparseSegTreeTracer {
     return nodes;
   }
 
-  generatePointAdd(index, delta) {
+  #midpoint(node) {
+    return Math.floor((node.left + node.right) / 2);
+  }
+
+  #ensureLeftChild(node, mid = this.#midpoint(node)) {
+    if (!node.leftChild) {
+      node.leftChild = this.#createNode(node.left, mid, node.depth + 1, node.id);
+    }
+    return node.leftChild;
+  }
+
+  #ensureRightChild(node, mid = this.#midpoint(node)) {
+    if (!node.rightChild) {
+      node.rightChild = this.#createNode(mid + 1, node.right, node.depth + 1, node.id);
+    }
+    return node.rightChild;
+  }
+
+  #recompute(node) {
+    const leftSum = node.leftChild ? node.leftChild.sum : 0;
+    const rightSum = node.rightChild ? node.rightChild.sum : 0;
+    node.sum = leftSum + rightSum;
+  }
+
+  #pushLazy(node, emit) {
+    if (node.lazy === 0 || node.left === node.right) {
+      return;
+    }
+
+    const pending = node.lazy;
+    emit(
+      `Resolve pending +${pending} on [${node.left}, ${node.right}]`,
+      2,
+      node,
+    );
+
+    const mid = this.#midpoint(node);
+    const leftChild = this.#ensureLeftChild(node, mid);
+    const rightChild = this.#ensureRightChild(node, mid);
+    const leftLength = mid - node.left + 1;
+    const rightLength = node.right - mid;
+
+    leftChild.sum += leftLength * pending;
+    leftChild.lazy += pending;
+    rightChild.sum += rightLength * pending;
+    rightChild.lazy += pending;
+    emit(
+      `Push pending +${pending} to children of [${node.left}, ${node.right}]`,
+      3,
+      node,
+    );
+
+    node.lazy = 0;
+    emit(`Clear lazy tag at [${node.left}, ${node.right}]`, 3, node);
+  }
+
+  #pushLazyImmediate(node) {
+    if (node.lazy === 0 || node.left === node.right) {
+      return;
+    }
+
+    const pending = node.lazy;
+    const mid = this.#midpoint(node);
+    const leftChild = this.#ensureLeftChild(node, mid);
+    const rightChild = this.#ensureRightChild(node, mid);
+    const leftLength = mid - node.left + 1;
+    const rightLength = node.right - mid;
+
+    leftChild.sum += leftLength * pending;
+    leftChild.lazy += pending;
+    rightChild.sum += rightLength * pending;
+    rightChild.lazy += pending;
+    node.lazy = 0;
+  }
+
+  generateRangeAdd(queryLeft, queryRight, delta) {
     const events = [];
 
     const emit = (message, line, activeNode, extras = {}) => {
@@ -75,61 +152,55 @@ class SparseSegTreeTracer {
       });
     };
 
-    const update = (node) => {
+    const update = (node, left, right) => {
       emit(`Visit node [${node.left}, ${node.right}]`, 1, node);
 
-      if (node.left === node.right) {
-        node.sum += delta;
-        emit(
-          `Leaf hit at index ${node.left}: add ${delta}, sum becomes ${node.sum}`,
-          2,
-          node,
-        );
+      if (right < queryLeft || left > queryRight) {
+        emit(`No overlap with [${queryLeft}, ${queryRight}]`, 4, node, { contribution: 0 });
         return;
       }
 
-      const mid = Math.floor((node.left + node.right) / 2);
-      emit(`Split [${node.left}, ${node.right}] at mid=${mid}`, 3, node);
-
-      if (index <= mid) {
-        if (!node.leftChild) {
-          node.leftChild = this.#createNode(node.left, mid, node.depth + 1, node.id);
+      if (queryLeft <= left && right <= queryRight) {
+        const length = right - left + 1;
+        node.sum += length * delta;
+        if (left !== right) {
+          node.lazy += delta;
           emit(
-            `Create left child [${node.left}, ${mid}] lazily`,
-            4,
-            node.leftChild,
+            `Total overlap: add ${delta} * len(${length}) on [${left}, ${right}] and mark lazy`,
+            5,
+            node,
           );
+        } else {
+          emit(`Leaf overlap at index ${left}: sum becomes ${node.sum}`, 5, node);
         }
-
-        emit(`Recurse into left child for index ${index}`, 5, node.leftChild);
-        update(node.leftChild);
-      } else {
-        if (!node.rightChild) {
-          node.rightChild = this.#createNode(mid + 1, node.right, node.depth + 1, node.id);
-          emit(
-            `Create right child [${mid + 1}, ${node.right}] lazily`,
-            4,
-            node.rightChild,
-          );
-        }
-
-        emit(`Recurse into right child for index ${index}`, 5, node.rightChild);
-        update(node.rightChild);
+        return;
       }
 
-      const leftSum = node.leftChild ? node.leftChild.sum : 0;
-      const rightSum = node.rightChild ? node.rightChild.sum : 0;
-      node.sum = leftSum + rightSum;
+      this.#pushLazy(node, emit);
+
+      const mid = Math.floor((left + right) / 2);
+      if (queryLeft <= mid) {
+        const leftChild = this.#ensureLeftChild(node, mid);
+        emit(`Recurse into left child [${left}, ${mid}]`, 6, leftChild);
+        update(leftChild, left, mid);
+      }
+      if (queryRight > mid) {
+        const rightChild = this.#ensureRightChild(node, mid);
+        emit(`Recurse into right child [${mid + 1}, ${right}]`, 6, rightChild);
+        update(rightChild, mid + 1, right);
+      }
+
+      this.#recompute(node);
       emit(
-        `Recompute [${node.left}, ${node.right}] = ${leftSum} + ${rightSum} = ${node.sum}`,
+        `Recompute [${left}, ${right}] from children, sum=${node.sum}`,
         6,
         node,
       );
     };
 
-    update(this.root);
+    update(this.root, this.leftBound, this.rightBound);
     emit(
-      `Update complete: value at index ${index} increased by ${delta}`,
+      `Update complete: added ${delta} to every index in [${queryLeft}, ${queryRight}]`,
       0,
       this.root,
       { done: true },
@@ -138,39 +209,50 @@ class SparseSegTreeTracer {
     return { events };
   }
 
-  applyPointAdd(index, delta) {
-    if (!Number.isSafeInteger(index) || index < this.leftBound || index > this.rightBound) {
+  applyRangeAdd(queryLeft, queryRight, delta) {
+    if (
+      !Number.isSafeInteger(queryLeft) ||
+      !Number.isSafeInteger(queryRight) ||
+      queryLeft > queryRight
+    ) {
+      return;
+    }
+    if (queryLeft < this.leftBound || queryRight > this.rightBound) {
       return;
     }
     if (!Number.isSafeInteger(delta) || delta === 0) {
       return;
     }
 
-    const update = (node) => {
-      if (node.left === node.right) {
-        node.sum += delta;
+    const update = (node, left, right) => {
+      if (right < queryLeft || left > queryRight) {
         return;
       }
 
-      const mid = Math.floor((node.left + node.right) / 2);
-      if (index <= mid) {
-        if (!node.leftChild) {
-          node.leftChild = this.#createNode(node.left, mid, node.depth + 1, node.id);
+      if (queryLeft <= left && right <= queryRight) {
+        const length = right - left + 1;
+        node.sum += length * delta;
+        if (left !== right) {
+          node.lazy += delta;
         }
-        update(node.leftChild);
-      } else {
-        if (!node.rightChild) {
-          node.rightChild = this.#createNode(mid + 1, node.right, node.depth + 1, node.id);
-        }
-        update(node.rightChild);
+        return;
       }
 
-      const leftSum = node.leftChild ? node.leftChild.sum : 0;
-      const rightSum = node.rightChild ? node.rightChild.sum : 0;
-      node.sum = leftSum + rightSum;
+      this.#pushLazyImmediate(node);
+
+      const mid = Math.floor((left + right) / 2);
+      if (queryLeft <= mid) {
+        const leftChild = this.#ensureLeftChild(node, mid);
+        update(leftChild, left, mid);
+      }
+      if (queryRight > mid) {
+        const rightChild = this.#ensureRightChild(node, mid);
+        update(rightChild, mid + 1, right);
+      }
+      this.#recompute(node);
     };
 
-    update(this.root);
+    update(this.root, this.leftBound, this.rightBound);
   }
 
   generateRangeQuery(queryLeft, queryRight) {
@@ -188,6 +270,11 @@ class SparseSegTreeTracer {
     };
 
     const query = (node, left, right) => {
+      if (right < queryLeft || left > queryRight) {
+        emit(`No overlap for [${left}, ${right}]`, 4, node, { contribution: 0 });
+        return 0;
+      }
+
       if (!node) {
         emit(
           `Node [${left}, ${right}] was never created, contribution is 0`,
@@ -200,23 +287,20 @@ class SparseSegTreeTracer {
 
       emit(`Visit materialized node [${left}, ${right}] with sum=${node.sum}`, 1, node);
 
-      if (right < queryLeft || left > queryRight) {
-        emit(`No overlap for [${left}, ${right}]`, 2, node, { contribution: 0 });
-        return 0;
-      }
-
       if (queryLeft <= left && right <= queryRight) {
         emit(
           `Total overlap for [${left}, ${right}], contribute ${node.sum}`,
-          3,
+          5,
           node,
           { contribution: node.sum },
         );
         return node.sum;
       }
 
+      this.#pushLazy(node, emit);
+
       const mid = Math.floor((left + right) / 2);
-      emit(`Partial overlap at [${left}, ${right}], recurse both halves`, 4, node);
+      emit(`Partial overlap at [${left}, ${right}], recurse both halves`, 6, node);
 
       const leftPart = query(node.leftChild, left, mid);
       const rightPart = query(node.rightChild, mid + 1, right);
@@ -224,7 +308,7 @@ class SparseSegTreeTracer {
 
       emit(
         `Combine [${left}, ${right}] => ${leftPart} + ${rightPart} = ${total}`,
-        5,
+        6,
         node,
         { contribution: total },
       );
@@ -239,6 +323,33 @@ class SparseSegTreeTracer {
 
     return { events, result };
   }
+
+  getPointValue(index) {
+    if (!Number.isSafeInteger(index) || index < this.leftBound || index > this.rightBound) {
+      return 0;
+    }
+
+    const queryPoint = (node, left, right, carry) => {
+      if (index < left || index > right) {
+        return 0;
+      }
+      if (!node) {
+        return carry;
+      }
+      if (left === right) {
+        return node.sum + carry;
+      }
+
+      const nextCarry = carry + node.lazy;
+      const mid = Math.floor((left + right) / 2);
+      if (index <= mid) {
+        return queryPoint(node.leftChild, left, mid, nextCarry);
+      }
+      return queryPoint(node.rightChild, mid + 1, right, nextCarry);
+    };
+
+    return queryPoint(this.root, this.leftBound, this.rightBound, 0);
+  }
 }
 
 const elements = {
@@ -249,8 +360,6 @@ const elements = {
   boundRight: document.getElementById("boundRight"),
   resetTreeBtn: document.getElementById("resetTreeBtn"),
   opType: document.getElementById("opType"),
-  pointIndexWrap: document.getElementById("pointIndexWrap"),
-  pointIndex: document.getElementById("pointIndex"),
   deltaWrap: document.getElementById("deltaWrap"),
   deltaValue: document.getElementById("deltaValue"),
   leftWrap: document.getElementById("leftWrap"),
@@ -277,7 +386,7 @@ const elements = {
 const state = {
   speedMs: Number(elements.speedRange.value),
   tracer: null,
-  pointValues: new Map(),
+  probeIndices: new Set(),
   lastQueryResult: null,
   lastSnapshot: null,
   lastActiveNodeId: null,
@@ -291,32 +400,52 @@ const helpers = createRuntimeHelpers({
 });
 let operationRunner = null;
 const MAX_INITIAL_VALUES = 24;
+const MAX_PROBE_POINTS = 120;
+
+function registerProbeIndex(index) {
+  if (!Number.isSafeInteger(index)) {
+    return;
+  }
+  if (index < state.leftBound || index > state.rightBound) {
+    return;
+  }
+  if (!state.probeIndices.has(index) && state.probeIndices.size >= MAX_PROBE_POINTS) {
+    return;
+  }
+  state.probeIndices.add(index);
+}
+
+function registerProbeRange(left, right) {
+  registerProbeIndex(left);
+  registerProbeIndex(right);
+  registerProbeIndex(Math.floor((left + right) / 2));
+}
 
 function renderPoints() {
   elements.pointStrip.innerHTML = "";
-  const entries = Array.from(state.pointValues.entries()).sort((a, b) => a[0] - b[0]);
-
-  if (entries.length === 0) {
+  if (!state.tracer) {
     const message = document.createElement("p");
     message.className = "empty-state";
-    message.textContent = "No materialized points yet. Run point updates to create sparse nodes.";
+    message.textContent = "Reset or load the tree to start probing sample indices.";
     elements.pointStrip.appendChild(message);
     return;
   }
 
-  const visibleEntries = entries.slice(0, 120);
-  for (const [index, value] of visibleEntries) {
+  const indices = Array.from(state.probeIndices).sort((a, b) => a - b);
+  if (indices.length === 0) {
+    const message = document.createElement("p");
+    message.className = "empty-state";
+    message.textContent = "No probe points selected yet.";
+    elements.pointStrip.appendChild(message);
+    return;
+  }
+
+  for (const index of indices) {
+    const value = state.tracer.getPointValue(index);
     const cell = document.createElement("div");
     cell.className = "point-cell";
     cell.innerHTML = `<span class="idx">i=${index}</span><span class="val">${value}</span>`;
     elements.pointStrip.appendChild(cell);
-  }
-
-  if (entries.length > visibleEntries.length) {
-    const message = document.createElement("p");
-    message.className = "empty-state";
-    message.textContent = `Showing first ${visibleEntries.length} materialized points out of ${entries.length}.`;
-    elements.pointStrip.appendChild(message);
   }
 }
 
@@ -427,6 +556,9 @@ function renderTree(snapshot, activeNodeId = null) {
 
     const card = document.createElement("div");
     card.className = "node-card tree-node";
+    if (node.lazy !== 0) {
+      card.classList.add("has-lazy");
+    }
     if (node.id === activeNodeId) {
       card.classList.add("active");
     }
@@ -439,7 +571,8 @@ function renderTree(snapshot, activeNodeId = null) {
     card.innerHTML = `
       <div class="node-head">#${node.id} [${node.left},${node.right}]</div>
       <div class="node-sum">sum: ${node.sum}</div>
-      <div class="node-lazy">${leftChildLabel} | ${rightChildLabel}</div>
+      <div class="node-lazy">lazy: ${node.lazy}</div>
+      <div class="node-children">${leftChildLabel} | ${rightChildLabel}</div>
     `;
 
     diagram.appendChild(card);
@@ -522,8 +655,6 @@ function syncInputBounds() {
   const min = String(state.leftBound);
   const max = String(state.rightBound);
 
-  elements.pointIndex.min = min;
-  elements.pointIndex.max = max;
   elements.leftIndex.min = min;
   elements.leftIndex.max = max;
   elements.rightIndex.min = min;
@@ -546,29 +677,25 @@ function loadTree(left, right, initialValues = []) {
   state.leftBound = left;
   state.rightBound = right;
   state.tracer = new SparseSegTreeTracer(left, right);
-  state.pointValues = new Map();
+  state.probeIndices = new Set();
   for (let offset = 0; offset < initialValues.length; offset += 1) {
     const value = initialValues[offset];
     if (value === 0) {
       continue;
     }
     const index = left + offset;
-    state.tracer.applyPointAdd(index, value);
-    state.pointValues.set(index, value);
+    state.tracer.applyRangeAdd(index, index, value);
+    registerProbeIndex(index);
   }
+  registerProbeRange(left, right);
   state.lastQueryResult = null;
 
   syncInputBounds();
 
-  const midpoint = Math.floor((left + right) / 2);
-  const pointCandidate = elements.pointIndex.valueAsNumber;
   const leftCandidate = elements.leftIndex.valueAsNumber;
   const rightCandidate = elements.rightIndex.valueAsNumber;
   const defaultRight = Math.min(right, left + Math.floor((right - left) / 4));
 
-  elements.pointIndex.value = String(
-    clampToBounds(Number.isFinite(pointCandidate) ? pointCandidate : midpoint),
-  );
   elements.leftIndex.value = String(
     clampToBounds(Number.isFinite(leftCandidate) ? leftCandidate : left),
   );
@@ -588,13 +715,10 @@ function loadTree(left, right, initialValues = []) {
   helpers.clearCodeHighlights();
 
   const initialCount = initialValues.length;
-  const seededCount = state.pointValues.size;
   const message =
     initialCount === 0
       ? `Sparse tree reset for universe [${left}, ${right}].`
-      : seededCount === 0
-        ? `Sparse tree loaded for [${left}, ${right}] with ${initialCount} initial values (all zero).`
-        : `Sparse tree loaded for [${left}, ${right}] with ${initialCount} initial values (${seededCount} non-zero).`;
+      : `Sparse tree loaded for [${left}, ${right}] with ${initialCount} initial values.`;
   helpers.updateStatus(message);
   helpers.appendLog(message, "ok");
 }
@@ -654,10 +778,9 @@ function handleRandomInitialValues() {
 function handleOperationTypeChange() {
   const isUpdate = elements.opType.value === "update";
 
-  elements.pointIndexWrap.style.display = isUpdate ? "flex" : "none";
   elements.deltaWrap.style.display = isUpdate ? "flex" : "none";
-  elements.leftWrap.style.display = isUpdate ? "none" : "flex";
-  elements.rightWrap.style.display = isUpdate ? "none" : "flex";
+  elements.leftWrap.style.display = "flex";
+  elements.rightWrap.style.display = "flex";
 
   helpers.focusCodePanel(elements.opType.value);
   helpers.clearCodeHighlights();
@@ -668,22 +791,12 @@ function setOperationType(opType) {
   handleOperationTypeChange();
   helpers.updateStatus(
     opType === "update"
-      ? "Shortcut: switched to Point Add Update mode."
+      ? "Shortcut: switched to Range Add Update mode."
       : "Shortcut: switched to Range Sum Query mode.",
   );
 }
 
-function validatePointIndex(index) {
-  if (!Number.isSafeInteger(index)) {
-    return "Point index must be an integer.";
-  }
-  if (index < state.leftBound || index > state.rightBound) {
-    return `Point index must be within [${state.leftBound}, ${state.rightBound}].`;
-  }
-  return null;
-}
-
-function validateQueryRange(left, right) {
+function validateRange(left, right) {
   if (!Number.isSafeInteger(left) || !Number.isSafeInteger(right)) {
     return "L and R must be integers.";
   }
@@ -705,17 +818,18 @@ function prepareOperation() {
   }
 
   const opType = elements.opType.value;
+  const left = elements.leftIndex.valueAsNumber;
+  const right = elements.rightIndex.valueAsNumber;
+  const rangeError = validateRange(left, right);
+  if (rangeError) {
+    helpers.updateStatus(rangeError);
+    helpers.appendLog(rangeError);
+    return null;
+  }
+  registerProbeRange(left, right);
 
   if (opType === "update") {
-    const index = elements.pointIndex.valueAsNumber;
     const delta = elements.deltaValue.valueAsNumber;
-
-    const indexError = validatePointIndex(index);
-    if (indexError) {
-      helpers.updateStatus(indexError);
-      helpers.appendLog(indexError);
-      return null;
-    }
 
     if (!Number.isSafeInteger(delta)) {
       const message = "Delta must be an integer.";
@@ -724,69 +838,34 @@ function prepareOperation() {
       return null;
     }
 
-    const trace = state.tracer.generatePointAdd(index, delta);
-    const nextPoints = new Map(state.pointValues);
-    const nextValue = (nextPoints.get(index) ?? 0) + delta;
-    if (nextValue === 0) {
-      nextPoints.delete(index);
-    } else {
-      nextPoints.set(index, nextValue);
-    }
+    const trace = state.tracer.generateRangeAdd(left, right, delta);
 
     return {
       opType,
       events: trace.events,
-      summary: `Update applied: a[${index}] += ${delta}`,
-      nextPoints,
+      summary: `Update applied: added ${delta} to [${left}, ${right}]`,
     };
-  }
-
-  const left = elements.leftIndex.valueAsNumber;
-  const right = elements.rightIndex.valueAsNumber;
-  const rangeError = validateQueryRange(left, right);
-  if (rangeError) {
-    helpers.updateStatus(rangeError);
-    helpers.appendLog(rangeError);
-    return null;
   }
 
   const trace = state.tracer.generateRangeQuery(left, right);
 
-  let naive = 0;
-  for (const [index, value] of state.pointValues.entries()) {
-    if (index >= left && index <= right) {
-      naive += value;
-    }
-  }
-
   return {
     opType,
     events: trace.events,
-    summary: `Query result for [${left}, ${right}] is ${trace.result} (naive: ${naive})`,
+    summary: `Query result for [${left}, ${right}] is ${trace.result}`,
     result: trace.result,
-    naive,
   };
 }
 
 function finalizePendingOperation(meta) {
-  if (meta.nextPoints) {
-    state.pointValues = meta.nextPoints;
-  }
   if (typeof meta.result === "number") {
     state.lastQueryResult = meta.result;
   }
 
-  const mismatch =
-    typeof meta.result === "number" &&
-    typeof meta.naive === "number" &&
-    meta.result !== meta.naive;
-
-  const text = mismatch
-    ? `${meta.summary} (warning: naive check is ${meta.naive})`
-    : meta.summary;
+  const text = meta.summary;
 
   helpers.updateStatus(text);
-  helpers.appendLog(text, mismatch ? "" : "ok");
+  helpers.appendLog(text, "ok");
 
   renderPoints();
   renderTree(state.tracer.snapshot(), null);

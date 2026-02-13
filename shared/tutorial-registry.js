@@ -57,11 +57,11 @@ export const tutorialRegistry = Object.freeze({
     route: "sparse_segment_tree/",
     title: "Sparse Segment Tree Lab",
     description:
-      "Interactive Sparse Segment Tree tutorial. Explore dynamic node creation for point updates and range sum queries over huge index spaces.",
-    landingTitle: "Sparse Segment Tree",
+      "Interactive Sparse Segment Tree tutorial with lazy propagation. Explore dynamic node creation for range updates and range sum queries over huge index spaces.",
+    landingTitle: "Sparse Segment Tree + Lazy Propagation",
     landingDescription:
-      "Dynamic segment tree for huge index spaces. Nodes are created lazily only along touched paths, so untouched ranges consume zero extra memory.",
-    landingTags: ["dynamic-nodes", "point-update", "range-query"],
+      "Dynamic segment tree for huge index spaces with lazy propagation. Nodes are created only where recursion reaches, while untouched ranges stay implicit.",
+    landingTags: ["dynamic-nodes", "range-add", "range-query", "lazy-propagation"],
     fontHref:
       "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap",
     tagName: "sparse-segment-tree-tutorial-app",
