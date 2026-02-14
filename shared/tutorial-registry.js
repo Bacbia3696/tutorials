@@ -168,7 +168,7 @@ export const tutorialRegistry = Object.freeze({
   }),
   convex_hull: freezeTutorial({
     id: 'convex_hull',
-    category: 'graph',
+    category: 'geometry',
     route: 'convex_hull/',
     title: 'Convex Hull Tutorial Lab',
     description:
@@ -184,7 +184,7 @@ export const tutorialRegistry = Object.freeze({
   }),
   line_sweep: freezeTutorial({
     id: 'line_sweep',
-    category: 'graph',
+    category: 'geometry',
     route: 'line_sweep/',
     title: 'Line Sweep Tutorial Lab',
     description:
@@ -239,6 +239,7 @@ export const tutorialList = Object.freeze(
 export const tutorialGroups = Object.freeze({
   ds: Object.freeze(tutorialList.filter((tutorial) => tutorial.category === 'ds')),
   graph: Object.freeze(tutorialList.filter((tutorial) => tutorial.category === 'graph')),
+  geometry: Object.freeze(tutorialList.filter((tutorial) => tutorial.category === 'geometry')),
 });
 
 export function getTutorialConfig(tutorialId) {

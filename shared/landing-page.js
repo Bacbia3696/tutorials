@@ -1,8 +1,21 @@
-import { tutorialGroups, tutorialList } from './tutorial-registry.js';
+function resolveCacheBustedUrl(relativePath) {
+  const url = new URL(relativePath, import.meta.url);
+  const sourceUrl = new URL(import.meta.url);
+  const cacheBust = sourceUrl.searchParams.get('v');
+  if (cacheBust) {
+    url.searchParams.set('v', cacheBust);
+  }
+  return url.href;
+}
+
+const { tutorialGroups, tutorialList } = await import(
+  resolveCacheBustedUrl('./tutorial-registry.js'),
+);
 
 const categoryBadgeLabel = Object.freeze({
   ds: 'Data Structure',
   graph: 'Graph Algorithm',
+  geometry: 'Computational Geometry',
 });
 
 function updateHeroBadge() {
@@ -71,6 +84,7 @@ function renderCategoryGrid(gridSelector, tutorials) {
 function renderLandingPage() {
   updateHeroBadge();
   renderCategoryGrid('#dsGrid', tutorialGroups.ds);
+  renderCategoryGrid('#geometryGrid', tutorialGroups.geometry);
   renderCategoryGrid('#graphGrid', tutorialGroups.graph);
 }
 

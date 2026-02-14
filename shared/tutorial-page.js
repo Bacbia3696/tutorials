@@ -43,6 +43,19 @@ function ensureStylesheet(href, key, shouldCacheBust = true) {
   return link;
 }
 
+function ensureFavicon(href) {
+  let link = document.querySelector('link[rel="icon"][data-tutorial-asset="favicon"]');
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.dataset.tutorialAsset = 'favicon';
+    document.head.appendChild(link);
+  }
+  link.href = toVersionedUrl(href);
+  return link;
+}
+
 function ensureMetaDescription(content) {
   let meta = document.querySelector('meta[name="description"]');
   if (!meta) {
@@ -92,6 +105,7 @@ function bootstrapTutorialPage(tutorialId) {
 
   ensurePreconnectLink('https://fonts.googleapis.com');
   ensurePreconnectLink('https://fonts.gstatic.com', true);
+  ensureFavicon('../favicon.svg');
 
   if (config.fontHref) {
     ensureStylesheet(config.fontHref, 'font', false);

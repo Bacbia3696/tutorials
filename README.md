@@ -2,7 +2,7 @@
 
 **Live Site:** https://bacbia3696.github.io/tutorials/
 
-Interactive, browser-based labs for learning core data structures and graph algorithms:
+Interactive, browser-based labs for learning core data structures, graph algorithms, and computational geometry:
 - `trie/`: insert/search/prefix/delete tracing for Trie
 - `kmp/`: LPS construction + Knuth-Morris-Pratt string matching trace
 - `segment_tree/`: range update and range query with lazy propagation

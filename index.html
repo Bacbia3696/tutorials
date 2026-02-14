@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Algorithm Tutorials Playground</title>
     <meta name="description"
-        content="Interactive, browser-based labs for learning core data structures and graph algorithms. Step-by-step tracing for Trie, KMP, Segment Tree, Sparse Segment Tree, Fenwick Tree, Disjoint Set Union, Dijkstra, Bellman-Ford, Kruskal, Convex Hull, Line Sweep, Eulerian Path, and Topological Sort." />
+        content="Interactive, browser-based labs for learning core data structures, graph algorithms, and computational geometry. Step-by-step tracing for Trie, KMP, Segment Tree, Sparse Segment Tree, Fenwick Tree, Disjoint Set Union, Dijkstra, Bellman-Ford, Kruskal, Convex Hull, Line Sweep, Eulerian Path, and Topological Sort." />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -32,6 +33,8 @@
             --text-muted: #6b7280;
             --accent-ds: #6ee7b7;
             --accent-ds-dim: rgba(110, 231, 183, 0.12);
+            --accent-geometry: #f59e0b;
+            --accent-geometry-dim: rgba(245, 158, 11, 0.12);
             --accent-graph: #93c5fd;
             --accent-graph-dim: rgba(147, 197, 253, 0.12);
             --gradient-hero: linear-gradient(135deg,
@@ -151,6 +154,39 @@
             line-height: 1.6;
         }
 
+        .top-right-links {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 3;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: color var(--transition), border-color var(--transition),
+                background var(--transition), transform var(--transition);
+        }
+
+        .social-link:hover {
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .social-link:focus-visible {
+            outline: 2px solid var(--accent-graph);
+            outline-offset: 2px;
+        }
+
         /* ── Section headers ── */
         .section-header {
             display: flex;
@@ -232,6 +268,12 @@
                     transparent 60%);
         }
 
+        .card[data-category="geometry"]::before {
+            background: linear-gradient(135deg,
+                    rgba(245, 158, 11, 0.05),
+                    transparent 60%);
+        }
+
         .card-badge {
             display: inline-flex;
             align-self: flex-start;
@@ -252,6 +294,11 @@
         .card[data-category="graph"] .card-badge {
             background: var(--accent-graph-dim);
             color: var(--accent-graph);
+        }
+
+        .card[data-category="geometry"] .card-badge {
+            background: var(--accent-geometry-dim);
+            color: var(--accent-geometry);
         }
 
         .card h3 {
@@ -322,6 +369,16 @@
         }
 
         @media (max-width: 720px) {
+            .top-right-links {
+                top: 14px;
+                right: 14px;
+            }
+
+            .social-link {
+                width: 40px;
+                height: 40px;
+            }
+
             .hero {
                 padding: 56px 0 36px;
             }
@@ -336,6 +393,16 @@
 <body>
     <div class="bg-grid"></div>
     <div class="bg-glow"></div>
+    <div class="top-right-links">
+        <a class="social-link" href="https://github.com/Bacbia3696/tutorials" target="_blank"
+            rel="noopener noreferrer" aria-label="Open GitHub repository">
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+                fill="currentColor">
+                <path
+                    d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.57.1.78-.25.78-.56 0-.28-.01-1.03-.02-2.03-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.67 1.24 3.32.95.1-.74.4-1.24.72-1.53-2.56-.29-5.26-1.28-5.26-5.72 0-1.26.45-2.3 1.18-3.1-.12-.29-.51-1.47.11-3.06 0 0 .97-.31 3.17 1.18a11.06 11.06 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.77.11 3.06.73.8 1.18 1.84 1.18 3.1 0 4.45-2.7 5.42-5.27 5.71.41.36.78 1.08.78 2.18 0 1.58-.01 2.86-.01 3.25 0 .31.2.67.79.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+            </svg>
+        </a>
+    </div>
 
     <div class="container">
         <!-- Hero -->
@@ -344,7 +411,7 @@
             <h1>Algorithm Tutorials Playground</h1>
             <p>
                 Step-by-step animated visualizations for core data structures and
-                graph algorithms. Watch each operation unfold, trace the pseudocode,
+                graph algorithms, plus computational geometry. Watch each operation unfold, trace the pseudocode,
                 and build real intuition.
             </p>
         </header>
@@ -354,6 +421,12 @@
             <h2>Data Structures</h2>
         </div>
         <div id="dsGrid" class="grid"></div>
+
+        <!-- Computational Geometry -->
+        <div class="section-header">
+            <h2>Computational Geometry</h2>
+        </div>
+        <div id="geometryGrid" class="grid"></div>
 
         <!-- Graph Algorithms -->
         <div class="section-header">
@@ -372,7 +445,13 @@
             </p>
         </footer>
     </div>
-    <script type="module" src="./shared/landing-page.js"></script>
+    <script type="module">
+        const cacheBust = (window.__tutorialCacheBust ?? Date.now().toString());
+        window.__tutorialCacheBust = cacheBust;
+        const landingScriptUrl = new URL('./shared/landing-page.js', window.location.href);
+        landingScriptUrl.searchParams.set('v', cacheBust);
+        import(landingScriptUrl.href);
+    </script>
 </body>
 
 </html>
